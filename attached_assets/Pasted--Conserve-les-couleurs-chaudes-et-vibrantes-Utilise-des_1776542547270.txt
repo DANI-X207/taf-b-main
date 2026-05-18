@@ -1,0 +1,39 @@
+- Conserve les couleurs chaudes et vibrantes.
+   - Utilise des composants modernes (cards, modals, navbar fixe, footer minimaliste).
+
+2. **Gestion des utilisateurs**
+   - Chaque visiteur doit créer un compte avant d’accéder au catalogue.
+   - Si l’utilisateur a déjà un compte, il peut se connecter directement.
+   - Implémente un **système de cookies sécurisé** :
+     - Les cookies gardent la session active du client (nom, email, ID utilisateur).
+     - Expiration configurable (ex. 7 jours).
+     - Utilise `httpOnly`, `secure`, et `SameSite=strict` pour la sécurité.
+   - Stocke les comptes dans la base de données (SQLite ou MongoDB).
+   - Validation des champs et messages d’erreur clairs.
+
+3. **Espace administrateur**
+   - Interface distincte pour l’administrateur (layout différent du client).
+   - Accès via un bouton **Connexion Admin** avec mot de passe : `TAF1-FLEMME`.
+   - L’admin peut :
+     - Ajouter un livre (image, description, prix, catégorie, infos supplémentaires).
+     - Modifier ou supprimer un livre.
+     - Gérer les commandes et les publicités.
+   - Les livres ajoutés apparaissent automatiquement dans la bonne catégorie.
+
+4. **Fonctionnalités client**
+   - Catalogue, panier, avis clients, commande avec annulation possible dans les 5 minutes.
+   - Envoi automatique d’un email à `moussokiexauce7@gmail.com` avec les infos du produit et du client.
+   - Génération d’un reçu PDF téléchargeable.
+   - Vérification de la zone livrable (Potopoto → Saint Exupérie, Présidence, OSH, CHU).
+   - Hors zone = message d’erreur et blocage de la commande.
+
+5. **Optimisation et déploiement**
+   - Supprime tous les éléments inutiles de webdev.
+   - Rends le projet déployable sur toutes les plateformes (Replit, Vercel, Netlify).
+   - Ajoute une option pour **télécharger le code source complet** du projet modifié (zip).
+   - Documente chaque module dans le code.
+
+6. **Extras**
+   - Système d’avis clients (1–5 étoiles + commentaire).
+   - Sécurité renforcée (hash des mots de passe, cookies sécurisés, validation des formulaires).
+   - Page de suivi de commande en temps réel (statuts : En attente → Confirmée → En livraison → Livrée).

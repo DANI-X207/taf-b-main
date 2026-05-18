@@ -1,0 +1,8 @@
+.pythonlibs/
+data/
+__pycache__/
+*.pyc
+*.pyo
+node_modules/
+.env
+

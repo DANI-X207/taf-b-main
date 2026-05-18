@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/png" href="/img/ICON-1.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Librairie Magma — Mon Compte</title>
+<link rel="stylesheet" href="/magma-fixes.css">
+<style>
+body { margin:0; min-height:100vh; background:linear-gradient(135deg,#fff7ef,#f3f1f1); font-family:'Trebuchet MS',Arial,sans-serif; color:#2d2d2d; }
+.mc-wrap { max-width:780px; margin:60px auto; padding:0 18px; }
+.mc-back { display:inline-flex; align-items:center; gap:6px; background:#000000; color:#fff; text-decoration:none; padding:10px 18px; border-radius:999px; font-weight:700; font-size:.9rem; margin-bottom:18px; }
+.mc-back:hover { background:#3a3850; }
+.mc-card { background:#fff; border-radius:18px; padding:32px; box-shadow:0 18px 60px rgba(0,0,0,.12); }
+.mc-card h1 { margin:0 0 6px; color:#2b293a; font-size:1.8rem; }
+.mc-card .sub { color:#888; font-size:.9rem; margin-bottom:24px; }
+.mc-avatar { width:72px; height:72px; border-radius:50%; background:#ff690c; color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.8rem; font-weight:700; margin-bottom:18px; }
+.mc-list { list-style:none; padding:0; margin:0; }
+.mc-list li { display:flex; justify-content:space-between; gap:14px; padding:14px 0; border-bottom:1px solid #eee; }
+.mc-list li:last-child { border-bottom:0; }
+.mc-list .lbl { color:#888; font-size:.85rem; }
+.mc-list .val { color:#2b293a; font-weight:600; text-align:right; word-break:break-word; }
+.mc-loading, .mc-error { color:#888; padding:14px; text-align:center; }
+.mc-error { color:#b42318; }
+.mc-logout { display:block; width:100%; margin-top:22px; padding:13px 18px; background:#b42318; color:#fff; border:none; border-radius:999px; font-weight:700; font-size:.95rem; cursor:pointer; transition:background .15s; font-family:inherit; }
+.mc-logout:hover { background:#8f1a13; }
+</style>
+</head>
+<body>
+<div class="mc-wrap">
+  <a href="/" class="mc-back">← Retour à l'accueil</a>
+  <div class="mc-card" id="mc-card">
+    <div class="mc-loading">Chargement…</div>
+  </div>
+</div>
+<script>
+(function() {
+  function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function fmtDate(s){if(!s)return"—";var d=new Date(s.indexOf("T")!==-1?s:s+"Z");return isNaN(d)?s:d.toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});}
+  
+  var currentUser = null;
+
+  function renderViewMode(card) {
+    var u = currentUser;
+    var avatarHtml = u.avatar ? '<img src="'+esc(u.avatar)+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">' : esc((u.name||u.email||"?").charAt(0).toUpperCase());
+    card.innerHTML = 
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+        '<div class="mc-avatar">'+avatarHtml+'</div>' +
+        '<button type="button" id="mc-edit-btn" style="background:#f0f0f0;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.85rem;transition:background .2s;">✏️ Éditer profil</button>' +
+      '</div>'+
+      '<h1>'+esc(u.name||"Mon compte")+'</h1>'+
+      '<p class="sub">Vos informations personnelles enregistrées sur Librairie Magma.</p>'+
+      '<ul class="mc-list">'+
+        '<li><span class="lbl">Nom complet</span><span class="val">'+esc(u.name||"—")+'</span></li>'+
+        '<li><span class="lbl">Email</span><span class="val">'+esc(u.email||"—")+'</span></li>'+
+        '<li><span class="lbl">Téléphone</span><span class="val">'+esc(u.phone||"—")+'</span></li>'+
+        '<li><span class="lbl">Date d\'inscription</span><span class="val">'+esc(fmtDate(u.created_at))+'</span></li>'+
+      '</ul>'+
+      '<button type="button" class="mc-logout" id="mc-logout-btn">Se déconnecter</button>';
+      
+    document.getElementById("mc-edit-btn").addEventListener("click", function() { renderEditMode(card); });
+    document.getElementById("mc-logout-btn").addEventListener("click", handleLogout);
+  }
+
+  function renderEditMode(card) {
+    var u = currentUser;
+    var avatarHtml = u.avatar ? '<img src="'+esc(u.avatar)+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">' : '<span>'+esc((u.name||u.email||"?").charAt(0).toUpperCase())+'</span>';
+    card.innerHTML = 
+      '<form id="mc-edit-form">'+
+        '<div style="display:flex;gap:18px;align-items:center;margin-bottom:24px;">' +
+          '<div class="mc-avatar" style="margin-bottom:0;position:relative;cursor:pointer;overflow:hidden;" id="mc-avatar-upload-box" title="Changer la photo">'+
+            avatarHtml +
+            '<div style="position:absolute;inset:0;background:rgba(0,0,0,.5);color:#fff;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;" id="mc-avatar-overlay">📷</div>'+
+          '</div>' +
+          '<input type="file" id="mc-avatar-input" accept="image/*" style="display:none;">'+
+          '<div><h2 style="margin:0;font-size:1.2rem;color:#2b293a;">Modifier profil</h2><p style="margin:0;color:#888;font-size:.85rem;">Mettez à jour vos informations.</p></div>'+
+        '</div>'+
+        '<div id="mc-edit-error" style="color:#b42318;background:#fee4e2;padding:10px;border-radius:6px;font-size:.85rem;margin-bottom:14px;display:none;"></div>'+
+        '<div style="margin-bottom:14px;">'+
+          '<label style="display:block;font-size:.85rem;color:#555;margin-bottom:6px;">Nom complet</label>'+
+          '<input type="text" name="name" value="'+esc(u.name)+'" required style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-family:inherit;box-sizing:border-box;">'+
+        '</div>'+
+        '<div style="margin-bottom:14px;">'+
+          '<label style="display:block;font-size:.85rem;color:#555;margin-bottom:6px;">Email</label>'+
+          '<input type="email" name="email" value="'+esc(u.email)+'" required style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-family:inherit;box-sizing:border-box;">'+
+        '</div>'+
+        '<div style="margin-bottom:24px;">'+
+          '<label style="display:block;font-size:.85rem;color:#555;margin-bottom:6px;">Téléphone</label>'+
+          '<input type="text" name="phone" value="'+esc(u.phone)+'" required style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-family:inherit;box-sizing:border-box;">'+
+        '</div>'+
+        '<div style="display:flex;gap:10px;">'+
+          '<button type="button" id="mc-cancel-btn" style="flex:1;background:#f0f0f0;color:#333;border:none;padding:12px;border-radius:6px;cursor:pointer;font-weight:600;">Annuler</button>'+
+          '<button type="submit" id="mc-save-btn" style="flex:1;background:#ff690c;color:#fff;border:none;padding:12px;border-radius:6px;cursor:pointer;font-weight:600;">Enregistrer</button>'+
+        '</div>'+
+      '</form>';
+
+    var currentAvatarBase64 = u.avatar || "";
+
+    var uploadBox = document.getElementById("mc-avatar-upload-box");
+    var overlay = document.getElementById("mc-avatar-overlay");
+    var fileInput = document.getElementById("mc-avatar-input");
+    
+    uploadBox.addEventListener("mouseenter", function() { overlay.style.opacity = "1"; });
+    uploadBox.addEventListener("mouseleave", function() { overlay.style.opacity = "0"; });
+    uploadBox.addEventListener("click", function() { fileInput.click(); });
+    
+    fileInput.addEventListener("change", function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(evt) {
+        currentAvatarBase64 = evt.target.result;
+        uploadBox.innerHTML = '<img src="'+currentAvatarBase64+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">' +
+          '<div style="position:absolute;inset:0;background:rgba(0,0,0,.5);color:#fff;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;" id="mc-avatar-overlay">📷</div>';
+        overlay = document.getElementById("mc-avatar-overlay");
+        uploadBox.addEventListener("mouseenter", function() { overlay.style.opacity = "1"; });
+        uploadBox.addEventListener("mouseleave", function() { overlay.style.opacity = "0"; });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById("mc-cancel-btn").addEventListener("click", function() { renderViewMode(card); });
+    document.getElementById("mc-edit-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var btn = document.getElementById("mc-save-btn");
+      var err = document.getElementById("mc-edit-error");
+      btn.disabled = true; btn.textContent = "Enregistrement…";
+      err.style.display = "none";
+      
+      var payload = {
+        name: this.name.value,
+        email: this.email.value,
+        phone: this.phone.value,
+        avatar: currentAvatarBase64
+      };
+      
+      fetch("/api/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function(r){return r.json().then(function(d){return {ok:r.ok, data:d};});})
+        .then(function(res){
+          if (!res.ok) throw new Error(res.data.error || "Erreur de modification");
+          currentUser = res.data.user;
+          renderViewMode(card);
+        })
+        .catch(function(e){
+          err.textContent = e.message;
+          err.style.display = "block";
+          btn.disabled = false; btn.textContent = "Enregistrer";
+        });
+    });
+  }
+
+  function handleLogout() {
+    var btn = document.getElementById("mc-logout-btn");
+    btn.disabled=true;btn.textContent="Déconnexion…";
+    fetch("/api/auth/logout",{method:"POST",credentials:"same-origin"})
+      .then(function(){
+        document.cookie="magma_sid=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        window.location.href="/";
+      })
+      .catch(function(){btn.disabled=false;btn.textContent="Se déconnecter";});
+  }
+
+  fetch("/api/auth/status").then(function(r){return r.json();}).then(function(data){
+    var card=document.getElementById("mc-card");
+    if(!data.authenticated||!data.user){card.innerHTML='<p class="mc-error">Vous n\'êtes pas connecté. <a href="/login.html">Se connecter</a></p>';return;}
+    currentUser = data.user;
+    renderViewMode(card);
+  }).catch(function(){
+    document.getElementById("mc-card").innerHTML='<p class="mc-error">Impossible de charger les informations du compte.</p>';
+  });
+})();
+</script>
+</body>
+</html>

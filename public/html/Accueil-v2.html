@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/png" href="/img/ICON-1.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mayombe — Accueil</title>
+<!-- skip-inject: magma-fixes.css -->
+<script>window.MAGMA_HOMEPAGE_CUSTOM=true;</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#f2f1f1 !important;min-height:100vh}
+  body{font-family:Verdana,Arial,Helvetica,sans-serif;color:#2d2d2d;line-height:1.5}
+  a{text-decoration:none;color:inherit}
+  img{display:block;max-width:100%}
+
+  /* Hide floating cart badge injected by bookstore.js (we have our own inline badge) */
+  #magma-cart-badge{display:none !important}
+
+  /* ===== HEADER ===== */
+  .topbar{background:#000000;color:#fff;height:56px;display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;flex-shrink:0;text-decoration:none;color:inherit}
+  .logo-mark{width:28px;height:28px;background:#ff690c;border-radius:6px;display:grid;place-items:center;font-size:14px}
+  .logo-img{height:42px;width:auto;display:block;object-fit:contain}
+  .search{flex:0 1 300px;height:34px;background:#fff;border-radius:4px;display:flex;align-items:center;padding:0 12px;gap:8px}
+  .search input{flex:1;border:0;outline:0;font-size:13px;color:#2d2d2d;background:transparent;min-width:0}
+  .search button{background:#ff690c;color:#fff;border:0;height:26px;padding:0 12px;border-radius:3px;font-weight:600;cursor:pointer;font-size:12px;flex-shrink:0}
+  .topbar-nav{display:flex;align-items:center;gap:18px;font-size:13px}
+  .topbar-nav a{opacity:.85;white-space:nowrap}.topbar-nav a:hover{opacity:1}
+  .icons{display:flex;align-items:center;gap:14px;margin-left:auto;flex-shrink:0}
+  .icon-btn{color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;position:relative;font-size:12px;text-decoration:none}
+  .icon-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8}
+  .icon-btn .lbl{font-size:12px;opacity:.9}
+  .icon-btn:hover{opacity:.85}
+  .cart-badge{position:absolute;top:-6px;left:12px;background:#ff690c;color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:grid;place-items:center;padding:0 4px}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(rgba(255, 112, 29, 0.78),#ff690c),url('/img/pexels-mikhail-nilov-6970019.png') center/cover no-repeat;height:340px;position:relative;display:flex;align-items:center;padding:0 64px}
+  .hero-card{background:#fff;border-radius:6px;padding:22px 26px;max-width:340px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .hero-card h2{font-size:18px;color:#2b293a;margin-bottom:10px;line-height:1.3}
+  .hero-card p{font-size:12.5px;color:#666;margin-bottom:14px}
+  .btn-orange{display:inline-block;background:#ff690c;color:#fff;border:0;padding:10px 22px;border-radius:3px;font-weight:600;font-size:13px;cursor:pointer;letter-spacing:.3px}
+  .btn-orange:hover{background:#e85a00}
+
+  /* ===== SECTIONS WRAPPER ===== */
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+  section{padding:38px 0}
+  h2.sec-title{font-size:20px;color:#2b293a;margin-bottom:18px;font-weight:700}
+  h3.sec-title{font-size:18px;color:#2b293a;margin-bottom:6px;font-weight:700;text-align:center}
+  .sec-sub{text-align:center;font-size:13px;color:#888;margin-bottom:24px}
+
+  /* ===== CATEGORIES ===== */
+  .cats{display:flex;flex-wrap:wrap;gap:10px}
+  .cat-chip{background:#fff;border:1px solid #e2e2e2;color:#444;padding:8px 18px;border-radius:20px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .cat-chip:hover,.cat-chip.active{background:#ff690c;color:#fff;border-color:#ff690c}
+
+  /* ===== PRODUCT GRID ===== */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .pcard{background:#fff;border-radius:6px;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;display:flex;flex-direction:column}
+  .pcard:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,0,0,.08)}
+  .pcard .thumb{width:100%;aspect-ratio:1/1;background:#f0eee9;display:grid;place-items:center;overflow:hidden}
+  .pcard .thumb img{width:100%;height:100%;object-fit:cover}
+  .pcard .body{padding:10px 12px 14px;flex:1;display:flex;flex-direction:column}
+  .pcard .pname{font-size:12.5px;color:#2d2d2d;font-weight:600;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px}
+  .pcard .pauthor{font-size:11px;color:#888;margin-bottom:8px}
+  .pcard .pprice{font-size:13px;color:#ff690c;font-weight:700;margin-top:auto}
+  .pcard .add-cart{margin-top:8px;width:100%;background:#2b293a;color:#fff;border:0;padding:7px 0;border-radius:3px;font-size:11.5px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:background .15s}
+  .pcard .add-cart:hover{background:#ff690c}
+  .pcard .add-cart:disabled{opacity:.55;cursor:wait}
+  .vitr-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;padding:11px 22px;border-radius:24px;font-weight:600;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transition:opacity .25s;pointer-events:none;z-index:9999}
+  .vitr-toast.show{opacity:1}
+  .vitr-toast.error{background:#dc2626}
+  .pcard .ribbon{position:absolute;top:8px;right:8px;background:rgba(255,105,12,.95);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:3px;letter-spacing:.3px}
+
+  /* ===== ORANGE CTA BANNER ===== */
+  .cta-banner{background:#ff690c;color:#fff;border-radius:6px;padding:28px 36px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-top:8px}
+  .cta-banner h3{font-size:18px;font-weight:700}
+  .cta-banner p{font-size:13px;opacity:.92;max-width:560px}
+  .cta-banner .btn-white{background:#fff;color:#ff690c;border:0;padding:9px 22px;border-radius:3px;font-weight:700;cursor:pointer;font-size:13px}
+
+  /* ===== TWO INFO CARDS ===== */
+  .two-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .info-card{background:#fff;border-radius:6px;padding:22px}
+  .info-card h4{font-size:14.5px;color:#2b293a;margin-bottom:14px;font-weight:700}
+  .info-thumbs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .info-thumb{aspect-ratio:1/1;background:#f0eee9;border-radius:4px;overflow:hidden;display:grid;place-items:center}
+  .info-thumb img{width:100%;height:100%;object-fit:cover}
+  .info-thumb .lbl{font-size:11px;color:#888;text-align:center;padding-top:6px}
+
+  /* ===== HORIZONTAL STRIP ===== */
+  .strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}
+  .strip-item{aspect-ratio:1/1;border-radius:6px;overflow:hidden;background:#ddd}
+  .strip-item img{width:100%;height:100%;object-fit:cover}
+
+  /* ===== DARK PURPLE SECTION ===== */
+  .dark-section{background:#2b293a;color:#fff;padding:38px 0;margin-top:8px;border-radius:6px}
+  .dark-section .sec-title{color:#fff}
+  .dark-section .sec-sub{color:#bbb}
+  .dark-section .pcard{background:#3a3849}
+  .dark-section .pcard .pname{color:#fff}
+  .dark-section .pcard .pauthor{color:#aaa}
+  .dark-section .pcard .thumb{background:#4a4859}
+
+  /* ===== FASHION SECTION ===== */
+  .fashion{background:#1f1d2c;color:#fff;border-radius:6px;padding:36px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
+  .fashion h3{font-size:20px;font-weight:700;margin-bottom:8px}
+  .fashion p{font-size:13px;color:#bbb;margin-bottom:18px;line-height:1.6}
+  .fashion-imgs{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:240px}
+  .fashion-imgs > div{background-size:cover;background-position:center;border-radius:4px}
+  .fashion-dots{display:flex;gap:6px;margin-top:14px;justify-content:flex-end}
+  .fashion-dots span{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.3)}
+  .fashion-dots span.active{background:#ff690c}
+
+  /* ===== BOTTOM TWO INFO ===== */
+  .bottom-info{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .bottom-card{background:#f7f3ec;border-radius:6px;padding:22px;display:flex;align-items:center;gap:18px}
+  .bottom-card .ico{width:60px;height:60px;background:#ff690c;color:#fff;border-radius:6px;display:grid;place-items:center;font-size:24px;flex-shrink:0}
+  .bottom-card h5{font-size:14px;color:#2b293a;margin-bottom:4px;font-weight:700}
+  .bottom-card p{font-size:12px;color:#777}
+
+  /* ===== FOOTER ===== */
+  footer{background:#000000;color:#aaa;padding:48px 0 24px;margin-top:30px}
+  .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:32px}
+  .foot-brand h4{color:#fff;font-size:18px;margin-bottom:8px}
+  .foot-brand p{font-size:12px;color:#888;line-height:1.6}
+  .foot-col h5{color:#fff;font-size:13px;margin-bottom:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .foot-col a{display:block;color:#aaa;font-size:12.5px;padding:4px 0}
+  .foot-col a:hover{color:#ff690c}
+  .newsletter{display:flex;gap:6px;margin-top:8px}
+  .newsletter input{flex:1;padding:8px 10px;border:0;border-radius:3px;background:#2c2a3b;color:#fff;font-size:12px}
+  .newsletter button{background:#ff690c;color:#fff;border:0;padding:0 14px;border-radius:3px;cursor:pointer;font-size:12px;font-weight:600}
+  .copyright{text-align:right;font-size:11px;color:#666;margin-top:32px;padding-top:20px;border-top:1px solid #2c2a3b}
+
+  /* ===== HAMBURGER (mobile) ===== */
+  .menu-toggle{display:none;background:transparent;border:0;color:#fff;cursor:pointer;padding:6px 8px;border-radius:4px;align-items:center;justify-content:center}
+  .menu-toggle svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2}
+  .menu-toggle:hover{background:rgba(255,255,255,.08)}
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width:980px){
+    .grid{grid-template-columns:repeat(3,1fr)}
+    .two-cols,.bottom-info,.fashion{grid-template-columns:1fr}
+    .foot-grid{grid-template-columns:1fr 1fr}
+    .topbar{flex-wrap:wrap;height:auto;row-gap:10px;padding:10px 14px}
+    .topbar .logo{order:1;flex:1 1 auto}
+    .topbar .menu-toggle{display:inline-flex;order:2}
+    .topbar .icons{order:3;margin-left:0;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .topbar .search{order:4;flex:1 1 100%;height:38px}
+    .topbar .topbar-nav{order:5;flex:1 1 100%;flex-direction:column;align-items:stretch;gap:0;background:#1f1d2c;margin:6px -14px -10px;padding:4px 0;display:none}
+    .topbar .topbar-nav.is-open{display:flex}
+    .topbar .topbar-nav a{padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;opacity:1}
+    .topbar .icons .icon-btn .lbl{display:none}
+  }
+  @media (max-width:640px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .strip{grid-template-columns:repeat(3,1fr)}
+    .hero{padding:0 20px;height:280px}
+    .wrap{padding:0 16px}
+    .foot-grid{grid-template-columns:1fr}
+    .topbar{padding:8px 10px}
+    .topbar .logo{font-size:13px}
+    .topbar .logo span:not(.logo-mark){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+    .topbar .search button{padding:0 10px;font-size:11px;height:24px}
+    .topbar .icons{gap:6px}
+    .topbar .icons .icon-btn svg{width:22px;height:22px}
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="topbar">
+  <a href="/" class="logo" aria-label="Librairie Magma"><img class="logo-img" src="/img/Copilot_20260402_080209.png" alt="Librairie Magma"></a>
+  <form class="search" onsubmit="event.preventDefault();window.location='/catalogue.html?q='+encodeURIComponent(this.q.value)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" name="q" placeholder="Rechercher un article…">
+    <button type="submit">Recherche</button>
+  </form>
+  <nav class="topbar-nav">
+    <a href="/">Accueil</a>
+    <a href="/catalogue.html">Mon Magma</a>
+    <a href="/a-propos.html">à propos</a>
+  </nav>
+  <div class="icons">
+    <a class="icon-btn" href="/mon-compte.html" title="Mon compte">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+      <span class="lbl">Compte</span>
+    </a>
+    <a class="icon-btn" href="/panier.html" title="Panier">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+      <span class="cart-badge" id="cart-count">0</span>
+      <span class="lbl">Panier</span>
+    </a>
+    <a class="icon-btn" href="/mes-commandes.html" title="Mes commandes">
+      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>
+      <span class="lbl">Commandes</span>
+    </a>
+    <a class="icon-btn" href="/parametres.html" title="Paramètres">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      <span class="lbl">Paramètres</span>
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-card">
+    <h2>Découvrez nos nouveautés littéraires</h2>
+    <p>Plongez dans une sélection de livres soigneusement choisis pour vous évader.</p>
+    <a class="btn-orange" href="/catalogue.html">Découvrir</a>
+  </div>
+</div>
+
+<!-- MONTHLY SLIDESHOW -->
+<section class="wrap">
+  <div id="monthly-slider" class="monthly-slider" aria-label="Sélection du mois">
+    <div class="ms-track" id="ms-track"></div>
+    <button class="ms-nav ms-prev" type="button" aria-label="Précédent">‹</button>
+    <button class="ms-nav ms-next" type="button" aria-label="Suivant">›</button>
+    <div class="ms-dots" id="ms-dots"></div>
+  </div>
+</section>
+
+<style>
+  .monthly-slider{position:relative;background:#fff;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.08);overflow:hidden;margin:24px 0 8px;min-height:340px}
+  .ms-track{display:flex;transition:transform .55s ease}
+  .ms-slide{flex:0 0 100%;display:grid;grid-template-columns:240px 1fr;gap:28px;padding:32px 36px;align-items:center;min-height:340px;background:linear-gradient(135deg,#fdfaf6 0%,#f3eee8 100%)}
+  .ms-cover{width:240px;height:300px;border-radius:8px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.18);background:#eee}
+  .ms-cover img{width:100%;height:100%;object-fit:cover;display:block}
+  .ms-info .ms-tag{display:inline-block;background:#ff690c;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
+  .ms-info h3{font-size:26px;color:#2b293a;margin:0 0 6px;font-weight:800;line-height:1.2}
+  .ms-info .ms-author{font-size:14px;color:#888;margin-bottom:14px}
+  .ms-info .ms-desc{font-size:14px;color:#555;line-height:1.55;margin-bottom:18px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .ms-info .ms-price{font-size:18px;color:#ff690c;font-weight:700;margin-bottom:16px}
+  .ms-info .ms-cta{display:inline-block;padding:10px 22px;background:#2b293a;color:#fff;font-size:13px;font-weight:600;text-decoration:none;border-radius:6px;transition:background .2s}
+  .ms-info .ms-cta:hover{background:#ff690c}
+  .ms-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.95);color:#2b293a;font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;z-index:2}
+  .ms-prev{left:14px}
+  .ms-next{right:14px}
+  .ms-nav:hover{background:#ff690c;color:#fff}
+  .ms-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:2}
+  .ms-dot{width:8px;height:8px;border-radius:50%;background:rgba(43,41,58,.25);cursor:pointer;border:0;padding:0}
+  .ms-dot.active{background:#ff690c;width:22px;border-radius:5px}
+  @media (max-width:680px){
+    .monthly-slider{min-height:auto}
+    .ms-slide{grid-template-columns:1fr;text-align:center;padding:24px 20px;min-height:auto}
+    .ms-cover{width:170px;height:220px;margin:0 auto}
+    .ms-info h3{font-size:20px}
+    .ms-info .ms-desc{-webkit-line-clamp:4}
+    .ms-nav{width:32px;height:32px;font-size:18px}
+    .ms-prev{left:6px}.ms-next{right:6px}
+  }
+</style>
+
+<!-- CATEGORIES -->
+<section class="wrap">
+  <h2 class="sec-title">Catégories</h2>
+  <div class="cats" id="cats"></div>
+</section>
+
+<!-- PRODUCT GRID -->
+<section class="wrap">
+  <h3 class="sec-title">Nos experts ont sélectionné pour vous</h3>
+  <p class="sec-sub">les tendances à suivre</p>
+  <div class="grid" id="grid-trends"></div>
+</section>
+
+<!-- ORANGE CTA -->
+<section class="wrap">
+  <div class="cta-banner">
+    <h3>Les bonnes affaires n'attendent pas</h3>
+    <p>Profitez de nos ventes spéciales pour découvrir des articles hors du commun à des prix imbattables. Attention, stocks très limités.</p>
+  </div>
+</section>
+
+<!-- TWO INFO CARDS -->
+<section class="wrap">
+  <div class="two-cols">
+    <div class="info-card">
+      <h4>Vos prochaines lectures à découvrir</h4>
+      <div class="info-thumbs" id="info-cards-1"></div>
+    </div>
+    <div class="info-card">
+      <h4>Romans, jeunesse, essais et bien plus encore</h4>
+      <div class="info-thumbs" id="info-cards-2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- HORIZONTAL STRIP -->
+<section class="wrap">
+  <h3 class="sec-title">Nos ventes particulières regroupent des articles sélectionnés</h3>
+  <p class="sec-sub">pour leur authenticité, leur qualité et leur originalité</p>
+  <div class="strip" id="strip"></div>
+</section>
+
+<!-- DARK PURPLE SECTION -->
+<section class="wrap">
+  <div class="dark-section">
+    <div style="padding:0 24px">
+      <h3 class="sec-title">Nos experts ont sélectionné pour vous</h3>
+      <p class="sec-sub">les tendances à suivre</p>
+      <div class="grid" id="grid-dark"></div>
+    </div>
+  </div>
+</section>
+
+<!-- READING SECTION -->
+<section class="wrap">
+  <div class="fashion">
+    <div>
+      <h3>Lisez à votre rythme, à votre façon.</h3>
+      <p>Romans, essais, livres jeunesse ou ouvrages spécialisés — notre catalogue s'adapte à toutes les envies et à tous les lecteurs. Trouvez le livre qui vous accompagnera dans vos prochaines aventures.</p>
+      <a class="btn-orange" href="/catalogue.html">Découvrir le catalogue</a>
+    </div>
+    <div>
+      <div class="fashion-imgs">
+        <div style="background-image:url('/img/fashion-books-1.png')"></div>
+        <div style="background-image:url('/img/fashion-books-2.png')"></div>
+      </div>
+      <div class="fashion-dots"><span></span><span class="active"></span><span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM INFO -->
+<section class="wrap">
+  <div class="bottom-info">
+    <div class="bottom-card">
+      <div class="ico">🔍</div>
+      <div>
+        <h5>À la recherche de nouveautés ?</h5>
+        <p>Découvrez chaque semaine de nouveaux livres ajoutés au catalogue.</p>
+      </div>
+    </div>
+    <div class="bottom-card">
+      <div class="ico">🎁</div>
+      <div>
+        <h5>Ne manquez plus aucune offre !</h5>
+        <p>Inscrivez-vous à notre newsletter pour recevoir nos meilleures promotions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <h4>Librairie Magma</h4>
+        <p>Votre librairie en ligne de confiance — découvrez, achetez et faites-vous livrer vos livres préférés partout au Congo.</p>
+        <p style="margin-top:10px;font-size:12px;color:#888">📍 Pointe-Noire — Livraison Potopoto, Saint Exupéry, Présidence, OSH, CHU</p>
+      </div>
+      <div class="foot-col">
+        <h5>La boutique</h5>
+        <a href="/catalogue.html">Catalogue</a>
+        <a href="/panier.html">Mon panier</a>
+        <a href="/mes-commandes.html">Mes commandes</a>
+      </div>
+      <div class="foot-col">
+        <h5>Navigation</h5>
+        <a href="/">Accueil</a>
+        <a href="/mon-compte.html">Mon compte</a>
+        <a href="/auth/logout">Déconnexion</a>
+      </div>
+      <div class="foot-col">
+        <h5>Contact</h5>
+        <a href="mailto:moussokiexauce7@gmail.com">moussokiexauce7@gmail.com</a>
+        <a href="/conditions.html">Conditions générales</a>
+        <a href="/confidentialite.html">Politique de confidentialité</a>
+      </div>
+    </div>
+    <div class="copyright">© 2026 Librairie Magma — Tous droits réservés</div>
+  </div>
+</footer>
+
+<script>
+const FALLBACK_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23eee'/><text x='50' y='55' text-anchor='middle' font-family='Arial' font-size='10' fill='%23888'>Pas d image</text></svg>";
+const STRIP_IMGS = [
+  "/img/strip-books-1.png",
+  "/img/strip-books-2.png",
+  "/img/strip-books-3.png",
+  "/img/strip-books-4.png",
+  "/img/strip-books-5.png"
+];
+
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+function money(n){return new Intl.NumberFormat("fr-FR").format(n||0)+" FCFA"}
+
+function bookCard(b,withRibbon){
+  return `<div class="pcard">
+    ${withRibbon&&b.featured?'<span class="ribbon">TOP</span>':''}
+    <a href="/PI_Produit.html?id=${b.id}" style="display:contents">
+      <div class="thumb"><img src="${esc(b.image||FALLBACK_IMG)}" alt="${esc(b.titre)}" onerror="this.src='${FALLBACK_IMG}'"></div>
+    </a>
+    <div class="body">
+      <a href="/PI_Produit.html?id=${b.id}" style="color:inherit">
+        <div class="pname">${esc(b.titre)}</div>
+        <div class="pauthor">${esc(b.auteur)}</div>
+        <div class="pprice">${money(b.prix)}</div>
+      </a>
+      <button type="button" class="add-cart" data-bookid="${b.id}">Ajouter au panier</button>
+    </div>
+  </div>`;
+}
+
+function showAccueilToast(msg, type){
+  var t = document.getElementById("vitr-toast");
+  if(!t){ t = document.createElement("div"); t.id = "vitr-toast"; t.className = "vitr-toast"; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.className = "vitr-toast show" + (type === "error" ? " error" : "");
+  setTimeout(function(){ t.className = "vitr-toast"; }, 2200);
+}
+
+function refreshCartBadge(){
+  fetch("/api/cart",{credentials:"same-origin"}).then(r=>r.ok?r.json():null).then(d=>{
+    if(!d)return;
+    const items=Array.isArray(d)?d:(d.items||[]);
+    const n=items.reduce((s,i)=>s+(i.qty||i.quantity||1),0);
+    const el=document.getElementById("cart-count");
+    if(el){el.textContent=n;el.style.display=n>0?'grid':'none'}
+  }).catch(()=>{});
+}
+
+function bindAddCartButtons(){
+  document.querySelectorAll(".add-cart").forEach(function(btn){
+    if(btn.dataset.bound==="1") return;
+    btn.dataset.bound="1";
+    btn.addEventListener("click", function(ev){
+      ev.preventDefault(); ev.stopPropagation();
+      var id = parseInt(btn.getAttribute("data-bookid"), 10);
+      btn.disabled = true;
+      fetch("/api/cart/add", {
+        method: "POST", credentials: "same-origin",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({id: id, qty: 1})
+      }).then(function(r){
+        if(r.status === 401){
+          showAccueilToast("Connectez-vous pour ajouter au panier.", "error");
+          setTimeout(function(){ window.location.href = "/login.html?next=" + encodeURIComponent("/"); }, 900);
+          return null;
+        }
+        return r.json().then(function(d){
+          if(!r.ok){ throw new Error(d.error || "Ajout impossible"); }
+          showAccueilToast("✓ Ajouté au panier !");
+          refreshCartBadge();
+        });
+      }).catch(function(err){
+        showAccueilToast(err.message || "Ajout impossible", "error");
+      }).finally(function(){
+        setTimeout(function(){ btn.disabled = false; }, 600);
+      });
+    });
+  });
+}
+
+// ===== Slider : sélection aléatoire mais stable, renouvelée tous les 2 jours =====
+function monthlySeed(){
+  const dayIndex = Math.floor(Date.now() / 86400000);
+  return Math.floor(dayIndex / 2) + 1;
+}
+function seededRandom(seed){
+  let t = seed >>> 0;
+  return function(){
+    t = (t + 0x6D2B79F5) >>> 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function pickMonthlyBooks(list, count){
+  const rand = seededRandom(monthlySeed());
+  const arr = list.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, Math.min(count, arr.length));
+}
+const SLIDE_TAGLINES = [
+  "Le coup de cœur du mois",
+  "À découvrir absolument",
+  "Notre sélection éditoriale",
+  "Lu et adoré par nos lecteurs",
+  "Le livre dont on parle",
+  "Une plume à découvrir"
+];
+function renderMonthlySlider(books){
+  const track = document.getElementById("ms-track");
+  const dots = document.getElementById("ms-dots");
+  if (!track || !dots) return;
+  const slides = pickMonthlyBooks(books, 5);
+  if (slides.length === 0) { document.getElementById("monthly-slider").style.display = "none"; return; }
+  const rand = seededRandom(monthlySeed() + 7);
+  track.innerHTML = slides.map(function(b){
+    const tag = SLIDE_TAGLINES[Math.floor(rand() * SLIDE_TAGLINES.length)];
+    const desc = (b.description || b.infos || "Découvrez cet ouvrage soigneusement sélectionné par notre équipe.");
+    return '<div class="ms-slide">'
+      + '<a class="ms-cover" href="/PI_Produit.html?id=' + b.id + '"><img src="' + esc(b.image || FALLBACK_IMG) + '" alt="' + esc(b.titre) + '" onerror="this.src=\'' + FALLBACK_IMG + '\'"></a>'
+      + '<div class="ms-info">'
+      +   '<span class="ms-tag">' + esc(tag) + '</span>'
+      +   '<h3>' + esc(b.titre) + '</h3>'
+      +   '<div class="ms-author">par ' + esc(b.auteur) + '</div>'
+      +   '<p class="ms-desc">' + esc(desc) + '</p>'
+      +   '<div class="ms-price">' + money(b.prix) + '</div>'
+      +   '<a class="ms-cta" href="/PI_Produit.html?id=' + b.id + '">Découvrir ce livre</a>'
+      + '</div>'
+      + '</div>';
+  }).join("");
+  dots.innerHTML = slides.map(function(_, i){
+    return '<button type="button" class="ms-dot' + (i === 0 ? ' active' : '') + '" data-i="' + i + '" aria-label="Aller à la diapositive ' + (i+1) + '"></button>';
+  }).join("");
+  let idx = 0;
+  function goTo(n){
+    idx = (n + slides.length) % slides.length;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    dots.querySelectorAll(".ms-dot").forEach(function(d, i){ d.classList.toggle("active", i === idx); });
+  }
+  document.querySelector(".ms-prev").addEventListener("click", function(){ goTo(idx - 1); resetAuto(); });
+  document.querySelector(".ms-next").addEventListener("click", function(){ goTo(idx + 1); resetAuto(); });
+  dots.querySelectorAll(".ms-dot").forEach(function(d){
+    d.addEventListener("click", function(){ goTo(parseInt(d.getAttribute("data-i"), 10)); resetAuto(); });
+  });
+  let timer = setInterval(function(){ goTo(idx + 1); }, 5500);
+  function resetAuto(){ clearInterval(timer); timer = setInterval(function(){ goTo(idx + 1); }, 5500); }
+}
+
+fetch("/api/books").then(r=>r.json()).then(books=>{
+  const list=Array.isArray(books)?books:(books.books||[]);
+  renderMonthlySlider(list);
+  // Categories
+  const cats=["Tous",...new Set(list.map(b=>b.genre).filter(Boolean))];
+  document.getElementById("cats").innerHTML=cats.map((c,i)=>
+    `<span class="cat-chip ${i===0?'active':''}" onclick="window.location='/catalogue.html${i===0?'':'?genre='+encodeURIComponent(c)}'">${esc(c)}</span>`
+  ).join("");
+
+  // Trends grid (8 first)
+  const trends=list.slice(0,8);
+  document.getElementById("grid-trends").innerHTML=trends.map(b=>bookCard(b,true)).join("");
+
+  // Two info cards (4 thumbs each)
+  const half1=list.slice(0,4),half2=list.slice(4,8);
+  document.getElementById("info-cards-1").innerHTML=half1.map(b=>
+    `<a class="info-thumb" href="/PI_Produit.html?id=${b.id}"><img src="${esc(b.image||FALLBACK_IMG)}" alt="" onerror="this.src='${FALLBACK_IMG}'"></a>`
+  ).join("");
+  document.getElementById("info-cards-2").innerHTML=half2.map(b=>
+    `<a class="info-thumb" href="/PI_Produit.html?id=${b.id}"><img src="${esc(b.image||FALLBACK_IMG)}" alt="" onerror="this.src='${FALLBACK_IMG}'"></a>`
+  ).join("");
+
+  // Strip (5 images from public/img)
+  document.getElementById("strip").innerHTML=STRIP_IMGS.map(src=>
+    `<a class="strip-item" href="/catalogue.html"><img src="${src}" alt="" onerror="this.style.display='none'"></a>`
+  ).join("");
+
+  // Dark section grid (last 4)
+  const dark=list.slice(-4);
+  document.getElementById("grid-dark").innerHTML=dark.map(b=>bookCard(b,false)).join("");
+
+  bindAddCartButtons();
+}).catch(()=>{
+  document.getElementById("grid-trends").innerHTML='<p style="grid-column:1/-1;text-align:center;color:#888;padding:30px">Impossible de charger les livres.</p>';
+});
+
+// Cart count badge
+refreshCartBadge();
+</script>
+</body>
+</html>

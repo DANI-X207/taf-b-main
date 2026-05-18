@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/png" href="/img/ICON-1.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Librairie Magma — Mes Commandes</title>
+<link rel="stylesheet" href="/magma-fixes.css">
+<style>
+body { margin:0; min-height:100vh; background:linear-gradient(135deg,#fff7ef,#f3f1f1); font-family:'Trebuchet MS',Arial,sans-serif; color:#2d2d2d; }
+.mo-wrap { max-width:880px; margin:60px auto; padding:0 18px; }
+.mo-back { display:inline-flex; align-items:center; gap:6px; background:#000000; color:#fff; text-decoration:none; padding:10px 18px; border-radius:999px; font-weight:700; font-size:.9rem; margin-bottom:18px; }
+.mo-back:hover { background:#3a3850; }
+.mo-card { background:#fff; border-radius:18px; padding:28px; box-shadow:0 18px 60px rgba(0,0,0,.12); }
+.mo-card h1 { margin:0 0 6px; color:#2b293a; font-size:1.7rem; }
+.mo-card .sub { color:#888; font-size:.9rem; margin-bottom:20px; }
+.mo-filters { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+.mo-filters button { background:#f3f1ef; color:#555; border:0; padding:8px 14px; border-radius:999px; font-weight:600; font-size:.82rem; cursor:pointer; }
+.mo-filters button.active { background:#ff690c; color:#fff; }
+.mo-item { border:1px solid #efefef; border-radius:14px; padding:16px; margin-bottom:12px; background:#fafafa; }
+.mo-row { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.mo-id { font-weight:700; color:#2b293a; font-size:1rem; }
+.mo-date { color:#888; font-size:.78rem; margin-top:3px; }
+.mo-total { color:#ff690c; font-weight:700; font-size:1rem; }
+.mo-status { padding:4px 12px; border-radius:999px; font-size:.75rem; font-weight:700; white-space:nowrap; }
+.mo-zone { color:#666; font-size:.85rem; margin-top:6px; }
+.mo-empty, .mo-error { color:#888; padding:30px 14px; text-align:center; }
+.mo-error { color:#b42318; }
+.mo-details { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px 18px; margin:12px 0; padding:12px; background:#fff; border-radius:10px; border:1px solid #eee; }
+.mo-detail { font-size:.82rem; }
+.mo-detail b { display:block; color:#888; font-weight:600; font-size:.7rem; text-transform:uppercase; letter-spacing:.04em; margin-bottom:2px; }
+.mo-detail span { color:#2b293a; font-weight:600; }
+.mo-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px solid #eee; }
+.mo-btn { border:0; padding:10px 18px; border-radius:999px; font-weight:700; font-size:.85rem; cursor:pointer; transition:all .15s; }
+.mo-btn-ok { background:#16a34a; color:#fff; }
+.mo-btn-ok:hover { background:#15803d; }
+.mo-btn-warn { background:#fff; color:#b42318; border:1.5px solid #b42318; }
+.mo-btn-warn:hover { background:#fee4e2; }
+.mo-btn:disabled { opacity:.55; cursor:not-allowed; }
+.mo-flag { display:inline-block; margin-top:8px; font-size:.78rem; color:#b42318; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="mo-wrap">
+  <a href="/" class="mo-back">← Retour à l'accueil</a>
+  <div class="mo-card">
+    <h1>Mes commandes</h1>
+    <p class="sub">Historique complet de vos commandes passées sur Librairie Magma.</p>
+    <div class="mo-filters" id="mo-filters">
+      <button class="active" data-f="all">Toutes</button>
+      <button data-f="En attente">En attente</button>
+      <button data-f="En cours">En cours</button>
+      <button data-f="Terminées">Terminées</button>
+      <button data-f="Annulée">Annulées</button>
+    </div>
+    <div id="mo-list"><p class="mo-empty">Chargement…</p></div>
+  </div>
+</div>
+<script>
+(function() {
+  function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function money(v){return Number(v||0).toLocaleString("fr-FR")+" FCFA";}
+  function fmtDate(s){if(!s)return"—";var d=new Date(s.indexOf("T")!==-1?s:s+"Z");return isNaN(d)?s:d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});}
+  var STATUS_BG={"En attente":"#fef9c3","Confirmée":"#dcfce7","En livraison":"#dbeafe","Livrée":"#ede9fe","Annulée":"#fee4e2","Validée":"#d1fae5","Reçue":"#cffafe"};
+  var STATUS_FG={"En attente":"#854d0e","Confirmée":"#166534","En livraison":"#1e40af","Livrée":"#5b21b6","Annulée":"#b42318","Validée":"#065f46","Reçue":"#0e7490"};
+  var allOrders=[]; var currentFilter="all";
+  function render(){
+    var list=document.getElementById("mo-list");
+    var filtered=currentFilter==="all"?allOrders:allOrders.filter(function(o){
+      if(currentFilter==="En cours"){
+        return ["Confirmée","En livraison","Livrée"].indexOf(o.status) !== -1;
+      }
+      if(currentFilter==="Terminées"){
+        return ["Reçue","Validée"].indexOf(o.status) !== -1;
+      }
+      return (o.status||"")===currentFilter;
+    });
+    if(!filtered.length){list.innerHTML='<p class="mo-empty">Aucune commande dans cette catégorie.</p>';return;}
+    list.innerHTML=filtered.map(function(o){
+      var bg=STATUS_BG[o.status]||"#f3f4f6"; var fg=STATUS_FG[o.status]||"#555";
+      var canAct = ["En livraison", "Livrée"].indexOf(o.status) !== -1;
+      var canCancel = ["En attente", "Confirmée"].indexOf(o.status) !== -1 && !o.cancel_requested;
+      var canReceipt = o.status === "Validée" || (o.admin_confirmed && o.client_confirmed);
+      
+      var flag = o.not_received_reported_at ? '<div class="mo-flag">⚠ Non-réception signalée — l\'administrateur a été notifié.</div>' : '';
+      var cancelReqText = o.cancel_requested ? '<div class="mo-flag" style="color:#b42318;margin-top:6px;">⚠ Demande d\'annulation envoyée — en attente de l\'administrateur.</div>' : '';
+      
+      var receiptBtn = canReceipt
+        ? '<a class="mo-btn mo-btn-ok" href="/api/orders/'+esc(o.id)+'/receipt.pdf" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">📄 Télécharger le reçu (PDF)</a>'
+        : '<button class="mo-btn" type="button" disabled title="Disponible dès que la livraison sera confirmée par vous et l\'administrateur" style="background:#e5e7eb;color:#9ca3af;cursor:not-allowed;">📄 Reçu PDF (attente double confirmation)</button>';
+      
+      var cancelBtn = canCancel
+        ? '<button class="mo-btn mo-btn-warn" data-act="req-cancel" data-id="'+esc(o.id)+'">⚠ Demander l\'annulation</button>'
+        : '';
+
+      var actionButtons = [];
+      actionButtons.push(receiptBtn);
+      if (canAct) {
+        actionButtons.push('<button class="mo-btn mo-btn-ok" data-act="recv" data-id="'+esc(o.id)+'">✓ Valider la réception</button>');
+        actionButtons.push('<button class="mo-btn mo-btn-warn" data-act="not" data-id="'+esc(o.id)+'">⚠ Signaler non reçu</button>');
+      }
+      if (cancelBtn) {
+        actionButtons.push(cancelBtn);
+      }
+      
+      var actions = '<div class="mo-actions">' + actionButtons.join("") + '</div>';
+
+      return '<div class="mo-item" data-order="'+esc(o.id)+'">'+
+        '<div class="mo-row">'+
+          '<div><div class="mo-id">Commande #'+esc(o.id)+'</div><div class="mo-date">'+esc(fmtDate(o.created_at))+'</div></div>'+
+          '<span class="mo-status" style="background:'+bg+';color:'+fg+'">'+esc(o.status)+'</span>'+
+        '</div>'+
+        '<div class="mo-details">'+
+          '<div class="mo-detail"><b>Numéro</b><span>#'+esc(o.id)+'</span></div>'+
+          '<div class="mo-detail"><b>Date</b><span>'+esc(fmtDate(o.created_at))+'</span></div>'+
+          '<div class="mo-detail"><b>Montant</b><span>'+money(o.total)+'</span></div>'+
+          '<div class="mo-detail"><b>Zone de livraison</b><span>'+esc(o.delivery_zone||"—")+'</span></div>'+
+          '<div class="mo-detail"><b>Statut</b><span>'+esc(o.status)+'</span></div>'+
+        '</div>'+
+        flag + cancelReqText + actions +
+      '</div>';
+    }).join("");
+    list.querySelectorAll(".mo-btn").forEach(function(btn){
+      btn.addEventListener("click", function(){ handleAction(btn); });
+    });
+  }
+  function handleAction(btn){
+    var id = btn.getAttribute("data-id"); var act = btn.getAttribute("data-act");
+    if(act==="recv"){
+      if(!confirm("Confirmez-vous avoir reçu la commande #"+id+" ?")) return;
+      btn.disabled=true;
+      fetch("/api/orders/"+id+"/mark-received",{method:"POST",headers:{"Content-Type":"application/json"}})
+        .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});})
+        .then(function(x){ if(!x.ok) throw new Error(x.j.error||"Erreur"); reload("✓ Réception confirmée. Merci !"); })
+        .catch(function(e){ alert(e.message); btn.disabled=false; });
+    } else if(act==="not"){
+      var reason = prompt("Décrivez brièvement le problème (commande non reçue) :","");
+      if(reason===null) return;
+      btn.disabled=true;
+      fetch("/api/orders/"+id+"/report-not-received",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({reason:reason})})
+        .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});})
+        .then(function(x){ if(!x.ok) throw new Error(x.j.error||"Erreur"); reload("⚠ Signalement envoyé à l'administrateur."); })
+        .catch(function(e){ alert(e.message); btn.disabled=false; });
+    } else if(act==="req-cancel"){
+      var reason = prompt("Pourquoi voulez-vous annuler cette commande ?","");
+      if(reason===null) return;
+      btn.disabled=true;
+      fetch("/api/orders/"+id+"/request-cancel",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({reason:reason})})
+        .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});})
+        .then(function(x){ if(!x.ok) throw new Error(x.j.error||"Erreur"); reload("✓ Demande d'annulation envoyée à l'administrateur."); })
+        .catch(function(e){ alert(e.message); btn.disabled=false; });
+    }
+  }
+  function reload(msg){
+    fetch("/api/my-orders").then(function(r){return r.json();}).then(function(orders){ allOrders=orders||[]; render(); if(msg) alert(msg); });
+  }
+  document.querySelectorAll("#mo-filters button").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#mo-filters button").forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active"); currentFilter=b.getAttribute("data-f"); render();
+    });
+  });
+  fetch("/api/my-orders").then(function(r){if(!r.ok)throw r;return r.json();}).then(function(orders){
+    allOrders=orders||[]; if(!allOrders.length){document.getElementById("mo-list").innerHTML='<p class="mo-empty">Vous n\'avez pas encore passé de commande.</p>';return;}
+    render();
+  }).catch(function(){
+    document.getElementById("mo-list").innerHTML='<p class="mo-error">Connectez-vous pour voir vos commandes. <a href="/login.html">Se connecter</a></p>';
+  });
+})();
+</script>
+</body>
+</html>

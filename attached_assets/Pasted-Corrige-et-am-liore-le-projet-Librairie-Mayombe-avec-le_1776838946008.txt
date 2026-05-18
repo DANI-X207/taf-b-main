@@ -1,0 +1,32 @@
+Corrige et améliore le projet "Librairie Mayombe" avec les directives suivantes :
+
+1. Interface Admin :
+   - Supprime complètement l’icône et l’onglet "Panier" (il ne doit pas être visible dans l’administration).
+   - Change le style du tableau de bord pour qu’il ait un fond blanc au lieu d’un fond noir.
+   - Uniformise les couleurs des deux pages admin avec celles du reste du projet :
+     → Utiliser le bleu et le blanc comme couleurs principales.
+     → Conserver la cohérence visuelle et la lisibilité des textes et icônes.
+   - Ajoute une fonction de recherche de commandes par rapport au nom du client :
+     → L’admin doit pouvoir entrer un nom et voir toutes les commandes associées.
+     → Affiche les résultats sous forme de liste avec numéro de commande, date, montant, statut.
+
+2. Interface Client (page "mes-commandes.html") :
+   - Chaque commande doit afficher ses informations détaillées (numéro, date, montant, zone de livraison, statut).
+   - Le client ne peut télécharger le reçu en PDF **que lorsque le statut de la commande passe à "Confirmée"**.
+   - Avant ce statut, le bouton de téléchargement du reçu doit être désactivé ou invisible.
+
+3. Gestion des statuts de commande :
+   - Une commande passée en statut **Confirmée** ne peut plus revenir en statut "En attente".
+   - Une commande passée en statut **En livraison** ne peut plus être remise en statut "Confirmée".
+   - Les transitions doivent respecter cette logique stricte pour éviter les incohérences.
+
+4. Gestion des accès Admin :
+   - Crée deux pages HTML distinctes pour éviter les glitchs :
+     → **admin.html** : pour l’admin classique (mot de passe **TAF1-FLEMME**).
+        - Accès normal à l’interface admin.
+        - Ne pas afficher l’onglet "Téléchargements du code source".
+     → **super-admin.html** : pour le super admin (mot de passe **MMDE2007**).
+        - Accès complet à l’interface admin.
+        - Afficher un onglet supplémentaire "Télécharger le code source".
+        - Ajouter un autre onglet "Télécharger version Railway" permettant de récupérer une version déployable sur Railway.
+   - Chaque type d’admin doit être redirigé vers sa propre page HTML après connexion.

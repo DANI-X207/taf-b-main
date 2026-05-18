@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/png" href="/img/ICON-1.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Librairie Magma — Paramètres</title>
+<link rel="stylesheet" href="/magma-fixes.css">
+<style>
+body { margin:0; min-height:100vh; background:linear-gradient(135deg,#fff7ef,#f3f1f1); font-family:'Trebuchet MS',Arial,sans-serif; color:#2d2d2d; }
+.pa-wrap { max-width:760px; margin:60px auto; padding:0 18px; }
+.pa-back { display:inline-flex; align-items:center; gap:6px; background:#000000; color:#fff; text-decoration:none; padding:10px 18px; border-radius:999px; font-weight:700; font-size:.9rem; margin-bottom:18px; }
+.pa-back:hover { background:#3a3850; }
+.pa-card { background:#fff; border-radius:18px; padding:32px; box-shadow:0 18px 60px rgba(0,0,0,.12); }
+.pa-card h1 { margin:0 0 6px; color:#2b293a; font-size:1.7rem; }
+.pa-card .sub { color:#888; font-size:.9rem; margin-bottom:24px; }
+.pa-section { margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid #f0f0f0; }
+.pa-section:last-child { border-bottom:0; margin-bottom:0; padding-bottom:0; }
+.pa-section h2 { margin:0 0 4px; color:#2b293a; font-size:1.05rem; }
+.pa-section p { margin:0 0 14px; color:#888; font-size:.85rem; }
+.pa-segmented { display:flex; gap:10px; flex-wrap:wrap; }
+.pa-segmented button { flex:1; min-width:130px; background:#f3f1ef; border:1.5px solid transparent; padding:12px 18px; border-radius:14px; cursor:pointer; font-weight:700; font-size:.92rem; color:#555; transition:all .15s; }
+.pa-segmented button.on { background:#fff7ef; border-color:#ff690c; color:#ff690c; }
+.pa-toggle { display:flex; justify-content:space-between; align-items:center; padding:14px; background:#fafafa; border-radius:12px; margin-bottom:10px; }
+.pa-toggle .lbl { font-weight:600; color:#2b293a; font-size:.95rem; }
+.pa-toggle .desc { color:#888; font-size:.78rem; margin-top:3px; }
+.pa-switch { position:relative; display:inline-block; width:48px; height:26px; flex-shrink:0; }
+.pa-switch input { opacity:0; width:0; height:0; }
+.pa-switch span { position:absolute; inset:0; background:#ccc; border-radius:999px; transition:.2s; cursor:pointer; }
+.pa-switch span::before { content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+.pa-switch input:checked + span { background:#ff690c; }
+.pa-switch input:checked + span::before { transform:translateX(22px); }
+.pa-links { display:grid; gap:8px; }
+.pa-links a { display:block; padding:12px 14px; background:#fafafa; border-radius:10px; text-decoration:none; color:#2b293a; font-weight:600; transition:background .15s; }
+.pa-links a:hover { background:#fff7ef; color:#ff690c; }
+.pa-save-bar { position:sticky; bottom:0; background:#fff; padding:14px 0 0; margin-top:24px; border-top:1px solid #eee; display:flex; justify-content:flex-end; gap:10px; }
+.pa-save { background:#ff690c; color:#fff; border:0; border-radius:999px; padding:12px 28px; font-weight:700; cursor:pointer; font-size:.95rem; }
+.pa-save:hover { background:#e65a00; }
+.pa-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#16a34a; color:#fff; padding:12px 24px; border-radius:999px; font-weight:600; font-size:.9rem; box-shadow:0 8px 24px rgba(0,0,0,.18); opacity:0; transition:opacity .2s; pointer-events:none; }
+.pa-toast.on { opacity:1; }
+</style>
+</head>
+<body>
+<div class="pa-wrap">
+  <a href="/" class="pa-back">← Retour à l'accueil</a>
+  <div class="pa-card">
+    <h1>Paramètres</h1>
+    <p class="sub">Personnalisez votre expérience sur Librairie Magma.</p>
+
+    <div class="pa-section">
+      <h2>Thème d'affichage</h2>
+      <p>Choisissez l'apparence de l'interface.</p>
+      <div class="pa-segmented" id="pa-theme">
+        <button type="button" data-theme="light">☀ Clair</button>
+        <button type="button" data-theme="dark">🌙 Sombre</button>
+      </div>
+    </div>
+
+    <div class="pa-section">
+      <h2>Notifications</h2>
+      <p>Gérez les alertes que vous recevez.</p>
+      <label class="pa-toggle">
+        <div>
+          <div class="lbl">Notifications de commande</div>
+          <div class="desc">Recevoir des alertes sur l'avancement de mes commandes.</div>
+        </div>
+        <span class="pa-switch"><input type="checkbox" id="pa-notif"><span></span></span>
+      </label>
+      <label class="pa-toggle">
+        <div>
+          <div class="lbl">Promotions et nouveautés</div>
+          <div class="desc">Être informé des nouveaux articles et offres.</div>
+        </div>
+        <span class="pa-switch"><input type="checkbox" id="pa-promo"><span></span></span>
+      </label>
+    </div>
+
+    <div class="pa-section">
+      <h2>Mon compte</h2>
+      <p>Accès rapide à votre espace personnel.</p>
+      <div class="pa-links">
+        <a href="/mon-compte.html">👤 Mon Compte</a>
+        <a href="/mes-commandes.html">📦 Mes Commandes</a>
+        <a href="/api/auth/logout" id="pa-logout">🚪 Se déconnecter</a>
+      </div>
+    </div>
+
+    <div class="pa-section" id="pa-admin-section" style="display:none;">
+      <h2>Espace administrateur</h2>
+      <p>Votre numéro de téléphone est reconnu comme administrateur.</p>
+      <div class="pa-links">
+        <a id="pa-admin-link" href="/admin.html">🛠️ Ouvrir le tableau de bord administrateur</a>
+      </div>
+    </div>
+
+    <div class="pa-save-bar">
+      <button type="button" class="pa-save" id="pa-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+<div class="pa-toast" id="pa-toast">Paramètres enregistrés</div>
+<script>
+(function(){
+  function get(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }
+  function set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function applyTheme(t){ document.documentElement.setAttribute("data-magma-theme", t||"light"); }
+
+  var theme = get("magma-theme","light");
+  var notif = get("magma-notif","1");
+  var promo = get("magma-promo","1");
+
+  applyTheme(theme);
+  document.querySelectorAll("#pa-theme button").forEach(function(b){
+    if(b.getAttribute("data-theme")===theme) b.classList.add("on");
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#pa-theme button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      applyTheme(b.getAttribute("data-theme"));
+    });
+  });
+  document.getElementById("pa-notif").checked = notif==="1";
+  document.getElementById("pa-promo").checked = promo==="1";
+
+  document.getElementById("pa-save").addEventListener("click", function(){
+    var t = (document.querySelector("#pa-theme button.on")||{}).getAttribute && document.querySelector("#pa-theme button.on").getAttribute("data-theme") || "light";
+    set("magma-theme", t);
+    set("magma-notif", document.getElementById("pa-notif").checked?"1":"0");
+    set("magma-promo", document.getElementById("pa-promo").checked?"1":"0");
+    applyTheme(t);
+    var tt=document.getElementById("pa-toast"); tt.classList.add("on"); setTimeout(function(){tt.classList.remove("on");},1800);
+  });
+
+  document.getElementById("pa-logout").addEventListener("click", function(e){
+    e.preventDefault();
+    fetch("/api/auth/logout",{method:"POST"}).finally(function(){ window.location.href="/"; });
+  });
+
+  fetch("/api/admin/status").then(function(r){return r.ok?r.json():null;}).then(function(d){
+    if(!d || !d.authenticated) return;
+    var section = document.getElementById("pa-admin-section");
+    var link = document.getElementById("pa-admin-link");
+    if(!section || !link) return;
+    section.style.display = "block";
+    if(d.is_super){
+      link.setAttribute("href","/super-admin.html");
+      link.textContent = "🛡️ Ouvrir le tableau de bord super-administrateur";
+    }
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/png" href="/img/ICON-1.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Librairie Magma — Catalogue</title>
+<!-- skip-inject: magma-fixes.css -->
+<script>window.MAGMA_CATALOG_CUSTOM=true;</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#f2f1f1 !important;min-height:100vh}
+  body{font-family:Verdana,Arial,Helvetica,sans-serif;color:#2d2d2d;line-height:1.5}
+  a{text-decoration:none;color:inherit}
+  img{display:block;max-width:100%}
+
+  #magma-cart-badge{display:none !important}
+
+  /* ===== HEADER (identique à Accueil-v2) ===== */
+  .topbar{background:#000000;color:#fff;height:56px;display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;flex-shrink:0;text-decoration:none;color:inherit}
+  .logo-mark{width:28px;height:28px;background:#ff690c;border-radius:6px;display:grid;place-items:center;font-size:14px}
+  .logo-img{height:42px;width:auto;display:block;object-fit:contain}
+  .search{flex:0 1 300px;height:34px;background:#fff;border-radius:4px;display:flex;align-items:center;padding:0 12px;gap:8px}
+  .search input{flex:1;border:0;outline:0;font-size:13px;color:#2d2d2d;background:transparent;min-width:0}
+  .search button{background:#ff690c;color:#fff;border:0;height:26px;padding:0 12px;border-radius:3px;font-weight:600;cursor:pointer;font-size:12px;flex-shrink:0}
+  .topbar-nav{display:flex;align-items:center;gap:18px;font-size:13px}
+  .topbar-nav a{opacity:.85;white-space:nowrap}.topbar-nav a:hover{opacity:1}
+  .icons{display:flex;align-items:center;gap:14px;margin-left:auto;flex-shrink:0}
+  .icon-btn{color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;position:relative;font-size:12px;text-decoration:none}
+  .icon-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8}
+  .icon-btn .lbl{font-size:12px;opacity:.9}
+  .icon-btn:hover{opacity:.85}
+  .cart-badge{position:absolute;top:-6px;left:12px;background:#ff690c;color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:grid;place-items:center;padding:0 4px}
+
+  /* ===== HERO ===== */
+  .page-hero{background:linear-gradient(135deg,rgba(255, 112, 29, 0.78),#ff690c);color:#fff;padding:50px 32px 38px;text-align:center}
+  .page-hero h1{font-size:32px;font-weight:800;letter-spacing:.3px;margin-bottom:8px}
+  .page-hero p{color:#ffffff;font-size:14px;max-width:560px;margin:0 auto}
+
+  /* ===== WRAP ===== */
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+
+  /* ===== TOOLBAR ===== */
+  .toolbar{background:#fff;border-radius:8px;padding:20px 24px;margin-top:-24px;position:relative;z-index:5;box-shadow:0 12px 40px rgba(0,0,0,.08);display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .toolbar input,.toolbar select{padding:11px 14px;border:1px solid #e2e2e2;border-radius:6px;font-size:13px;color:#2d2d2d;outline:none;font-family:inherit;background:#fff}
+  .toolbar input:focus,.toolbar select:focus{border-color:#ff690c}
+  .toolbar input{flex:1;min-width:220px}
+  .toolbar select{min-width:180px;cursor:pointer}
+  .toolbar .reset{background:#f4f4f4;color:#555;border:0;padding:11px 18px;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600}
+  .toolbar .reset:hover{background:#e9e9e9}
+  .results-count{margin:18px 0 14px;font-size:13px;color:#777}
+
+  /* ===== CATEGORY CHIPS ===== */
+  .cats{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0 6px}
+  .cat-chip{background:#fff;border:1px solid #e2e2e2;color:#444;padding:8px 18px;border-radius:20px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .cat-chip:hover,.cat-chip.active{background:#ff690c;color:#fff;border-color:#ff690c}
+
+  /* ===== PRODUCT GRID ===== */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding:8px 0 60px}
+  .pcard{background:#fff;border-radius:8px;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit}
+  .pcard:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,0,0,.08)}
+  .pcard .thumb{width:100%;aspect-ratio:3/4;background:#f0eee9;display:grid;place-items:center;overflow:hidden}
+  .pcard .thumb img{width:100%;height:100%;object-fit:cover}
+  .pcard .body{padding:12px 14px 16px;flex:1;display:flex;flex-direction:column}
+  .pcard .pname{font-size:13px;color:#2d2d2d;font-weight:700;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px}
+  .pcard .pauthor{font-size:11.5px;color:#888;margin-bottom:6px}
+  .pcard .pgenre{font-size:10.5px;color:#ff690c;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+  .pcard .pprice{font-size:14px;color:#ff690c;font-weight:800;margin-top:auto}
+  .pcard .add{margin-top:10px;background:#2b293a;color:#fff;border:0;padding:8px 12px;border-radius:4px;cursor:pointer;font-size:11.5px;font-weight:700;letter-spacing:.3px}
+  .pcard .add:hover{background:#ff690c}
+  .pcard .ribbon{position:absolute;top:8px;right:8px;background:rgba(255,105,12,.95);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:3px;letter-spacing:.3px}
+  .pcard .stock-out{position:absolute;top:8px;left:8px;background:rgba(40,40,40,.85);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:3px}
+
+  .empty{text-align:center;padding:50px 20px;background:#fff;border-radius:8px;color:#777;margin-top:24px;grid-column:1/-1}
+  .empty .ico{font-size:48px;margin-bottom:14px}
+
+  /* ===== FOOTER ===== */
+  footer{background:#000000;color:#aaa;padding:48px 0 24px;margin-top:30px}
+  .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:32px}
+  .foot-brand h4{color:#fff;font-size:18px;margin-bottom:8px}
+  .foot-brand p{font-size:12px;color:#888;line-height:1.6}
+  .foot-col h5{color:#fff;font-size:13px;margin-bottom:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .foot-col a{display:block;color:#aaa;font-size:12.5px;padding:4px 0}
+  .foot-col a:hover{color:#ff690c}
+  .copyright{text-align:right;font-size:11px;color:#666;margin-top:32px;padding-top:20px;border-top:1px solid #2c2a3b}
+
+  @media (max-width:980px){.grid{grid-template-columns:repeat(3,1fr)}.foot-grid{grid-template-columns:1fr 1fr}.topbar-nav{display:none}}
+  @media (max-width:760px){
+    /* Header passe sur 2 lignes : logo+icônes en haut, recherche en dessous */
+    .topbar{height:auto;padding:8px 12px;flex-wrap:wrap;gap:8px;row-gap:8px}
+    .logo{font-size:13px;order:1}
+    .logo-mark{width:24px;height:24px;font-size:12px}
+    .icons{order:2;gap:10px;margin-left:auto}
+    .icon-btn .lbl{display:none}
+    .icon-btn svg{width:22px;height:22px}
+    .search{order:3;flex:1 1 100%;height:36px}
+    .search input{font-size:14px}
+    .search button{height:28px;padding:0 10px;font-size:11.5px}
+    .page-hero{padding:36px 18px 28px}
+    .page-hero p{font-size:13px}
+    .toolbar{padding:14px 14px;gap:10px}
+    .toolbar input,.toolbar select{flex:1 1 100%;min-width:0;font-size:14px}
+    .toolbar .reset{flex:1 1 100%;text-align:center}
+  }
+  @media (max-width:640px){.grid{grid-template-columns:repeat(2,1fr);gap:12px}.wrap{padding:0 12px}.foot-grid{grid-template-columns:1fr}.page-hero h1{font-size:22px}.cat-chip{padding:7px 14px;font-size:12px}}
+  @media (max-width:380px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="/" class="logo" aria-label="Librairie Magma"><img class="logo-img" src="/img/Copilot_20260402_080209.png" alt="Librairie Magma"></a>
+  <form class="search" id="hdr-search-form">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" name="q" id="hdr-search" placeholder="Rechercher un article…">
+    <button type="submit">Recherche</button>
+  </form>
+  <nav class="topbar-nav">
+    <a href="/">Accueil</a>
+    <a href="/catalogue.html">Mon Magma</a>
+    <a href="/a-propos.html">à propos</a>
+  </nav>
+  <div class="icons">
+    <a class="icon-btn" href="/mon-compte.html" title="Mon compte">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+      <span class="lbl">Compte</span>
+    </a>
+    <a class="icon-btn" href="/panier.html" title="Panier">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+      <span class="cart-badge" id="cart-count">0</span>
+      <span class="lbl">Panier</span>
+    </a>
+    <a class="icon-btn" href="/mes-commandes.html" title="Mes commandes">
+      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>
+      <span class="lbl">Commandes</span>
+    </a>
+    <a class="icon-btn" href="/parametres.html" title="Paramètres">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      <span class="lbl">Paramètres</span>
+    </a>
+  </div>
+</header>
+
+<section class="page-hero">
+  <h1>Notre catalogue</h1>
+  <p>Découvrez tous les livres de la Librairie Magma — romans, jeunesse, sciences, développement personnel et bien plus.</p>
+</section>
+
+<main class="wrap">
+  <div class="toolbar">
+    <input type="search" id="cat-search" placeholder="Rechercher un livre ou un auteur…" autocomplete="off">
+    <select id="cat-genre">
+      <option value="">Toutes les catégories</option>
+    </select>
+    <select id="cat-sort">
+      <option value="recent">Plus récents</option>
+      <option value="price-asc">Prix croissant</option>
+      <option value="price-desc">Prix décroissant</option>
+      <option value="title">Titre (A–Z)</option>
+    </select>
+    <button class="reset" type="button" id="cat-reset">Réinitialiser</button>
+  </div>
+
+  <div class="cats" id="cat-chips"></div>
+
+  <div class="results-count" id="cat-count">Chargement…</div>
+
+  <div class="grid" id="cat-grid"></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <h4>Librairie Magma</h4>
+        <p>Votre librairie en ligne de confiance — découvrez, achetez et faites-vous livrer vos livres préférés partout au Congo.</p>
+        <p style="margin-top:10px;font-size:12px;color:#888">📍 Pointe-Noire — Livraison Potopoto, Saint Exupéry, Présidence, OSH, CHU</p>
+      </div>
+      <div class="foot-col">
+        <h5>La boutique</h5>
+        <a href="/catalogue.html">Catalogue</a>
+        <a href="/panier.html">Mon panier</a>
+        <a href="/mes-commandes.html">Mes commandes</a>
+      </div>
+      <div class="foot-col">
+        <h5>Navigation</h5>
+        <a href="/">Accueil</a>
+        <a href="/mon-compte.html">Mon compte</a>
+        <a href="/login.html">Connexion</a>
+      </div>
+      <div class="foot-col">
+        <h5>Contact</h5>
+        <a href="mailto:moussokiexauce7@gmail.com">moussokiexauce7@gmail.com</a>
+        <a href="/conditions.html">Conditions générales</a>
+        <a href="/confidentialite.html">Politique de confidentialité</a>
+      </div>
+    </div>
+    <div class="copyright">© 2026 Librairie Magma — Tous droits réservés</div>
+  </div>
+</footer>
+
+<script>
+const FALLBACK_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 130'><rect width='100' height='130' fill='%23eee'/><text x='50' y='70' text-anchor='middle' font-family='Arial' font-size='10' fill='%23888'>Pas d'image</text></svg>";
+function esc(s){return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+function fmtPrice(n){return new Intl.NumberFormat('fr-FR').format(Math.round(Number(n||0)))+' FCFA';}
+
+let ALL_BOOKS = [];
+let ACTIVE_GENRE = '';
+
+async function loadBooks(){
+  const r = await fetch('/api/books',{credentials:'same-origin'});
+  ALL_BOOKS = r.ok ? await r.json() : [];
+  renderChips();
+  applyFilters();
+}
+
+function renderChips(){
+  const genres = Array.from(new Set(ALL_BOOKS.map(b=>b.genre).filter(Boolean))).sort();
+  const host = document.getElementById('cat-chips');
+  host.innerHTML = '';
+  const all = document.createElement('span');
+  all.className = 'cat-chip' + (ACTIVE_GENRE===''?' active':'');
+  all.textContent = 'Tous';
+  all.onclick = ()=>{ACTIVE_GENRE='';document.getElementById('cat-genre').value='';applyFilters();};
+  host.appendChild(all);
+  genres.forEach(g=>{
+    const chip = document.createElement('span');
+    chip.className = 'cat-chip' + (ACTIVE_GENRE===g?' active':'');
+    chip.textContent = g;
+    chip.onclick = ()=>{ACTIVE_GENRE=g;document.getElementById('cat-genre').value=g;applyFilters();};
+    host.appendChild(chip);
+  });
+  // Synchronise le <select>
+  const sel = document.getElementById('cat-genre');
+  sel.innerHTML = '<option value="">Toutes les catégories</option>' + genres.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');
+  sel.value = ACTIVE_GENRE;
+}
+
+function applyFilters(){
+  const q = (document.getElementById('cat-search').value||'').toLowerCase().trim();
+  const g = document.getElementById('cat-genre').value;
+  ACTIVE_GENRE = g;
+  const sort = document.getElementById('cat-sort').value;
+  let list = ALL_BOOKS.slice();
+  if(g) list = list.filter(b => (b.genre||'')===g);
+  if(q) list = list.filter(b => (b.titre||'').toLowerCase().includes(q) || (b.auteur||'').toLowerCase().includes(q));
+  if(sort==='price-asc') list.sort((a,b)=>Number(a.prix)-Number(b.prix));
+  else if(sort==='price-desc') list.sort((a,b)=>Number(b.prix)-Number(a.prix));
+  else if(sort==='title') list.sort((a,b)=>String(a.titre||'').localeCompare(String(b.titre||'')));
+  else list.sort((a,b)=>Number(b.id)-Number(a.id));
+  renderGrid(list);
+  renderChips();
+}
+
+function renderGrid(books){
+  const grid = document.getElementById('cat-grid');
+  const count = document.getElementById('cat-count');
+  if(!grid || !count) return;
+  count.textContent = books.length===0 ? 'Aucun livre trouvé' : (books.length===1 ? '1 livre trouvé' : books.length+' livres trouvés');
+  if(!books.length){
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="ico">📚</div><p>Aucun livre ne correspond à votre recherche.</p></div>';
+    return;
+  }
+  grid.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  books.forEach(b=>{
+    const a = document.createElement('a');
+    a.className = 'pcard';
+    a.href = '/PI_Produit.html?id=' + encodeURIComponent(b.id);
+    const ribbon = b.featured ? '<span class="ribbon">TOP</span>' : '';
+    const stockOut = (Number(b.stock||0)<=0) ? '<span class="stock-out">Rupture</span>' : '';
+    a.innerHTML = `
+      ${ribbon}${stockOut}
+      <div class="thumb"><img src="${esc(b.image||FALLBACK_IMG)}" alt="${esc(b.titre||'')}" onerror="this.src='${FALLBACK_IMG}'"></div>
+      <div class="body">
+        <div class="pgenre">${esc(b.genre||'Livre')}</div>
+        <div class="pname">${esc(b.titre||'')}</div>
+        <div class="pauthor">${esc(b.auteur||'Auteur inconnu')}</div>
+        <div class="pprice">${fmtPrice(b.prix)}</div>
+        <button class="add" type="button" data-id="${b.id}">Ajouter au panier</button>
+      </div>`;
+    frag.appendChild(a);
+  });
+  grid.appendChild(frag);
+  grid.querySelectorAll('.add').forEach(btn=>{
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      addToCart(this.dataset.id, this);
+    });
+  });
+}
+
+async function addToCart(bookId, btn){
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '…';
+  try{
+    const r = await fetch('/api/cart/add',{
+      method:'POST', credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({id: Number(bookId), qty: 1})
+    });
+    if(r.status===401){
+      window.location.href = '/login.html';
+      return;
+    }
+    if(r.ok){
+      btn.textContent = '✓ Ajouté';
+      updateCartBadge();
+      setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},1500);
+    } else {
+      btn.textContent = 'Erreur';
+      setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},1500);
+    }
+  }catch(e){
+    btn.textContent = 'Erreur';
+    setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},1500);
+  }
+}
+
+function updateCartBadge(){
+  fetch('/api/cart',{credentials:'same-origin'}).then(r=>r.ok?r.json():[]).then(items=>{
+    var c = (items||[]).reduce((s,i)=>s+Number(i.qty||0),0);
+    var b = document.getElementById('cart-count');
+    if(b) b.textContent = c;
+  }).catch(()=>{});
+}
+
+// Pré-remplit la recherche depuis ?q= et ?genre=
+const params = new URLSearchParams(window.location.search);
+const initialQ = params.get('q') || '';
+const initialG = params.get('genre') || '';
+if(initialQ) document.getElementById('cat-search').value = initialQ;
+ACTIVE_GENRE = initialG;
+
+document.getElementById('cat-search').addEventListener('input', applyFilters);
+document.getElementById('cat-genre').addEventListener('change', applyFilters);
+document.getElementById('cat-sort').addEventListener('change', applyFilters);
+document.getElementById('cat-reset').addEventListener('click', ()=>{
+  document.getElementById('cat-search').value='';
+  document.getElementById('cat-genre').value='';
+  document.getElementById('cat-sort').value='recent';
+  ACTIVE_GENRE='';
+  applyFilters();
+});
+document.getElementById('hdr-search-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  document.getElementById('cat-search').value = document.getElementById('hdr-search').value;
+  applyFilters();
+});
+
+loadBooks();
+updateCartBadge();
+</script>
+</body>
+</html>

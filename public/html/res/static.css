@@ -1,0 +1,67 @@
+/* WEBDEV 25 – static.css (stub de compatibilité) */
+
+/* ── Positionnement statique / absolu pour les éléments WEBDEV ───── */
+
+/* Éléments positionnés en absolu à l'intérieur d'un conteneur relatif */
+.wbHnImg > span {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+
+/* ── Barre de défilement ─────────────────────────────────────────── */
+.wbBarDefilement { overflow: auto; }
+
+/* ── Zones de répétition (listes/tables répétées) ────────────────── */
+.wbZoneRepetition { display: block; overflow: hidden; }
+
+/* ── Image homothetique (preserve ratio) ────────────────────────── */
+.wbHnImg[data-wbModeHomothetique] img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Interactifs ─────────────────────────────────────────────────── */
+[onclick] { cursor: pointer; }
+
+/* ── Wbplanche (carousel planche) ───────────────────────────────── */
+.wbplanche {
+  background-repeat: repeat;
+  background-position: 0% 0%;
+  background-attachment: scroll;
+  background-size: auto auto;
+  background-origin: padding-box;
+}
+.wbplancheLibInc { font-size: 1px; }
+
+/* ── Saisie dans tableau ─────────────────────────────────────────── */
+td.valignmiddle { vertical-align: middle; }
+
+/* ── Colonne impaire / paire (tables répétées) ───────────────────── */
+.wbImpaire { }
+.wbPaire   { }
+
+/* ── Lien WEBDEV hors zone répétition ───────────────────────────── */
+.wblienHorsZTR {
+  border: 0 !important;
+  background: transparent !important;
+  outline-width: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ── Sélection ───────────────────────────────────────────────────── */
+*::-moz-selection { color: #FFF; background-color: #79A2E4; }
+::selection       { color: #FFF; background-color: #79A2E4; }
+
+/* ── Éléments invisibles initialement (animation WEBDEV) ────────── */
+[data-wbEffetApparition] { }
+
+/* ── Masquage IE11 ───────────────────────────────────────────────── */
+@media all and (-ms-high-contrast: none) {
+  *::-ms-backdrop, #page,
+  tr[style*='height: 100%'] > td > *[style*='height: 100%'] {
+    height: auto !important;
+  }
+}

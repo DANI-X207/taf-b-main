@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/png" href="/img/ICON-1.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Librairie Magma — Détail du livre</title>
+<script>window.MAGMA_DETAIL_CUSTOM=true;</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Verdana,Arial,Helvetica,sans-serif;color:#2d2d2d;background:#f2f1f1;line-height:1.5}
+  a{text-decoration:none;color:inherit}
+  img{display:block;max-width:100%}
+  #magma-cart-badge{display:none !important}
+
+  .topbar{background:#000000;color:#fff;min-height:56px;display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;z-index:100;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;text-decoration:none;color:inherit}
+  .logo-mark{width:28px;height:28px;background:#ff690c;border-radius:6px;display:grid;place-items:center;font-size:14px}
+  .logo-img{height:42px;width:auto;display:block;object-fit:contain}
+  .nav{display:flex;gap:18px;font-size:13px;margin-left:auto}
+  .nav a{opacity:.85}.nav a:hover{opacity:1}
+  .menu-toggle{display:none;background:transparent;border:0;color:#fff;cursor:pointer;padding:6px 8px;border-radius:4px;align-items:center;justify-content:center}
+  .menu-toggle svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2}
+  .menu-toggle:hover{background:rgba(255,255,255,.08)}
+  @media (max-width:760px){
+    .topbar{padding:8px 14px;gap:10px}
+    .topbar .logo{flex:1 1 auto;min-width:0}
+    .topbar .menu-toggle{display:inline-flex;order:2}
+    .topbar .topbar-nav{order:5;flex:1 1 100%;flex-direction:column;align-items:stretch;gap:0;background:#1f1d2c;margin:6px -14px -10px;padding:4px 0;display:none}
+    .topbar .topbar-nav.is-open{display:flex}
+    .topbar .topbar-nav a{padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;opacity:1}
+  }
+
+  .wrap{ max-width:760px; margin:60px auto; padding:0 18px;}
+  .back{ display:inline-flex; align-items:center; gap:6px; background:#000000; color:#fff; text-decoration:none; padding:10px 18px; border-radius:999px; font-weight:700; font-size:.9rem; margin-bottom:18px; }
+  .back:hover{background:#3a3850;}
+
+  .product{background:#fff;border-radius:8px;padding:28px;display:grid;grid-template-columns:340px 1fr;gap:32px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+  .cover-wrap{background:#f0eee9;border-radius:6px;padding:16px;display:grid;place-items:center;aspect-ratio:3/4}
+  .cover-wrap img{width:100%;height:100%;object-fit:contain}
+  .info h1{color:#2b293a;font-size:22px;margin-bottom:6px;line-height:1.3}
+  .info .author{color:#888;font-size:14px;margin-bottom:12px}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .badge{background:#f4f1ec;color:#2b293a;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600}
+  .badge.featured{background:#ff690c;color:#fff}
+  .price{font-size:28px;font-weight:700;color:#ff690c;margin:14px 0 6px}
+  .stock{font-size:12px;color:#1f7a4d;margin-bottom:14px}
+  .stock.out{color:#b42318}
+  .description{font-size:14px;color:#444;line-height:1.7;margin-bottom:18px;white-space:pre-line}
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{padding:12px 24px;border:0;border-radius:4px;font-weight:700;font-size:14px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+  .btn-primary{background:#ff690c;color:#fff}
+  .btn-primary:hover{background:#e85a00}
+  .btn-primary:disabled{background:#ccc;cursor:not-allowed}
+  .btn-outline{background:#fff;color:#2b293a;border:1.5px solid #2b293a}
+  .btn-outline:hover{background:#2b293a;color:#fff}
+
+  .reviews{background:#fff;border-radius:8px;padding:28px;margin-top:18px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+  .reviews h2{color:#2b293a;font-size:18px;margin-bottom:16px}
+  .review-list{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+  .review-card{background:#fafafa;border-left:3px solid #ff690c;padding:12px 16px;border-radius:4px}
+  .review-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12px;color:#888}
+  .review-head .author{color:#2b293a;font-weight:700}
+  .review-stars{color:#ff690c;font-size:13px}
+  .review-text{font-size:13.5px;color:#444}
+  .empty{color:#888;font-size:13px;text-align:center;padding:18px;background:#fafafa;border-radius:4px}
+
+  .review-form{border-top:1px solid #eee;padding-top:18px}
+  .review-form h3{color:#2b293a;font-size:15px;margin-bottom:12px}
+  .review-form label{display:block;font-size:12px;color:#666;margin-bottom:5px;font-weight:600}
+  .review-form input,.review-form textarea,.review-form select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:4px;font-size:13px;font-family:inherit;margin-bottom:12px;outline:0}
+  .review-form input:focus,.review-form textarea:focus,.review-form select:focus{border-color:#ff690c}
+  .review-form textarea{resize:vertical;min-height:80px}
+  .login-prompt{background:#fff7ef;border:1px solid #ffd9b3;color:#7a3a00;padding:14px 18px;border-radius:6px;font-size:13.5px;text-align:center}
+  .login-prompt a{color:#ff690c;font-weight:700;text-decoration:underline}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;padding:11px 22px;border-radius:24px;font-weight:600;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transition:opacity .25s;pointer-events:none;z-index:9999}
+  .toast.show{opacity:1}
+  .toast.error{background:#dc2626}
+
+  @media (max-width:760px){
+    .product{grid-template-columns:1fr;padding:18px}
+    .cover-wrap{aspect-ratio:auto;max-width:240px;margin:0 auto}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="/" class="logo" aria-label="Librairie Magma"><img class="logo-img" src="/img/Copilot_20260402_080209.png" alt="Librairie Magma"></a>
+  <nav class="nav topbar-nav">
+    <a href="/">Accueil</a>
+    <a href="/catalogue.html">Catalogue</a>
+    <a href="/panier.html">Panier</a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <a href="javascript:history.back()" class="back">← Retour</a>
+
+  <div id="product-root">
+    <div class="empty" style="padding:60px">Chargement…</div>
+  </div>
+
+  <div class="reviews" id="reviews-root" style="display:none">
+    <h2>Commentaires des lecteurs</h2>
+    <div class="review-list" id="review-list"></div>
+    <div id="review-form-area"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const FALLBACK_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'><rect width='100' height='140' fill='%23eee'/><text x='50' y='75' text-anchor='middle' font-family='Arial' font-size='10' fill='%23888'>Pas de couverture</text></svg>";
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+function money(n){return new Intl.NumberFormat("fr-FR").format(n||0)+" FCFA"}
+function stars(n){n=Math.max(0,Math.min(5,parseInt(n,10)||0));return "★".repeat(n)+"☆".repeat(5-n)}
+
+function showToast(msg, type){
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (type==="error" ? " error" : "");
+  setTimeout(function(){t.className = "toast";}, 2400);
+}
+
+function getId(){
+  var p = new URLSearchParams(window.location.search);
+  return parseInt(p.get("id") || p.get("book") || "0", 10);
+}
+
+var BOOK_ID = getId();
+var IS_AUTH = false;
+
+function renderProduct(b){
+  var inStock = (b.stock == null) || b.stock > 0;
+  document.getElementById("product-root").innerHTML =
+    '<div class="product">' +
+      '<div class="cover-wrap"><img src="' + esc(b.image||FALLBACK_IMG) + '" alt="' + esc(b.titre) + '" onerror="this.src=\'' + FALLBACK_IMG + '\'"></div>' +
+      '<div class="info">' +
+        '<h1>' + esc(b.titre) + '</h1>' +
+        '<div class="author">par ' + esc(b.auteur||"Auteur inconnu") + '</div>' +
+        '<div class="badges">' +
+          (b.genre ? '<span class="badge">' + esc(b.genre) + '</span>' : '') +
+          (b.featured ? '<span class="badge featured">Sélection Magma</span>' : '') +
+        '</div>' +
+        '<div class="price">' + money(b.prix) + '</div>' +
+        '<div class="stock' + (inStock?'':' out') + '">' + (inStock ? '✓ En stock' + (b.stock!=null ? ' (' + b.stock + ' disponibles)' : '') : '✕ Rupture de stock') + '</div>' +
+        '<div class="description">' + esc(b.description || "Aucun résumé disponible pour ce livre.") + '</div>' +
+        '<div class="actions">' +
+          '<button class="btn btn-primary" id="btn-add" ' + (inStock?'':'disabled') + '>🛒 Ajouter au panier</button>' +
+          '<a class="btn btn-outline" href="/MABOUTIQUE.html">Voir le catalogue</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var btn = document.getElementById("btn-add");
+  if(btn){
+    btn.addEventListener("click", function(){
+      if(!IS_AUTH){
+        showToast("Connectez-vous pour ajouter au panier.", "error");
+        setTimeout(function(){window.location.href = "/login.html?next=" + encodeURIComponent(window.location.pathname + window.location.search);}, 900);
+        return;
+      }
+      btn.disabled = true;
+      fetch("/api/cart/add", {
+        method:"POST", credentials:"same-origin",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({book_id: b.id, quantity: 1})
+      }).then(function(r){
+        return r.json().then(function(d){
+          if(r.status === 401){
+            showToast("Connectez-vous pour ajouter au panier.", "error");
+            setTimeout(function(){window.location.href = "/login.html?next=" + encodeURIComponent(window.location.pathname + window.location.search);}, 900);
+            return;
+          }
+          if(!r.ok){ throw new Error(d.error || "Ajout impossible"); }
+          showToast("✓ Livre ajouté au panier !");
+        });
+      }).catch(function(err){
+        showToast(err.message || "Ajout impossible", "error");
+      }).finally(function(){
+        setTimeout(function(){btn.disabled = !inStock;}, 800);
+      });
+    });
+  }
+}
+
+function renderReviews(reviews){
+  var list = document.getElementById("review-list");
+  if(!reviews.length){
+    list.innerHTML = '<div class="empty">Aucun commentaire pour le moment. Soyez le premier à donner votre avis !</div>';
+  } else {
+    list.innerHTML = reviews.map(function(r){
+      return '<div class="review-card">' +
+        '<div class="review-head"><span class="author">' + esc(r.customer_name||r.author||"Anonyme") + '</span>' +
+          '<span class="review-stars">' + stars(r.rating) + '</span>' +
+        '</div>' +
+        '<div class="review-text">' + esc(r.comment||"") + '</div>' +
+      '</div>';
+    }).join("");
+  }
+  document.getElementById("reviews-root").style.display = "block";
+}
+
+function renderReviewForm(){
+  var area = document.getElementById("review-form-area");
+  if(!IS_AUTH){
+    area.innerHTML = '<div class="login-prompt">Pour laisser un commentaire, <a href="/login.html?next=' + encodeURIComponent(window.location.pathname + window.location.search) + '">connectez-vous</a> ou <a href="/register.html">créez un compte</a>.</div>';
+    return;
+  }
+  area.innerHTML =
+    '<div class="review-form"><h3>Donnez votre avis</h3>' +
+      '<label>Note</label>' +
+      '<select id="rv-rating">' +
+        '<option value="5">★★★★★ — Excellent</option>' +
+        '<option value="4">★★★★☆ — Très bon</option>' +
+        '<option value="3" selected>★★★☆☆ — Bon</option>' +
+        '<option value="2">★★☆☆☆ — Moyen</option>' +
+        '<option value="1">★☆☆☆☆ — Décevant</option>' +
+      '</select>' +
+      '<label>Votre commentaire</label>' +
+      '<textarea id="rv-comment" placeholder="Partagez votre avis sur ce livre…" maxlength="600"></textarea>' +
+      '<button class="btn btn-primary" id="rv-submit">Publier mon avis</button>' +
+    '</div>';
+
+  document.getElementById("rv-submit").addEventListener("click", function(){
+    var rating = parseInt(document.getElementById("rv-rating").value, 10) || 5;
+    var comment = document.getElementById("rv-comment").value.trim();
+    if(comment.length < 3){ showToast("Votre commentaire est trop court.", "error"); return; }
+    var btn = document.getElementById("rv-submit");
+    btn.disabled = true;
+    fetch("/api/books/" + BOOK_ID + "/reviews", {
+      method:"POST", credentials:"same-origin",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({rating: rating, comment: comment})
+    }).then(function(r){
+      return r.json().then(function(d){
+        if(!r.ok){ throw new Error(d.error || "Publication impossible"); }
+        showToast("✓ Avis publié !");
+        loadReviews();
+        document.getElementById("rv-comment").value = "";
+      });
+    }).catch(function(err){ showToast(err.message, "error"); })
+    .finally(function(){ btn.disabled = false; });
+  });
+}
+
+function loadReviews(){
+  fetch("/api/books/" + BOOK_ID + "/reviews").then(function(r){return r.ok?r.json():[];}).then(renderReviews);
+}
+
+function init(){
+  if(!BOOK_ID){
+    document.getElementById("product-root").innerHTML = '<div class="empty" style="padding:60px">Livre introuvable. <a href="/MABOUTIQUE.html" style="color:#ff690c">Voir le catalogue</a></div>';
+    return;
+  }
+  Promise.all([
+    fetch("/api/auth/status").then(function(r){return r.ok?r.json():{authenticated:false};}).catch(function(){return {authenticated:false};}),
+    fetch("/api/books/" + BOOK_ID).then(function(r){
+      if(!r.ok) throw new Error("Livre introuvable");
+      return r.json();
+    })
+  ]).then(function(arr){
+    IS_AUTH = !!arr[0].authenticated;
+    renderProduct(arr[1]);
+    renderReviewForm();
+    loadReviews();
+  }).catch(function(){
+    document.getElementById("product-root").innerHTML = '<div class="empty" style="padding:60px">Livre introuvable. <a href="/MABOUTIQUE.html" style="color:#ff690c">Voir le catalogue</a></div>';
+  });
+}
+
+init();
+</script>
+</body>
+</html>

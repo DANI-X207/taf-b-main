@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/png" href="/img/ICON-1.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Librairie Magma — Mon panier</title>
+<!-- skip-inject: magma-fixes.css -->
+<script>window.MAGMA_CART_CUSTOM=true;</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#f2f1f1 !important;min-height:100vh}
+  body{font-family:Verdana,Arial,Helvetica,sans-serif;color:#2d2d2d;line-height:1.5}
+  a{text-decoration:none;color:inherit}
+  img{display:block;max-width:100%}
+
+  #magma-cart-badge{display:none !important}
+
+  /* ===== CHECKOUT MODAL ===== */
+  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+  .modal-back.show{display:flex}
+  .modal{background:#fff;border-radius:10px;width:100%;max-width:520px;max-height:90vh;overflow:auto;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+  .modal-head{padding:18px 22px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+  .modal-head h3{font-size:17px;color:#2b293a;font-weight:700}
+  .modal-close{background:transparent;border:0;font-size:24px;color:#888;cursor:pointer;line-height:1}
+  .modal-body{padding:20px 22px}
+  .modal-body .field{margin-bottom:14px}
+  .modal-body label{display:block;font-size:12px;color:#555;font-weight:600;margin-bottom:5px}
+  .modal-body input,.modal-body select,.modal-body textarea{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:5px;font-size:13.5px;font-family:inherit;outline:0;background:#fff;color:#2d2d2d}
+  .modal-body input:focus,.modal-body select:focus,.modal-body textarea:focus{border-color:#ff690c}
+  .modal-body textarea{resize:vertical;min-height:60px}
+  .modal-foot{padding:16px 22px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:10px;background:#fafafa;border-radius:0 0 10px 10px}
+  .modal-foot button{padding:10px 20px;border-radius:5px;font-weight:700;font-size:13px;cursor:pointer;border:0}
+  .modal-foot .btn-cancel{background:#fff;color:#555;border:1px solid #ddd}
+  .modal-foot .btn-confirm{background:#ff690c;color:#fff}
+  .modal-foot .btn-confirm:disabled{opacity:.55;cursor:wait}
+  .modal-err{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 12px;border-radius:5px;font-size:12.5px;margin-bottom:12px;display:none}
+  .modal-err.show{display:block}
+
+  /* ===== HEADER (identique à Accueil-v2) ===== */
+  .topbar{background:#000000;color:#fff;height:56px;display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;flex-shrink:0;text-decoration:none;color:inherit}
+  .logo-mark{width:28px;height:28px;background:#ff690c;border-radius:6px;display:grid;place-items:center;font-size:14px}
+  .logo-img{height:42px;width:auto;display:block;object-fit:contain}
+  .search{flex:0 1 300px;height:34px;background:#fff;border-radius:4px;display:flex;align-items:center;padding:0 12px;gap:8px}
+  .search input{flex:1;border:0;outline:0;font-size:13px;color:#2d2d2d;background:transparent;min-width:0}
+  .search button{background:#ff690c;color:#fff;border:0;height:26px;padding:0 12px;border-radius:3px;font-weight:600;cursor:pointer;font-size:12px;flex-shrink:0}
+  .topbar-nav{display:flex;align-items:center;gap:18px;font-size:13px}
+  .topbar-nav a{opacity:.85;white-space:nowrap}.topbar-nav a:hover{opacity:1}
+  .icons{display:flex;align-items:center;gap:14px;margin-left:auto;flex-shrink:0}
+  .icon-btn{color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;position:relative;font-size:12px;text-decoration:none}
+  .icon-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8}
+  .icon-btn .lbl{font-size:12px;opacity:.9}
+  .icon-btn:hover{opacity:.85}
+  .cart-badge{position:absolute;top:-6px;left:12px;background:#ff690c;color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:grid;place-items:center;padding:0 4px}
+
+  /* ===== HERO ===== */
+  .page-hero{background:linear-gradient(135deg,rgba(255, 112, 29, 0.78),#ff690c);color:#fff;padding:50px 32px 38px;text-align:center}
+  .page-hero h1{font-size:32px;font-weight:800;letter-spacing:.3px;margin-bottom:8px}
+  .page-hero p{color:#ffffff;font-size:14px;max-width:560px;margin:0 auto}
+
+  /* ===== LAYOUT ===== */
+  .wrap{max-width:1200px;margin:0 auto;padding:32px}
+  .cart-layout{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:flex-start}
+
+  /* ===== CART ITEMS ===== */
+  .cart-card{background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.06);overflow:hidden}
+  .cart-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #f0f0f0}
+  .cart-head h2{font-size:18px;color:#2b293a;font-weight:700}
+  .cart-head .cnt{background:#fff5ee;color:#ff690c;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px}
+  .cart-list{padding:0}
+  .citem{display:grid;grid-template-columns:90px 1fr auto;gap:18px;padding:20px 24px;border-bottom:1px solid #f5f5f5;align-items:center}
+  .citem:last-child{border-bottom:0}
+  .citem .thumb{width:90px;height:120px;background:#f0eee9;border-radius:6px;overflow:hidden;display:grid;place-items:center}
+  .citem .thumb img{width:100%;height:100%;object-fit:cover}
+  .citem .info{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .citem .ititle{font-size:14.5px;color:#2d2d2d;font-weight:700;line-height:1.35}
+  .citem .iauthor{font-size:12px;color:#888}
+  .citem .iprice{font-size:13px;color:#ff690c;font-weight:700;margin-top:4px}
+  .citem .right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+  .citem .qty{display:inline-flex;align-items:center;gap:0;border:1px solid #e2e2e2;border-radius:6px;overflow:hidden}
+  .citem .qty button{width:34px;height:34px;background:#fff;border:0;color:#2b293a;font-size:18px;font-weight:700;cursor:pointer;line-height:1;transition:background .15s}
+  .citem .qty button:hover{background:#fff5ee;color:#ff690c}
+  .citem .qty button:disabled{opacity:.4;cursor:not-allowed}
+  .citem .qty .qval{min-width:38px;height:34px;display:grid;place-items:center;font-size:14px;font-weight:700;color:#2b293a;border-left:1px solid #e2e2e2;border-right:1px solid #e2e2e2;background:#fafafa}
+  .citem .subtotal{font-size:14px;color:#2b293a;font-weight:700}
+  .citem .remove{background:none;border:0;color:#c54545;cursor:pointer;font-size:11.5px;text-decoration:underline;padding:0}
+  .citem .remove:hover{color:#a02e2e}
+
+  .cart-foot{padding:18px 24px;display:flex;justify-content:space-between;align-items:center;background:#fafafa}
+  .cart-foot a{font-size:13px;color:#ff690c;font-weight:600}
+  .cart-foot button.clear{background:none;border:0;color:#888;font-size:12.5px;cursor:pointer;text-decoration:underline}
+  .cart-foot button.clear:hover{color:#c54545}
+
+  .empty-cart{text-align:center;padding:60px 24px}
+  .empty-cart .ico{font-size:56px;margin-bottom:14px}
+  .empty-cart h3{font-size:18px;color:#2b293a;margin-bottom:8px}
+  .empty-cart p{color:#888;font-size:13.5px;margin-bottom:20px}
+  .btn-orange{display:inline-block;background:#ff690c;color:#fff;border:0;padding:12px 26px;border-radius:6px;font-weight:700;cursor:pointer;font-size:13.5px;letter-spacing:.3px}
+  .btn-orange:hover{background:#e85a00}
+
+  /* ===== SUMMARY ===== */
+  .summary{background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.06);padding:24px;position:sticky;top:80px}
+  .summary h3{font-size:16px;color:#2b293a;font-weight:700;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #f0f0f0}
+  .sum-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13.5px;color:#3a3848}
+  .sum-row.total{margin-top:12px;padding-top:14px;border-top:1px solid #f0f0f0;font-size:17px;color:#2b293a;font-weight:800}
+  .sum-row.total .val{color:#ff690c}
+  .summary .checkout{display:block;width:100%;margin-top:18px;text-align:center}
+  .summary .ship-info{margin-top:14px;font-size:12px;color:#888;line-height:1.5;padding:10px;background:#f8f8f8;border-radius:6px}
+  .summary .ship-info strong{color:#2b293a;display:block;margin-bottom:4px}
+
+  /* ===== FOOTER ===== */
+  footer{background:#000000;color:#aaa;padding:48px 0 24px;margin-top:30px}
+  footer .wrap{max-width:1200px;padding:0 32px}
+  .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:32px}
+  .foot-brand h4{color:#fff;font-size:18px;margin-bottom:8px}
+  .foot-brand p{font-size:12px;color:#888;line-height:1.6}
+  .foot-col h5{color:#fff;font-size:13px;margin-bottom:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .foot-col a{display:block;color:#aaa;font-size:12.5px;padding:4px 0}
+  .foot-col a:hover{color:#ff690c}
+  .copyright{text-align:right;font-size:11px;color:#666;margin-top:32px;padding-top:20px;border-top:1px solid #2c2a3b}
+
+  /* Toast */
+  .toast{position:fixed;bottom:24px;right:24px;background:#2b293a;color:#fff;padding:12px 20px;border-radius:6px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:1000;opacity:0;transform:translateY(10px);transition:all .25s}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.err{background:#c54545}
+
+  @media (max-width:980px){
+    .cart-layout{grid-template-columns:1fr}
+    .summary{position:static}
+    .foot-grid{grid-template-columns:1fr 1fr}
+    .topbar-nav{display:none}
+  }
+  @media (max-width:760px){
+    .topbar{height:auto;padding:8px 12px;flex-wrap:wrap;gap:8px;row-gap:8px}
+    .logo{font-size:13px;order:1}
+    .logo-mark{width:24px;height:24px;font-size:12px}
+    .icons{order:2;gap:10px;margin-left:auto}
+    .icon-btn .lbl{display:none}
+    .icon-btn svg{width:22px;height:22px}
+    .search{order:3;flex:1 1 100%;height:36px}
+    .search input{font-size:14px}
+    .search button{height:28px;padding:0 10px;font-size:11.5px}
+    .page-hero{padding:36px 18px 28px}
+    .page-hero p{font-size:13px}
+  }
+  @media (max-width:640px){
+    .citem{grid-template-columns:70px 1fr;gap:12px;padding:16px}
+    .citem .thumb{width:70px;height:94px}
+    .citem .right{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}
+    .wrap{padding:20px 14px;max-width:100vw}
+    .foot-grid{grid-template-columns:1fr}
+    .page-hero h1{font-size:22px}
+    body,html{overflow-x:hidden}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="/" class="logo" aria-label="Librairie Magma"><img class="logo-img" src="/img/Copilot_20260402_080209.png" alt="Librairie Magma"></a>
+  <form class="search" onsubmit="event.preventDefault();window.location='/catalogue.html?q='+encodeURIComponent(this.q.value)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" name="q" placeholder="Rechercher un article…">
+    <button type="submit">Recherche</button>
+  </form>
+  <nav class="topbar-nav">
+    <a href="/">Accueil</a>
+    <a href="/catalogue.html">Mon Magma</a>
+    <a href="/a-propos.html">à propos</a>
+  </nav>
+  <div class="icons">
+    <a class="icon-btn" href="/mon-compte.html" title="Mon compte">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+      <span class="lbl">Compte</span>
+    </a>
+    <a class="icon-btn" href="/panier.html" title="Panier">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+      <span class="cart-badge" id="cart-count">0</span>
+      <span class="lbl">Panier</span>
+    </a>
+    <a class="icon-btn" href="/mes-commandes.html" title="Mes commandes">
+      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>
+      <span class="lbl">Commandes</span>
+    </a>
+    <a class="icon-btn" href="/parametres.html" title="Paramètres">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      <span class="lbl">Paramètres</span>
+    </a>
+  </div>
+</header>
+
+<section class="page-hero">
+  <h1>Mon panier</h1>
+  <p>Vérifiez vos articles, ajustez les quantités et finalisez votre commande.</p>
+</section>
+
+<main class="wrap">
+  <div class="cart-layout">
+    <div class="cart-card" id="cart-host">
+      <div class="empty-cart">
+        <div class="ico">⏳</div>
+        <h3>Chargement de votre panier…</h3>
+      </div>
+    </div>
+
+    <aside class="summary">
+      <h3>Récapitulatif</h3>
+      <div class="sum-row"><span>Sous-total</span><span class="val" id="sum-subtotal">0 FCFA</span></div>
+      <div class="sum-row"><span>Articles</span><span class="val" id="sum-count">0</span></div>
+      <div class="sum-row"><span>Livraison</span><span class="val" style="color:#28a745;font-weight:700">À calculer</span></div>
+      <div class="sum-row total"><span>Total</span><span class="val" id="sum-total">0 FCFA</span></div>
+      <button type="button" class="btn-orange checkout" id="checkout-btn">Passer la commande</button>
+      <div class="ship-info">
+        <strong>📍 Zones de livraison</strong>
+        Pointe-Noire : Potopoto, Saint Exupéry, Présidence, OSH, CHU.
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <h4>Librairie Magma</h4>
+        <p>Votre librairie en ligne de confiance — découvrez, achetez et faites-vous livrer vos livres préférés partout au Congo.</p>
+        <p style="margin-top:10px;font-size:12px;color:#888">📍 Pointe-Noire — Livraison Potopoto, Saint Exupéry, Présidence, OSH, CHU</p>
+      </div>
+      <div class="foot-col">
+        <h5>La boutique</h5>
+        <a href="/catalogue.html">Catalogue</a>
+        <a href="/panier.html">Mon panier</a>
+        <a href="/mes-commandes.html">Mes commandes</a>
+      </div>
+      <div class="foot-col">
+        <h5>Navigation</h5>
+        <a href="/">Accueil</a>
+        <a href="/mon-compte.html">Mon compte</a>
+        <a href="/login.html">Connexion</a>
+      </div>
+      <div class="foot-col">
+        <h5>Contact</h5>
+        <a href="mailto:moussokiexauce7@gmail.com">moussokiexauce7@gmail.com</a>
+        <a href="/conditions.html">Conditions générales</a>
+        <a href="/confidentialite.html">Politique de confidentialité</a>
+      </div>
+    </div>
+    <div class="copyright">© 2026 Librairie Magma — Tous droits réservés</div>
+  </div>
+</footer>
+
+<div class="modal-back" id="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="checkout-title">Finaliser ma commande</h3>
+      <button type="button" class="modal-close" id="checkout-cancel" aria-label="Fermer">×</button>
+    </div>
+    <form id="checkout-form" novalidate>
+      <div class="modal-body">
+        <div class="modal-err" id="checkout-err"></div>
+        <div class="field" style="display:none;">
+          <label for="co-name">Nom complet *</label>
+          <input type="text" id="co-name" name="customer_name" maxlength="140" required>
+        </div>
+        <div class="field" style="display:none;">
+          <label for="co-email">Email *</label>
+          <input type="email" id="co-email" name="customer_email" required>
+        </div>
+        <div class="field" style="display:none;">
+          <label for="co-phone">Téléphone *</label>
+          <input type="tel" id="co-phone" name="customer_phone" placeholder="+242 …" required>
+        </div>
+        <div class="field">
+          <label for="co-zone">Zone de livraison *</label>
+          <select id="co-zone" name="delivery_zone" required>
+            <option value="">— Choisir une zone —</option>
+          </select>
+        </div>
+        <div class="field" style="display:none;">
+          <label for="co-address">Adresse précise *</label>
+          <textarea id="co-address" name="delivery_address" maxlength="260" required placeholder="Quartier, rue, point de repère…"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn-cancel" id="checkout-cancel-2">Annuler</button>
+        <button type="submit" class="btn-confirm" id="checkout-confirm">Valider la commande</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const FALLBACK_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 130'><rect width='100' height='130' fill='%23eee'/><text x='50' y='70' text-anchor='middle' font-family='Arial' font-size='10' fill='%23888'>Pas d'image</text></svg>";
+function esc(s){return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+function fmtPrice(n){return new Intl.NumberFormat('fr-FR').format(Math.round(Number(n||0)))+' FCFA';}
+
+let CART = [];
+let STOCK = {};
+
+function showToast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr?' err':'');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>{t.className='toast';},2200);
+}
+
+async function loadStock(){
+  try{
+    const r = await fetch('/api/books');
+    if(!r.ok) return;
+    const books = await r.json();
+    STOCK = {};
+    books.forEach(b => { STOCK[b.id] = Number(b.stock||0); });
+  }catch(e){}
+}
+
+async function loadCart(){
+  try{
+    const r = await fetch('/api/cart',{credentials:'same-origin'});
+    if(r.status===401){
+      window.location.href = '/login.html';
+      return;
+    }
+    CART = r.ok ? (await r.json()) : [];
+    render();
+  }catch(e){
+    document.getElementById('cart-host').innerHTML = '<div class="empty-cart"><div class="ico">⚠️</div><h3>Erreur de chargement</h3><p>Impossible de récupérer votre panier.</p></div>';
+  }
+}
+
+function render(){
+  const host = document.getElementById('cart-host');
+  if(!CART.length){
+    host.innerHTML = `
+      <div class="empty-cart">
+        <div class="ico">🛒</div>
+        <h3>Votre panier est vide</h3>
+        <p>Découvrez notre catalogue et ajoutez vos livres préférés.</p>
+        <a class="btn-orange" href="/catalogue.html">Découvrir le catalogue</a>
+      </div>`;
+    updateSummary();
+    return;
+  }
+  const totalItems = CART.reduce((s,i)=>s+Number(i.qty||0),0);
+  let html = `
+    <div class="cart-head">
+      <h2>Articles dans votre panier</h2>
+      <span class="cnt">${totalItems} article${totalItems>1?'s':''}</span>
+    </div>
+    <div class="cart-list">`;
+  CART.forEach(item=>{
+    const subtotal = Number(item.prix||0) * Number(item.qty||0);
+    const stock = STOCK[item.id] || 99;
+    const atMax = item.qty >= stock;
+    html += `
+      <div class="citem" data-id="${item.id}">
+        <div class="thumb"><img src="${esc(item.image||FALLBACK_IMG)}" alt="${esc(item.titre)}" onerror="this.src='${FALLBACK_IMG}'"></div>
+        <div class="info">
+          <div class="ititle">${esc(item.titre)}</div>
+          <div class="iauthor">${esc(item.auteur||'Auteur inconnu')}</div>
+          <div class="iprice">${fmtPrice(item.prix)} l'unité</div>
+        </div>
+        <div class="right">
+          <div class="qty">
+            <button type="button" class="dec" data-id="${item.id}" ${item.qty<=1?'disabled':''} title="Réduire">−</button>
+            <span class="qval">${item.qty}</span>
+            <button type="button" class="inc" data-id="${item.id}" ${atMax?'disabled':''} title="${atMax?'Stock maximum atteint':'Augmenter'}">+</button>
+          </div>
+          <div class="subtotal">${fmtPrice(subtotal)}</div>
+          <button type="button" class="remove" data-id="${item.id}">Retirer</button>
+        </div>
+      </div>`;
+  });
+  html += `
+    </div>
+    <div class="cart-foot">
+      <a href="/catalogue.html">← Continuer mes achats</a>
+      <button type="button" class="clear" id="btn-clear">Vider le panier</button>
+    </div>`;
+  host.innerHTML = html;
+
+  host.querySelectorAll('.inc').forEach(b => b.addEventListener('click', ()=>updateQty(b.dataset.id, +1)));
+  host.querySelectorAll('.dec').forEach(b => b.addEventListener('click', ()=>updateQty(b.dataset.id, -1)));
+  host.querySelectorAll('.remove').forEach(b => b.addEventListener('click', ()=>removeItem(b.dataset.id)));
+  const clr = document.getElementById('btn-clear');
+  if(clr) clr.addEventListener('click', clearAll);
+
+  updateSummary();
+}
+
+function updateSummary(){
+  const subtotal = CART.reduce((s,i)=>s+Number(i.prix||0)*Number(i.qty||0),0);
+  const count = CART.reduce((s,i)=>s+Number(i.qty||0),0);
+  document.getElementById('sum-subtotal').textContent = fmtPrice(subtotal);
+  document.getElementById('sum-total').textContent = fmtPrice(subtotal);
+  document.getElementById('sum-count').textContent = count;
+  document.getElementById('cart-count').textContent = count;
+  const btn = document.getElementById('checkout-btn');
+  if(CART.length){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+  else{btn.style.opacity='.4';btn.style.pointerEvents='none';}
+}
+
+async function updateQty(bookId, delta){
+  bookId = Number(bookId);
+  const item = CART.find(i => i.id === bookId);
+  if(!item) return;
+  const newQty = item.qty + delta;
+  if(newQty < 1){ removeItem(bookId); return; }
+  const stock = STOCK[bookId] || 99;
+  if(newQty > stock){ showToast('Stock maximum atteint', true); return; }
+  try{
+    const r = await fetch('/api/cart/update',{
+      method:'POST', credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({id: bookId, qty: newQty})
+    });
+    if(r.status===401){ window.location.href='/login.html'; return; }
+    const data = await r.json();
+    if(!r.ok){ showToast(data.error || 'Erreur', true); return; }
+    CART = data.cart || [];
+    render();
+  }catch(e){ showToast('Erreur réseau', true); }
+}
+
+async function removeItem(bookId){
+  bookId = Number(bookId);
+  try{
+    const r = await fetch('/api/cart/remove/'+bookId,{method:'DELETE',credentials:'same-origin'});
+    if(r.status===401){ window.location.href='/login.html'; return; }
+    const data = await r.json();
+    CART = data.cart || [];
+    render();
+    showToast('Article retiré du panier');
+  }catch(e){ showToast('Erreur réseau', true); }
+}
+
+async function clearAll(){
+  if(!confirm('Êtes-vous sûr de vouloir vider tout le panier ?')) return;
+  try{
+    const r = await fetch('/api/cart/clear',{method:'DELETE',credentials:'same-origin'});
+    if(r.status===401){ window.location.href='/login.html'; return; }
+    if(r.ok){ CART = []; render(); showToast('Panier vidé'); }
+  }catch(e){ showToast('Erreur réseau', true); }
+}
+
+// ===== CHECKOUT =====
+let ME = null;
+let ZONES = [];
+
+async function loadMe(){
+  try{
+    const r = await fetch('/api/auth/status',{credentials:'same-origin'});
+    if(r.ok){
+      const data = await r.json();
+      ME = data && data.user ? data.user : null;
+    }
+  }catch(e){}
+}
+
+async function loadZones(){
+  try{
+    const r = await fetch('/api/delivery-zones',{credentials:'same-origin'});
+    if(r.ok){
+      ZONES = await r.json();
+    }
+  }catch(e){}
+  if(!ZONES || !ZONES.length){
+    ZONES = ["Potopoto la gare","Total vers Saint Exupérie","Présidence","OSH","CHU"];
+  }
+  const sel = document.getElementById('co-zone');
+  sel.innerHTML = '<option value="">— Choisir une zone —</option>' +
+    ZONES.map(z => `<option value="${esc(z)}">${esc(z)}</option>`).join('');
+}
+
+function openCheckout(){
+  if(!CART.length){ showToast('Votre panier est vide', true); return; }
+  const me = ME || {};
+  document.getElementById('co-name').value = me.name || me.username || '';
+  document.getElementById('co-email').value = me.email || '';
+  document.getElementById('co-phone').value = me.phone || '';
+  document.getElementById('co-zone').value = '';
+  document.getElementById('co-address').value = '';
+  const err = document.getElementById('checkout-err');
+  err.className = 'modal-err'; err.textContent = '';
+  document.getElementById('checkout-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('co-zone').focus(), 80);
+}
+
+function closeCheckout(){
+  document.getElementById('checkout-modal').classList.remove('show');
+}
+
+async function submitCheckout(ev){
+  ev.preventDefault();
+  const btn = document.getElementById('checkout-confirm');
+  const err = document.getElementById('checkout-err');
+  err.className = 'modal-err'; err.textContent = '';
+  const zone = document.getElementById('co-zone').value;
+  const address = document.getElementById('co-address').value.trim() || zone;
+  const payload = {
+    customer_name: document.getElementById('co-name').value.trim(),
+    customer_email: document.getElementById('co-email').value.trim(),
+    customer_phone: document.getElementById('co-phone').value.trim(),
+    delivery_zone: zone,
+    delivery_address: address
+  };
+  if(!payload.customer_name || !payload.customer_email || !payload.customer_phone || !payload.delivery_zone || !payload.delivery_address){
+    err.className = 'modal-err show'; err.textContent = 'Veuillez choisir une zone de livraison.';
+    return;
+  }
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Envoi en cours…';
+  try{
+    const r = await fetch('/api/orders',{
+      method:'POST', credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(r.status === 401){ window.location.href = '/login.html?next=' + encodeURIComponent('/panier.html'); return; }
+    const data = await r.json();
+    if(!r.ok){
+      err.className = 'modal-err show';
+      err.textContent = data.error || 'Erreur lors de la validation.';
+      return;
+    }
+    closeCheckout();
+    showToast('✓ Commande #' + data.order.id + ' envoyée !');
+    CART = [];
+    setTimeout(()=>{ window.location.href = '/mes-commandes.html'; }, 900);
+  }catch(e){
+    err.className = 'modal-err show';
+    err.textContent = 'Erreur réseau. Veuillez réessayer.';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+}
+
+document.getElementById('checkout-btn').addEventListener('click', openCheckout);
+document.getElementById('checkout-cancel').addEventListener('click', closeCheckout);
+document.getElementById('checkout-cancel-2').addEventListener('click', closeCheckout);
+document.getElementById('checkout-form').addEventListener('submit', submitCheckout);
+document.getElementById('checkout-modal').addEventListener('click', function(ev){
+  if(ev.target === this) closeCheckout();
+});
+document.addEventListener('keydown', function(ev){
+  if(ev.key === 'Escape' && document.getElementById('checkout-modal').classList.contains('show')) closeCheckout();
+});
+
+(async function init(){
+  await Promise.all([loadStock(), loadMe(), loadZones()]);
+  await loadCart();
+})();
+</script>
+</body>
+</html>

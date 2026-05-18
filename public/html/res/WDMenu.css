@@ -1,0 +1,111 @@
+/* WEBDEV 25 – WDMenu.css (stub de compatibilité) */
+
+/* ── Conteneur principal du menu ─────────────────────────────────── */
+.wbMenuMain {
+  display: block;
+  width: 100%;
+}
+
+/* ── Menu horizontal ─────────────────────────────────────────────── */
+.wbMenuHorizontal > ul.WDOngletMain {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: stretch;
+}
+
+/* ── Options du menu ─────────────────────────────────────────────── */
+.wbMenuHorizontal .WDMenuOption,
+.wbMenuHorizontal .wbMenuOption {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* ── Image dans option ───────────────────────────────────────────── */
+.wbMenuTDImage {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ── Option avec sous-menu ───────────────────────────────────────── */
+.wbOptionAvecSousMenu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Lien dans le menu ───────────────────────────────────────────── */
+.wbOptionLien {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+
+.wbLienMenu {
+  display: inline-block;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* ── Sous-menu (masqué par défaut) ───────────────────────────────── */
+.WDSousMenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  background: #fff;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  min-width: 160px;
+}
+
+/* Affichage au survol ──────────────────────────────────────────── */
+.wbMenuHorizontal .wbMenuOption:hover > .wbOptionAvecSousMenu > .wbOptionLien > .WDSousMenu,
+.wbMenuHorizontal .WDMenuOption:hover .WDSousMenu {
+  display: block;
+}
+
+/* ── Lien de sous-menu ───────────────────────────────────────────── */
+.wbLienMenuAvecSousMenu::after {
+  content: " ▾";
+  font-size: .7em;
+  opacity: .7;
+}
+
+/* ── Menu vertical (fallback mobile) ────────────────────────────── */
+.wbMenuVertical > ul.WDOngletMain {
+  display: block;
+}
+.wbMenuVertical .WDMenuOption {
+  display: block;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media only all and (max-width: 841px) {
+  .wbMenuHorizontal > ul.WDOngletMain {
+    flex-wrap: wrap;
+  }
+}
+
+@media only all and (max-width: 481px) {
+  .wbMenuHorizontal > ul.WDOngletMain {
+    flex-direction: column;
+  }
+  .wbMenuHorizontal .WDMenuOption,
+  .wbMenuHorizontal .wbMenuOption {
+    display: flex;
+    width: 100%;
+  }
+}

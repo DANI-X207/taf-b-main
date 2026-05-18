@@ -1,0 +1,97 @@
+/* WEBDEV 25 – standard.css (stub de compatibilité) */
+
+/* ── Reset de base ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── Clearfix ─────────────────────────────────────────────────────── */
+.clearfix::before,
+.clearfix::after { content: ""; display: table; }
+.clearfix::after { clear: both; }
+.clearfix { zoom: 1; }
+
+/* ── Utilitaires de largeur / hauteur ────────────────────────────── */
+.wbLargeurRWD { width: 100%; }
+.wbHauteurRWD { height: 100%; }
+
+/* ── Alignements ─────────────────────────────────────────────────── */
+.valignmiddle { vertical-align: middle; }
+.valignbottom { vertical-align: bottom; }
+.valigntop    { vertical-align: top; }
+
+/* ── Conteneurs images ───────────────────────────────────────────── */
+.lh0 { line-height: 0; font-size: 0; }
+.dzSpan {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+.wbHnImg {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  line-height: 0;
+}
+.wbHnImg img { display: block; }
+
+/* ── Padding standard WEBDEV ─────────────────────────────────────── */
+.htmlstd .padding { padding: 4px; }
+.htmlstd .webdevclass-riche .padding { padding: 4px; }
+
+/* ── Texte riche ─────────────────────────────────────────────────── */
+.webdevclass-riche { word-wrap: break-word; }
+.webdevclass-riche p { margin: 0; padding: 0; }
+
+/* ── Ancrage centre ──────────────────────────────────────────────── */
+.ancragecenter { text-align: center; }
+.ancragecenter > * { margin-left: auto; margin-right: auto; }
+
+/* ── Bouton lien WEBDEV ──────────────────────────────────────────── */
+.wblien {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: center;
+  box-shadow: none;
+  line-height: normal;
+  cursor: pointer;
+  display: inline-block;
+}
+.bbox { display: block; }
+
+/* ── Classe htmlstd sur <html> ───────────────────────────────────── */
+html.htmlstd { overflow-x: hidden; }
+
+/* ── États WEBDEV ────────────────────────────────────────────────── */
+.wbSurvol { }
+.wbActif  { }
+
+/* ── Effets ──────────────────────────────────────────────────────── */
+.effet { }
+
+/* ── Wrappers de position ────────────────────────────────────────── */
+[class^="pos"], [class*=" pos"] { display: block; }
+
+/* ── Lib champ (labels) ──────────────────────────────────────────── */
+.wbLibChamp { list-style: none; margin: 0; padding: 0; }
+.wbLibChamp li { margin: 0; padding: 0; }
+
+/* ── Saisie ──────────────────────────────────────────────────────── */
+input[type="text"], select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* ── Séparateur ──────────────────────────────────────────────────── */
+.wbSeparateur { border: none; border-top: 1px solid #ccc; margin: 0; }
+
+/* ── Planche (carousel WEBDEV) ───────────────────────────────────── */
+.wbPlanConteneur { overflow: hidden; position: relative; }
+.wbPlan { display: none; }
+.wbPlan.wbActif { display: block; }
+.wbPlanSimple { }
+
+/* ── Navigation principale ───────────────────────────────────────── */
+nav { display: block; }
+
+/* ── Cellules de tableau ─────────────────────────────────────────── */
+td { vertical-align: top; }

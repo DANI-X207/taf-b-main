@@ -1,0 +1,1202 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<link rel="icon" type="image/png" href="/img/ICON-1.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Librairie Magma — Administration</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; color: #2b293a; min-height: 100vh; }
+
+    /* ── LOGIN ── */
+    #admin-login-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255, 248, 248, 0.78),#000000;
+    }
+    .login-box {
+      background: #fff; border-radius: 8px; padding: 48px 44px;
+      width: min(420px, 94vw); box-shadow: 0 20px 60px rgba(0,0,0,.4); text-align: center;
+    }
+    .login-box .logo { width: 60px; height: 60px; margin: 0 auto 20px; }
+    .login-box .logo img { width: 100%; height: 100%; object-fit: contain; }
+    .login-box h1 { font-size: 22px; font-weight: 700; color: #2b293a; margin-bottom: 6px; }
+    .login-box p { font-size: 13px; color: #999; margin-bottom: 28px; }
+    .login-box input {
+      width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 4px;
+      font-size: 14px; background: #f7f7f7; outline: none; margin-bottom: 16px; transition: border-color .2s;
+    }
+    .login-box input:focus { border-color: #ff690c; background: #fff; }
+    .login-box button { width: 100%; padding: 13px; background: #ff690c; color: #fff; font-size: 15px; font-weight: 700; border: none; border-radius: 4px; cursor: pointer; }
+    .login-box button:hover { background: #e55a00; }
+    .login-box .btn-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 16px; padding: 10px 16px; background: transparent; color: #888;
+      border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-weight: 600;
+      text-decoration: none; cursor: pointer; transition: all .15s; width: auto;
+    }
+    .login-box .btn-back:hover { background: #f4f4f4; color: #2b293a; border-color: #bbb; }
+    .login-error { background: #fee4e2; color: #b42318; padding: 10px; border-radius: 4px; font-size: 13px; margin-bottom: 14px; }
+
+    /* ── RESPONSIVE LOGIN ── */
+    @media (max-width: 600px) {
+      .login-box { padding: 32px 22px; width: 94vw; max-width: 94vw; border-radius: 12px; }
+      .login-box h1 { font-size: 19px; }
+      .login-box p { font-size: 12px; margin-bottom: 22px; }
+      .login-box .logo { width: 50px; height: 50px; margin-bottom: 16px; }
+      .login-box input { font-size: 16px; padding: 13px 14px; } /* 16px prevents iOS zoom */
+      .login-box button { padding: 14px; font-size: 15px; min-height: 46px; }
+      #admin-login-screen { padding: 16px; }
+    }
+    @media (max-width: 380px) {
+      .login-box { padding: 24px 16px; }
+      .login-box h1 { font-size: 17px; }
+    }
+
+    /* ── SHELL ── */
+    #admin-dashboard { display: none; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 230px;
+      background: #2b293a; display: flex; flex-direction: column; z-index: 100; box-shadow: 4px 0 20px rgba(0,0,0,.18);
+    }
+    .sidebar-brand { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.1); display: flex; align-items: center; gap: 12px; }
+    .sidebar-brand img { width: 36px; height: 36px; object-fit: contain; filter: brightness(0) invert(1); }
+    .sidebar-brand span { color: #fff; font-size: 15px; font-weight: 700; line-height: 1.2; }
+    .sidebar-brand small { display: block; color: rgba(255,255,255,.45); font-size: 10px; font-weight: 400; }
+    .sidebar-nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+      color: rgba(255,255,255,.65); cursor: pointer; font-size: 14px;
+      border-left: 3px solid transparent; transition: all .15s;
+    }
+    .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+    .nav-item.active { background: rgba(255,105,12,.15); color: #ff690c; border-left-color: #ff690c; }
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.1); }
+    .sidebar-footer a { display: block; color: rgba(255,255,255,.5); font-size: 13px; text-decoration: none; margin-bottom: 10px; }
+    .sidebar-footer a:hover { color: #fff; }
+    .btn-logout { width: 100%; padding: 10px; background: rgba(255,255,255,.08); color: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.15); border-radius: 4px; font-size: 13px; cursor: pointer; transition: all .15s; }
+    .btn-logout:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+    /* MAIN */
+    .main-content { margin-left: 230px; padding: 32px 28px; min-height: 100vh; }
+    .page-header { margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .page-header h2 { font-size: 22px; font-weight: 700; color: #2b293a; }
+    .page-header p { font-size: 13px; color: #999; margin-top: 3px; }
+
+    /* CARD */
+    .card { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,.07); margin-bottom: 24px; }
+    .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #2b293a; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+
+    /* FORM */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 12px; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+    .form-group input, .form-group textarea, .form-group select { padding: 9px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; background: #fafafa; outline: none; transition: border-color .2s; font-family: Arial, sans-serif; }
+    .form-group input:focus, .form-group textarea:focus { border-color: #ff690c; background: #fff; }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .form-group.span2 { grid-column: span 2; }
+
+    /* BUTTONS */
+    .btn { padding: 10px 20px; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: #ff690c; color: #fff; }
+    .btn-primary:hover { background: #e55a00; }
+    .btn-secondary { background: #f0f0f0; color: #555; }
+    .btn-secondary:hover { background: #e0e0e0; }
+    .btn-danger { background: #fee4e2; color: #b42318; }
+    .btn-danger:hover { background: #fca5a5; }
+    .btn-info { background: #dbeafe; color: #1e40af; }
+    .btn-info:hover { background: #bfdbfe; }
+    .btn-success { background: #dcfce7; color: #166534; }
+    .btn-success:hover { background: #bbf7d0; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-group { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+    /* TABS */
+    .tab-bar { display: flex; gap: 4px; margin-bottom: 20px; background: #f8f8f8; padding: 4px; border-radius: 6px; width: fit-content; }
+    .tab-btn { padding: 8px 18px; border: none; background: none; border-radius: 4px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .tab-btn.active { background: #fff; color: #2b293a; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+    .tab-btn .tab-count { background: #ff690c; color: #fff; border-radius: 999px; padding: 1px 6px; font-size: 11px; margin-left: 4px; }
+
+    /* TABLE */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { text-align: left; padding: 10px 12px; background: #f8f8f8; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; border-bottom: 2px solid #eee; font-weight: 700; }
+    .data-table td { padding: 12px 12px; border-bottom: 1px solid #f4f4f4; vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr.clickable { cursor: pointer; transition: background .1s; }
+    .data-table tr.clickable:hover { background: #fafafa; }
+    .data-table .td-img img { width: 40px; height: 52px; object-fit: cover; border-radius: 3px; background: #eee; display: block; }
+    .td-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* ORDER CARDS */
+    .order-card { border: 1px solid #eee; border-radius: 6px; padding: 16px; margin-bottom: 12px; background: #fafafa; }
+    .order-card .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px; }
+    .order-id { font-weight: 700; font-size: 14px; }
+    .order-status { font-size: 12px; padding: 3px 10px; border-radius: 999px; font-weight: 600; flex-shrink: 0; }
+    .status-attente { background: #fef9c3; color: #854d0e; }
+    .status-confirmee { background: #dcfce7; color: #166534; }
+    .status-livraison { background: #dbeafe; color: #1e40af; }
+    .status-livree { background: #ede9fe; color: #5b21b6; }
+    .status-annulee { background: #fee4e2; color: #b42318; }
+    .status-validee { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+    .order-meta { font-size: 13px; color: #555; margin-bottom: 8px; }
+    .order-items-inline { font-size: 12px; color: #777; margin-bottom: 10px; padding: 8px; background: #f0f0f0; border-radius: 4px; }
+    .validation-pills { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+    .v-pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+    .v-done { background: #dcfce7; color: #166534; }
+    .v-pending { background: #f3f4f6; color: #9ca3af; }
+    .order-footer { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* ADS */
+    .ad-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; background: #fafafa; border: 1px solid #eee; border-radius: 6px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+    .ad-item:hover { border-color: #ff690c; }
+    .ad-info strong { display: block; font-size: 14px; margin-bottom: 4px; }
+    .ad-info small { color: #888; font-size: 12px; }
+
+    /* DOWNLOAD */
+    .download-card { display: flex; align-items: center; gap: 20px; padding: 24px; background: #fff; border-radius: 8px; border: 2px dashed #ddd; cursor: pointer; transition: all .2s; text-decoration: none; color: inherit; }
+    .download-card:hover { border-color: #ff690c; background: #fff8f5; }
+    .dl-icon { font-size: 36px; }
+    .dl-info strong { display: block; font-size: 15px; margin-bottom: 4px; }
+    .dl-info small { color: #888; font-size: 13px; }
+
+    /* STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-box { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.07); cursor: pointer; transition: transform .12s, box-shadow .12s; }
+    .stat-box:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+    .stat-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    .stat-value { font-size: 28px; font-weight: 700; color: #2b293a; }
+    .stat-sub { font-size: 12px; color: #ff690c; margin-top: 4px; }
+
+    /* SECTION */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* BADGE */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .badge-active { background: #dcfce7; color: #166534; }
+    .badge-inactive { background: #fee4e2; color: #b42318; }
+    .badge-neutral { background: #f3f4f6; color: #888; }
+    .check-label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #555; cursor: pointer; }
+    .check-label input { accent-color: #ff690c; width: 15px; height: 15px; }
+
+    /* MODAL */
+    #admin-modal { position: fixed; inset: 0; z-index: 9998; display: none; align-items: center; justify-content: center; }
+    #admin-modal.open { display: flex; }
+    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+    .modal-box { position: relative; z-index: 1; background: #fff; border-radius: 10px; width: min(620px, 94vw); max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 80px rgba(0,0,0,.35); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #eee; position: sticky; top: 0; background: #fff; z-index: 1; }
+    .modal-header h3 { font-size: 17px; font-weight: 700; color: #2b293a; }
+    .modal-close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: #f4f4f4; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; color: #666; transition: background .15s; flex-shrink: 0; }
+    .modal-close:hover { background: #eee; }
+    .modal-body { padding: 24px; }
+    .modal-field { margin-bottom: 14px; }
+    .modal-field-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+    .modal-field-value { font-size: 14px; color: #2b293a; line-height: 1.5; }
+    .modal-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+    .modal-section h4 { font-size: 13px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 12px; }
+    .modal-item-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f8f8f8; font-size: 13px; }
+    .modal-item-row:last-child { border-bottom: none; }
+    .modal-img { width: 80px; height: 104px; object-fit: cover; border-radius: 6px; background: #eee; float: right; margin: 0 0 12px 16px; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+    .modal-status-row { display: flex; gap: 8px; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+    .modal-status-row select { padding: 9px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; flex: 1; }
+
+    @media (max-width: 700px) {
+      .sidebar { width: 60px; }
+      .sidebar-brand span, .sidebar-brand small, .nav-item span, .sidebar-footer a, .btn-logout { display: none; }
+      .sidebar-brand { padding: 16px 12px; }
+      .nav-item { padding: 14px; justify-content: center; }
+      .main-content { margin-left: 60px; padding: 20px 14px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.span2 { grid-column: span 1; }
+      .hide-sm { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="admin-login-screen">
+  <div class="login-box">
+    <div class="logo"><img src="/img/Logo version mobile.png" alt="Magma"></div>
+    <h1>Espace Administrateur</h1>
+    <p>Accès protégé — Librairie Magma</p>
+    <div id="login-error" class="login-error" style="display:none;"></div>
+    <input type="password" id="admin-password" placeholder="Mot de passe administrateur" autocomplete="current-password">
+    <button id="admin-login-btn">Se connecter</button>
+    <a href="/" class="btn-back" id="admin-back-btn">← Retour à l'accueil</a>
+  </div>
+</div>
+
+<div id="admin-dashboard">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="/img/Logo version mobile.png" alt="Logo">
+      <div><span>Magma<small>Administration</small></span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-section="dashboard"><span class="icon">📊</span><span>Tableau de bord</span></div>
+      <div class="nav-item" data-section="users"><span class="icon">👥</span><span>Utilisateurs</span></div>
+      <div class="nav-item" data-section="modifs"><span class="icon">🔔</span><span>Modifications</span></div>
+      <div class="nav-item" data-section="books"><span class="icon">📚</span><span>Livres</span></div>
+      <div class="nav-item" data-section="orders"><span class="icon">📦</span><span>Commandes</span></div>
+      <div class="nav-item" data-section="ads"><span class="icon">📢</span><span>Publicités</span></div>
+      <div class="nav-item" data-section="downloads" data-super-only="1"><span class="icon">⬇️</span><span>Téléchargements</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/">← Retour au catalogue</a>
+      <button class="btn-logout" id="admin-logout-btn">Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="section-dashboard">
+      <div class="page-header"><div><h2>Tableau de bord</h2><p>Vue d'ensemble de la librairie</p></div></div>
+      <div class="stats-row">
+        <div class="stat-box" data-go="books" title="Voir les livres"><div class="stat-label">Livres</div><div class="stat-value" id="stat-books">—</div><div class="stat-sub">dans le catalogue</div></div>
+        <div class="stat-box" data-go="users" title="Voir les utilisateurs"><div class="stat-label">Utilisateurs</div><div class="stat-value" id="stat-users">—</div><div class="stat-sub">comptes clients</div></div>
+        <div class="stat-box" data-go="orders" title="Voir les commandes"><div class="stat-label">Commandes</div><div class="stat-value" id="stat-orders">—</div><div class="stat-sub">au total</div></div>
+        <div class="stat-box" data-go="orders" data-tab="active" title="Voir les commandes en cours"><div class="stat-label">En attente</div><div class="stat-value" id="stat-pending">—</div><div class="stat-sub">à traiter</div></div>
+        <div class="stat-box" data-go="orders" data-tab="validated" title="Voir les commandes validées"><div class="stat-label">Validées</div><div class="stat-value" id="stat-validated">—</div><div class="stat-sub">double confirmation</div></div>
+        <div class="stat-box" data-go="ads" title="Voir les publicités"><div class="stat-label">Publicités</div><div class="stat-value" id="stat-ads">—</div><div class="stat-sub">actives</div></div>
+      </div>
+      <div class="card">
+        <h3>Dernières commandes</h3>
+        <div id="dashboard-orders">Chargement…</div>
+      </div>
+      <div class="card">
+        <h3>Modifications récentes (24h)</h3>
+        <div id="dashboard-modifs">Chargement…</div>
+      </div>
+      <div class="card">
+        <h3>Derniers inscrits</h3>
+        <div id="dashboard-users">Chargement…</div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="section" id="section-users">
+      <div class="page-header">
+        <div><h2>Utilisateurs</h2><p>Comptes clients enregistrés</p></div>
+        <button class="btn btn-secondary btn-sm" id="users-refresh-btn">↻ Actualiser</button>
+      </div>
+      <div class="card" style="padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="users-search" placeholder="🔎 Rechercher un client par nom ou email…" style="flex:1;min-width:220px;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:#fafafa;outline:none;font-family:inherit;">
+        <button class="btn btn-secondary btn-sm" id="users-search-clear" type="button">Effacer</button>
+        <span id="users-search-count" style="color:#888;font-size:12px;"></span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nom</th>
+              <th class="hide-sm">Email</th>
+              <th class="hide-sm">Inscription</th>
+              <th class="hide-sm">Dernière connexion</th>
+              <th>Cmdes</th>
+              <th>Total dépensé</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <tr><td colspan="9" style="padding:24px;text-align:center;color:#999;">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MODIFICATIONS -->
+    <div class="section" id="section-modifs">
+      <div class="page-header">
+        <div><h2>Modifications de Profils</h2><p>Historique des changements effectués par les clients</p></div>
+        <button class="btn btn-secondary btn-sm" id="modifs-refresh-btn">↻ Actualiser</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Utilisateur</th>
+              <th>Changements détaillés</th>
+              <th>Statut</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="modifs-tbody">
+            <tr><td colspan="5" style="padding:24px;text-align:center;color:#999;">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BOOKS -->
+    <div class="section" id="section-books">
+      <div class="page-header">
+        <div><h2>Gestion des livres</h2><p>Ajouter, modifier ou supprimer des livres</p></div>
+        <button class="btn btn-secondary btn-sm" id="book-reset-btn">+ Nouveau livre</button>
+      </div>
+      <div class="card" id="book-form-card" style="display: none; border: 2px solid #ff690c; background: #fffdfa; box-shadow: 0 12px 30px rgba(255,105,12,0.12); position: relative;">
+        <h3 id="book-form-title">Ajouter un livre</h3>
+        <input type="hidden" id="book-id">
+        <div class="form-grid">
+          <div class="form-group"><label>Titre *</label><input type="text" id="book-title" placeholder="Titre du livre"></div>
+          <div class="form-group"><label>Auteur *</label><input type="text" id="book-author" placeholder="Nom de l'auteur"></div>
+          <div class="form-group"><label>Catégorie *</label><input type="text" id="book-category" placeholder="Ex: Roman, Science-fiction…"></div>
+          <div class="form-group"><label>Prix (FCFA) *</label><input type="number" id="book-price" placeholder="0" min="1"></div>
+          <div class="form-group">
+            <label>Image de couverture</label>
+            <input type="file" id="book-image-file" accept="image/png,image/jpeg,image/webp,image/gif" style="margin-bottom:6px;">
+            <input type="text" id="book-image" placeholder="…ou collez une URL https://…">
+            <div id="book-image-preview" style="margin-top:8px;display:none;"><img id="book-image-preview-img" src="" alt="" style="max-width:120px;max-height:160px;border-radius:6px;border:1px solid #e5e5e5;"></div>
+            <small id="book-image-status" style="display:block;color:#888;margin-top:4px;"></small>
+          </div>
+          <div class="form-group"><label>Stock</label><input type="number" id="book-stock" placeholder="10" min="0"></div>
+          <div class="form-group span2"><label>Description</label><textarea id="book-description" placeholder="Description du livre…"></textarea></div>
+          <div class="form-group span2"><label>Informations supplémentaires</label><textarea id="book-infos" placeholder="ISBN, édition, langue…"></textarea></div>
+          <div class="form-group span2"><label class="check-label"><input type="checkbox" id="book-featured"> Mettre en vedette sur la page d'accueil</label></div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" id="book-save-btn">Enregistrer le livre</button>
+          <button class="btn btn-secondary" id="book-cancel-btn">Annuler</button>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:16px 20px 0;display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="border:none;padding:0;margin:0;">Catalogue <span id="books-count" style="font-weight:400;color:#999;"></span></h3>
+        </div>
+        <table class="data-table" style="margin-top:12px;">
+          <thead>
+            <tr>
+              <th>Image</th><th>Titre</th><th class="hide-sm">Auteur</th><th class="hide-sm">Catégorie</th><th>Prix</th><th class="hide-sm">Stock</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-books-list">
+            <tr><td colspan="7" style="padding:24px;text-align:center;color:#999;">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="section" id="section-orders">
+      <div class="page-header">
+        <div><h2>Gestion des commandes</h2><p>Suivez et mettez à jour les statuts</p></div>
+        <button class="btn btn-secondary btn-sm" id="orders-refresh-btn">↻ Actualiser</button>
+      </div>
+      <div class="tab-bar" id="orders-tab-bar">
+        <button class="tab-btn active" data-tab="all">Toutes <span class="tab-count" id="tc-all">0</span></button>
+        <button class="tab-btn" data-tab="pending">En attente <span class="tab-count" id="tc-pending">0</span></button>
+        <button class="tab-btn" data-tab="active">En cours <span class="tab-count" id="tc-active">0</span></button>
+        <button class="tab-btn" data-tab="validated">Terminées <span class="tab-count" id="tc-validated">0</span></button>
+        <button class="tab-btn" data-tab="cancelled">Annulées <span class="tab-count" id="tc-cancelled">0</span></button>
+      </div>
+      <div id="orders-list">Chargement…</div>
+    </div>
+
+    <!-- ADS -->
+    <div class="section" id="section-ads">
+      <div class="page-header"><div><h2>Publicités</h2><p>Gérer les annonces affichées aux clients</p></div></div>
+      <div class="card">
+        <h3>Nouvelle publicité</h3>
+        <div class="form-grid">
+          <div class="form-group"><label>Titre *</label><input type="text" id="ad-title" placeholder="Titre de la publicité"></div>
+          <div class="form-group"><label>Lien (optionnel)</label><input type="text" id="ad-link" placeholder="https://…"></div>
+          <div class="form-group span2"><label>Message *</label><textarea id="ad-message" placeholder="Contenu de la publicité…" style="min-height:60px;"></textarea></div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" id="ad-save-btn">Publier la publicité</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Publicités actives</h3>
+        <div id="ads-list">Chargement…</div>
+      </div>
+    </div>
+
+    <!-- DOWNLOADS -->
+    <div class="section" id="section-downloads" data-super-only="1">
+      <div class="page-header"><div><h2>Téléchargements</h2><p>Ressources accessibles uniquement à l'administrateur</p></div></div>
+      <div class="card">
+        <h3>Code source du projet</h3>
+        <p style="font-size:13px;color:#888;margin-bottom:20px;">Téléchargez l'intégralité du code source de la Librairie Magma au format ZIP. Cette option est réservée à l'administration.</p>
+        <a href="/api/source.zip" class="download-card">
+          <div class="dl-icon">📦</div>
+          <div class="dl-info">
+            <strong>librairie-magma-source.zip</strong>
+            <small>Code source complet — serveur, frontend, base de données</small>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div id="admin-modal">
+  <div class="modal-overlay" id="modal-overlay"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">Détails</h3>
+      <button class="modal-close" id="modal-close-btn">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var loginScreen = document.getElementById("admin-login-screen");
+  var dashboard = document.getElementById("admin-dashboard");
+  var modal = document.getElementById("admin-modal");
+
+  /* ── UTILS ── */
+  function api(url, options) {
+    return fetch(url, options || {}).then(function (r) {
+      return r.json().then(function (d) { if (!r.ok) throw d; return d; });
+    });
+  }
+  function get(url) { return api(url); }
+  function post(url, d) { return api(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d || {}) }); }
+  function put(url, d) { return api(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d || {}) }); }
+  function del(url) { return api(url, { method: "DELETE" }); }
+  function esc(v) { return String(v == null ? "" : v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function money(v) { return Number(v || 0).toLocaleString("fr-FR") + " FCFA"; }
+  function fmtDate(s) {
+    if (!s) return "—";
+    var d = new Date(s.includes("T") ? s : s + "Z");
+    return isNaN(d) ? s : d.toLocaleDateString("fr-FR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+  }
+  function fmtDateShort(s) {
+    if (!s) return "—";
+    var d = new Date(s.includes("T") ? s : s + "Z");
+    return isNaN(d) ? s : d.toLocaleDateString("fr-FR", { day:"2-digit", month:"2-digit", year:"numeric" });
+  }
+
+  function toast(msg, type) {
+    var t = document.createElement("div");
+    t.textContent = msg;
+    t.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:99999;padding:13px 18px;border-radius:6px;color:#fff;font-size:14px;font-family:Arial,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:.3s;";
+    t.style.background = type === "error" ? "#b42318" : "#2b293a";
+    document.body.appendChild(t);
+    setTimeout(function () { t.style.opacity = "0"; setTimeout(function () { t.remove(); }, 300); }, 3200);
+  }
+
+  function statusClass(s) {
+    var map = { "En attente":"status-attente", "Confirmée":"status-confirmee", "En livraison":"status-livraison", "Livrée":"status-livree", "Annulée":"status-annulee", "Validée":"status-validee" };
+    return map[s] || "";
+  }
+
+  /* ── MODAL ── */
+  function openModal(title, bodyHtml) {
+    document.getElementById("modal-title").textContent = title;
+    document.getElementById("modal-body").innerHTML = bodyHtml;
+    modal.classList.add("open");
+  }
+  function closeModal() { modal.classList.remove("open"); }
+  document.getElementById("modal-close-btn").addEventListener("click", closeModal);
+  document.getElementById("modal-overlay").addEventListener("click", closeModal);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeModal(); });
+
+  /* ── NAVIGATION ── */
+  function activateSection(name) {
+    document.querySelectorAll(".nav-item").forEach(function (el) { el.classList.remove("active"); });
+    document.querySelectorAll(".section").forEach(function (el) { el.classList.remove("active"); });
+    var nav = document.querySelector("[data-section='" + name + "']");
+    var sec = document.getElementById("section-" + name);
+    if (nav) nav.classList.add("active");
+    if (sec) sec.classList.add("active");
+    if (name === "users") loadUsers();
+    if (name === "modifs") loadModifs();
+    if (name === "books") loadBooks();
+    if (name === "orders") loadOrders();
+    if (name === "ads") loadAds();
+    if (name === "dashboard") loadDashboard();
+  }
+  document.querySelectorAll(".nav-item").forEach(function (el) {
+    el.addEventListener("click", function () { activateSection(el.getAttribute("data-section")); });
+  });
+
+  /* ── DASHBOARD STAT BOXES (clickable shortcuts) ── */
+  document.querySelectorAll(".stat-box[data-go]").forEach(function (box) {
+    box.addEventListener("click", function () {
+      var target = box.getAttribute("data-go");
+      var tab = box.getAttribute("data-tab");
+      activateSection(target);
+      if (target === "orders" && tab) {
+        setTimeout(function () {
+          var btn = document.querySelector("#orders-tab-bar .tab-btn[data-tab='" + tab + "']");
+          if (btn) btn.click();
+        }, 50);
+      }
+    });
+  });
+
+  /* ── LOGOUT ──
+     On retire uniquement le rôle administrateur ; le compte client reste
+     connecté. On redirige donc vers la page d'accueil utilisateur au lieu
+     de réafficher l'écran de saisie du mot de passe administrateur. */
+  document.getElementById("admin-logout-btn").addEventListener("click", function () {
+    post("/api/admin/logout", {})
+      .then(function () { window.location.replace("/"); })
+      .catch(function () { window.location.replace("/"); });
+  });
+
+  /* ── LOGIN ── */
+  var loginErr = document.getElementById("login-error");
+  function doLogin() {
+    var pw = document.getElementById("admin-password").value;
+    loginErr.style.display = "none";
+    post("/api/admin/login", { password: pw })
+      .then(function () { loginScreen.style.display = "none"; dashboard.style.display = "block"; loadDashboard(); })
+      .catch(function (e) { loginErr.textContent = (e && e.error) || "Mot de passe incorrect."; loginErr.style.display = "block"; });
+  }
+  document.getElementById("admin-login-btn").addEventListener("click", doLogin);
+  document.getElementById("admin-password").addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
+
+  /* ── DASHBOARD ── */
+  function loadDashboard() {
+    get("/api/books").then(function (b) { document.getElementById("stat-books").textContent = b.length; }).catch(function () {});
+    get("/api/admin/users").then(function (users) {
+      document.getElementById("stat-users").textContent = users.length;
+      var recent = users.slice(0, 5);
+      document.getElementById("dashboard-users").innerHTML = recent.length === 0
+        ? '<p style="color:#999;font-size:13px;">Aucun utilisateur.</p>'
+        : recent.map(function (u) {
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f4f4f4;">'
+            + '<div><strong style="font-size:14px;">' + esc(u.name) + '</strong><br><small style="color:#888;">' + esc(u.email) + '</small></div>'
+            + '<small style="color:#aaa;">' + fmtDateShort(u.created_at) + '</small></div>';
+        }).join("");
+    }).catch(function () {});
+    get("/api/admin/orders").then(function (orders) {
+      document.getElementById("stat-orders").textContent = orders.length;
+      document.getElementById("stat-pending").textContent = orders.filter(function (o) { return o.status === "En attente"; }).length;
+      document.getElementById("stat-validated").textContent = orders.filter(function (o) { return o.status === "Validée"; }).length;
+      var recent = orders.slice(0, 5);
+      document.getElementById("dashboard-orders").innerHTML = recent.length === 0
+        ? '<p style="color:#999;font-size:13px;">Aucune commande.</p>'
+        : recent.map(function (o) {
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f4f4f4;">'
+            + '<div><strong style="font-size:14px;">#' + esc(o.id) + ' — ' + esc(o.customer_name) + '</strong><br><small style="color:#888;">' + esc(o.delivery_zone) + ' · ' + money(o.total) + '</small></div>'
+            + '<span class="order-status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></div>';
+        }).join("");
+    }).catch(function () {});
+    get("/api/admin/ads").then(function (ads) { document.getElementById("stat-ads").textContent = ads.filter(function (a) { return a.active; }).length; }).catch(function () {});
+    
+    get("/api/admin/user-modifications").then(function (mods) {
+      var container = document.getElementById("dashboard-modifs");
+      if (!container) return;
+      var recent = mods.slice(0, 5);
+      container.innerHTML = recent.length === 0
+        ? '<p style="color:#999;font-size:13px;">Aucune modification dans les dernières 24h.</p>'
+        : recent.map(function (m) {
+          var isRead = !!m.is_read;
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f4f4f4;cursor:pointer;" onclick="document.querySelector(\'[data-section=\\\'modifs\\\']\').click()">'
+            + '<div><strong style="font-size:14px;">' + esc(m.user_name) + '</strong> <span style="font-size:12px;color:#888;">a modifié son profil</span><br><small style="color:#aaa;">' + fmtDateShort(m.created_at) + '</small></div>'
+            + (isRead ? '<span class="badge badge-neutral">Lu</span>' : '<span class="badge badge-active" style="background:#ff690c;color:#fff;">Nouveau</span>')
+            + '</div>';
+        }).join("");
+    }).catch(function () {});
+  }
+
+  /* ── USERS ── */
+  var _users = [];
+  var _userSearch = "";
+  document.getElementById("users-refresh-btn").addEventListener("click", loadUsers);
+
+  var searchInput = document.getElementById("users-search");
+  var searchClear = document.getElementById("users-search-clear");
+  if (searchInput) {
+    searchInput.addEventListener("input", function () {
+      _userSearch = searchInput.value.trim().toLowerCase();
+      renderUsers();
+    });
+  }
+  if (searchClear) {
+    searchClear.addEventListener("click", function () {
+      _userSearch = "";
+      if (searchInput) searchInput.value = "";
+      renderUsers();
+    });
+  }
+
+  function filteredUsers() {
+    if (!_userSearch) return _users;
+    return _users.filter(function (u) {
+      var name = String(u.name || "").toLowerCase();
+      var email = String(u.email || "").toLowerCase();
+      return name.indexOf(_userSearch) !== -1 || email.indexOf(_userSearch) !== -1;
+    });
+  }
+
+  function renderUsers() {
+    var tbody = document.getElementById("users-tbody");
+    var countEl = document.getElementById("users-search-count");
+    var users = filteredUsers();
+    if (countEl) {
+      countEl.textContent = _userSearch
+        ? users.length + " résultat" + (users.length > 1 ? "s" : "") + " sur " + _users.length
+        : "";
+    }
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:24px;text-align:center;color:#999;">'
+        + (_userSearch ? "Aucun client ne correspond à « " + esc(_userSearch) + " »." : "Aucun utilisateur inscrit.")
+        + '</td></tr>';
+      return;
+    }
+    tbody.innerHTML = users.map(function (u) {
+        var isActive = u.is_active === undefined || u.is_active;
+        return '<tr class="clickable" data-uid="' + u.id + '">'
+          + '<td style="color:#aaa;font-size:12px;">' + esc(u.id) + '</td>'
+          + '<td><strong>' + esc(u.name) + '</strong></td>'
+          + '<td class="hide-sm" style="color:#555;">' + esc(u.email) + '</td>'
+          + '<td class="hide-sm" style="color:#888;font-size:12px;">' + fmtDateShort(u.created_at) + '</td>'
+          + '<td class="hide-sm" style="color:#888;font-size:12px;">' + (u.last_login_at ? fmtDateShort(u.last_login_at) : '<span style="color:#ddd;">Jamais</span>') + '</td>'
+          + '<td><span class="badge badge-neutral">' + esc(u.order_count) + '</span></td>'
+          + '<td style="font-weight:600;color:#ff690c;">' + money(u.total_spent) + '</td>'
+          + '<td><span class="badge ' + (isActive ? 'badge-active">Actif' : 'badge-inactive">Désactivé') + '</span></td>'
+          + '<td><div class="td-actions">'
+          + '<button class="btn btn-info btn-sm" data-view-uid="' + u.id + '">Voir</button>'
+          + '<button class="btn ' + (isActive ? 'btn-danger' : 'btn-success') + ' btn-sm" data-toggle-uid="' + u.id + '">' + (isActive ? 'Désactiver' : 'Réactiver') + '</button>'
+          + '</div></td>'
+          + '</tr>';
+      }).join("");
+
+    tbody.querySelectorAll("[data-view-uid]").forEach(function (btn) {
+      btn.addEventListener("click", function (e) { e.stopPropagation(); openUserModal(_users.find(function (x) { return String(x.id) === btn.getAttribute("data-view-uid"); })); });
+    });
+    tbody.querySelectorAll("[data-toggle-uid]").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var id = btn.getAttribute("data-toggle-uid");
+        put("/api/admin/users/" + id + "/toggle-status", {})
+          .then(function (r) { toast(r.is_active ? "Compte réactivé." : "Compte désactivé."); loadUsers(); })
+          .catch(function (e) { toast((e && e.error) || "Erreur.", "error"); });
+      });
+    });
+    tbody.querySelectorAll("tr.clickable").forEach(function (row) {
+      row.addEventListener("click", function () {
+        var u = _users.find(function (x) { return String(x.id) === row.getAttribute("data-uid"); });
+        if (u) openUserModal(u);
+      });
+    });
+  }
+
+  function loadUsers() {
+    var tbody = document.getElementById("users-tbody");
+    if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#999;">Chargement…</td></tr>';
+    get("/api/admin/users").then(function (users) {
+      _users = Array.isArray(users) ? users : [];
+      renderUsers();
+    }).catch(function (e) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#c33;">Erreur de chargement : ' + esc((e && e.error) || e || "inconnue") + '</td></tr>';
+    });
+  }
+
+  function openUserModal(u) {
+    if (!u) return;
+    var isActive = u.is_active === undefined || u.is_active;
+    openModal("Fiche client — " + u.name,
+      '<div class="modal-field"><div class="modal-field-label">ID</div><div class="modal-field-value">' + esc(u.id) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Nom d\'utilisateur</div><div class="modal-field-value">' + esc(u.name) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Email</div><div class="modal-field-value">' + esc(u.email) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Date d\'inscription</div><div class="modal-field-value">' + fmtDate(u.created_at) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Dernière connexion</div><div class="modal-field-value">' + (u.last_login_at ? fmtDate(u.last_login_at) : 'Jamais') + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Nombre de commandes</div><div class="modal-field-value">' + esc(u.order_count) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Total dépensé</div><div class="modal-field-value" style="font-size:18px;font-weight:700;color:#ff690c;">' + money(u.total_spent) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Statut du compte</div><div class="modal-field-value"><span class="badge ' + (isActive ? 'badge-active">Actif' : 'badge-inactive">Désactivé') + '</span></div></div>'
+      + '<div class="modal-actions">'
+      + '<button class="btn ' + (isActive ? 'btn-danger' : 'btn-success') + '" id="modal-user-toggle">' + (isActive ? '🔒 Désactiver ce compte' : '✅ Réactiver ce compte') + '</button>'
+      + '<button class="btn btn-danger" id="modal-user-delete">🗑 Supprimer</button>'
+      + '</div>'
+    );
+    document.getElementById("modal-user-toggle").addEventListener("click", function () {
+      put("/api/admin/users/" + u.id + "/toggle-status", {})
+        .then(function (r) { toast(r.is_active ? "Compte réactivé." : "Compte désactivé."); closeModal(); loadUsers(); })
+        .catch(function (e) { toast((e && e.error) || "Erreur.", "error"); });
+    });
+    document.getElementById("modal-user-delete").addEventListener("click", function () {
+      if (!confirm("Supprimer définitivement cet utilisateur ?")) return;
+      del("/api/admin/users/" + u.id)
+        .then(function () { toast("Utilisateur supprimé."); closeModal(); loadUsers(); })
+        .catch(function (e) { toast((e && e.error) || "Suppression impossible.", "error"); });
+    });
+  }
+
+  /* ── MODIFS ── */
+  document.getElementById("modifs-refresh-btn").addEventListener("click", loadModifs);
+  function loadModifs() {
+    var tbody = document.getElementById("modifs-tbody");
+    if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:#999;">Chargement…</td></tr>';
+    get("/api/admin/user-modifications").then(function(mods) {
+      if(mods.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#999;">Aucune modification récente.</td></tr>'; return; }
+      tbody.innerHTML = mods.map(function(m) {
+        var oldD = JSON.parse(m.old_data || "{}");
+        var newD = JSON.parse(m.new_data || "{}");
+        var changes = [];
+        if(oldD.name !== newD.name) changes.push("Nom: <s>" + esc(oldD.name) + "</s> ➔ " + esc(newD.name));
+        if(oldD.email !== newD.email) changes.push("Email: <s>" + esc(oldD.email) + "</s> ➔ " + esc(newD.email));
+        if(oldD.phone !== newD.phone) changes.push("Tél: <s>" + esc(oldD.phone) + "</s> ➔ " + esc(newD.phone));
+        if(oldD.avatar !== newD.avatar) changes.push("Photo de profil modifiée");
+        
+        var isRead = !!m.is_read;
+        return '<tr style="background:'+(isRead?'transparent':'#fffcf5')+'">'
+          + '<td style="color:#888;font-size:12px;">'+fmtDate(m.created_at)+'</td>'
+          + '<td><strong>'+esc(m.user_name)+'</strong><br><small style="color:#888;">'+esc(m.user_email)+'</small></td>'
+          + '<td style="font-size:12px;color:#555;line-height:1.6;">'+changes.join("<br>")+'</td>'
+          + '<td>'+(isRead?'<span class="badge badge-neutral">Lu</span>':'<span class="badge badge-active" style="background:#ff690c;color:#fff;">Nouveau</span>')+'</td>'
+          + '<td>'+(isRead?'':'<button class="btn btn-sm btn-secondary" onclick="markModifRead('+m.id+', this)">Marquer lu</button>')+'</td>'
+          + '</tr>';
+      }).join("");
+    }).catch(function(e) {
+      if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:#c33;">Erreur.</td></tr>';
+    });
+  }
+  
+  window.markModifRead = function(id, btn) {
+    btn.disabled = true; btn.textContent = "...";
+    post("/api/admin/user-modifications/"+id+"/read", {}).then(function() {
+      loadModifs();
+    }).catch(function() { btn.disabled = false; btn.textContent = "Marquer lu"; });
+  };
+
+  /* ── BOOKS ── */
+  function clearBookForm() {
+    ["book-id","book-title","book-author","book-category","book-price","book-image","book-stock","book-description","book-infos"].forEach(function (id) { document.getElementById(id).value = ""; });
+    document.getElementById("book-featured").checked = false;
+    document.getElementById("book-form-title").textContent = "Ajouter un livre";
+    document.getElementById("book-save-btn").textContent = "Enregistrer le livre";
+    var fileInput = document.getElementById("book-image-file"); if (fileInput) fileInput.value = "";
+    var preview = document.getElementById("book-image-preview"); if (preview) preview.style.display = "none";
+    var status = document.getElementById("book-image-status"); if (status) status.textContent = "";
+    var card = document.getElementById("book-form-card"); if (card) card.style.display = "none";
+  }
+  function bookPayload() {
+    return { titre: document.getElementById("book-title").value, auteur: document.getElementById("book-author").value, genre: document.getElementById("book-category").value, prix: document.getElementById("book-price").value, image: document.getElementById("book-image").value, stock: document.getElementById("book-stock").value || 10, description: document.getElementById("book-description").value, infos: document.getElementById("book-infos").value, featured: document.getElementById("book-featured").checked };
+  }
+  document.getElementById("book-reset-btn").addEventListener("click", function () { 
+    clearBookForm(); 
+    var card = document.getElementById("book-form-card");
+    if (card) card.style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" }); 
+  });
+  document.getElementById("book-cancel-btn").addEventListener("click", clearBookForm);
+  document.getElementById("book-save-btn").addEventListener("click", function () {
+    var id = document.getElementById("book-id").value;
+    var action = id ? put("/api/books/" + id, bookPayload()) : post("/api/books", bookPayload());
+    action.then(function () { toast(id ? "Livre mis à jour." : "Livre ajouté."); clearBookForm(); loadBooks(); })
+      .catch(function (e) { toast((e && e.error) || "Erreur.", "error"); });
+  });
+
+  function showCoverPreview(url) {
+    var box = document.getElementById("book-image-preview");
+    var img = document.getElementById("book-image-preview-img");
+    if (!url) { box.style.display = "none"; img.src = ""; return; }
+    img.src = url;
+    box.style.display = "block";
+  }
+
+  document.getElementById("book-image").addEventListener("input", function () {
+    showCoverPreview(this.value.trim());
+  });
+
+  document.getElementById("book-image-file").addEventListener("change", function (ev) {
+    var file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    var statusEl = document.getElementById("book-image-status");
+    statusEl.textContent = "Téléversement en cours…";
+    statusEl.style.color = "#555";
+    var fd = new FormData();
+    fd.append("file", file);
+    fetch("/api/admin/upload-cover", { method: "POST", body: fd, credentials: "same-origin" })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        if (!res.ok) throw res.data;
+        document.getElementById("book-image").value = res.data.url;
+        showCoverPreview(res.data.url);
+        statusEl.textContent = "Image téléversée ✓";
+        statusEl.style.color = "#166534";
+      })
+      .catch(function (err) {
+        statusEl.textContent = (err && err.error) || "Erreur lors du téléversement.";
+        statusEl.style.color = "#b42318";
+      });
+  });
+
+  function loadBooks() {
+    get("/api/books").then(function (books) {
+      var count = document.getElementById("books-count");
+      if (count) count.textContent = "(" + books.length + ")";
+      var tbody = document.getElementById("admin-books-list");
+      if (books.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="padding:24px;text-align:center;color:#999;">Aucun livre dans le catalogue.</td></tr>'; return; }
+      tbody.innerHTML = books.map(function (b) {
+        return '<tr class="clickable" data-bid="' + b.id + '">'
+          + '<td class="td-img"><img src="' + esc(b.image || "") + '" alt="" onerror="this.style.opacity=\'0\'"></td>'
+          + '<td><strong>' + esc(b.titre) + '</strong>' + (b.featured ? ' <span style="color:#ff690c;font-size:11px;">⭐</span>' : '') + '</td>'
+          + '<td class="hide-sm" style="color:#555;">' + esc(b.auteur) + '</td>'
+          + '<td class="hide-sm"><span class="badge badge-neutral">' + esc(b.genre) + '</span></td>'
+          + '<td style="white-space:nowrap;">' + money(b.prix) + '</td>'
+          + '<td class="hide-sm" style="color:' + (b.stock > 0 ? '#166534' : '#b42318') + ';font-weight:700;">' + esc(b.stock) + '</td>'
+          + '<td><div class="td-actions"><button class="btn btn-secondary btn-sm" data-edit="' + b.id + '">Modifier</button><button class="btn btn-danger btn-sm" data-del="' + b.id + '">Suppr.</button></div></td>'
+          + '</tr>';
+      }).join("");
+
+      tbody.querySelectorAll("tr.clickable").forEach(function (row) {
+        row.addEventListener("click", function (e) {
+          if (e.target.closest("button")) return;
+          var b = books.find(function (x) { return String(x.id) === row.getAttribute("data-bid"); });
+          if (!b) return;
+          openModal("Fiche livre — " + b.titre,
+            (b.image ? '<img class="modal-img" src="' + esc(b.image) + '" alt="" onerror="this.style.display=\'none\'">' : '')
+            + '<div class="modal-field"><div class="modal-field-label">Titre</div><div class="modal-field-value">' + esc(b.titre) + '</div></div>'
+            + '<div class="modal-field"><div class="modal-field-label">Auteur</div><div class="modal-field-value">' + esc(b.auteur) + '</div></div>'
+            + '<div class="modal-field"><div class="modal-field-label">Catégorie</div><div class="modal-field-value">' + esc(b.genre) + '</div></div>'
+            + '<div class="modal-field"><div class="modal-field-label">Prix</div><div class="modal-field-value" style="font-size:18px;font-weight:700;color:#ff690c;">' + money(b.prix) + '</div></div>'
+            + '<div class="modal-field"><div class="modal-field-label">Stock</div><div class="modal-field-value">' + esc(b.stock) + ' exemplaires</div></div>'
+            + (b.description ? '<div class="modal-field"><div class="modal-field-label">Description</div><div class="modal-field-value" style="white-space:pre-wrap;">' + esc(b.description) + '</div></div>' : '')
+            + (b.infos ? '<div class="modal-field"><div class="modal-field-label">Informations</div><div class="modal-field-value">' + esc(b.infos) + '</div></div>' : '')
+          );
+        });
+      });
+
+      tbody.querySelectorAll("[data-edit]").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var b = books.find(function (x) { return String(x.id) === btn.getAttribute("data-edit"); });
+          if (!b) return;
+          document.getElementById("book-id").value = b.id;
+          document.getElementById("book-title").value = b.titre;
+          document.getElementById("book-author").value = b.auteur;
+          document.getElementById("book-category").value = b.genre;
+          document.getElementById("book-price").value = b.prix;
+          document.getElementById("book-image").value = b.image || "";
+          showCoverPreview(b.image || "");
+          document.getElementById("book-stock").value = b.stock;
+          document.getElementById("book-description").value = b.description || "";
+          document.getElementById("book-infos").value = b.infos || "";
+          document.getElementById("book-featured").checked = !!b.featured;
+          document.getElementById("book-form-title").textContent = "Modifier : " + b.titre;
+          document.getElementById("book-save-btn").textContent = "Mettre à jour";
+          document.getElementById("book-form-card").style.display = "block";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+      tbody.querySelectorAll("[data-del]").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (!confirm("Supprimer ce livre définitivement ?")) return;
+          del("/api/books/" + btn.getAttribute("data-del"))
+            .then(function () { toast("Livre supprimé."); loadBooks(); })
+            .catch(function (e) { toast((e && e.error) || "Suppression impossible.", "error"); });
+        });
+      });
+    });
+  }
+
+  /* ── ORDERS ── */
+  var _orders = [];
+  var _orderTab = "all";
+  var STATUSES = ["En attente", "Confirmée", "En livraison", "Livrée", "Annulée"];
+
+  function getNextStatusInfo(o) {
+    var status = o.status;
+    if (status === "En attente") {
+      return { next: "Confirmée", label: "✓ Confirmer la commande", style: "btn-success" };
+    }
+    if (status === "Confirmée") {
+      return { next: "En livraison", label: "🚚 Mettre en livraison", style: "btn-primary" };
+    }
+    if (status === "En livraison") {
+      return { next: "Livrée", label: "🎁 Marquer comme Livrée", style: "btn-warning" };
+    }
+
+    return null;
+  }
+
+  document.getElementById("orders-refresh-btn").addEventListener("click", loadOrders);
+
+  document.getElementById("orders-tab-bar").querySelectorAll(".tab-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      _orderTab = btn.getAttribute("data-tab");
+      document.querySelectorAll("#orders-tab-bar .tab-btn").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      renderOrders();
+    });
+  });
+
+  function filteredOrders() {
+    if (_orderTab === "pending") return _orders.filter(function (o) { return o.status === "En attente"; });
+    if (_orderTab === "active") return _orders.filter(function (o) { return ["Confirmée", "En livraison", "Livrée"].includes(o.status); });
+    if (_orderTab === "validated") return _orders.filter(function (o) { return ["Reçue", "Validée"].includes(o.status); });
+    if (_orderTab === "cancelled") return _orders.filter(function (o) { return o.status === "Annulée"; });
+    return _orders;
+  }
+
+  function renderOrders() {
+    var list = document.getElementById("orders-list");
+    var filtered = filteredOrders();
+    document.getElementById("tc-all").textContent = _orders.length;
+    if (document.getElementById("tc-pending")) {
+      document.getElementById("tc-pending").textContent = _orders.filter(function (o) { return o.status === "En attente"; }).length;
+    }
+    document.getElementById("tc-active").textContent = _orders.filter(function (o) { return ["Confirmée", "En livraison", "Livrée"].includes(o.status); }).length;
+    document.getElementById("tc-validated").textContent = _orders.filter(function (o) { return ["Reçue", "Validée"].includes(o.status); }).length;
+    document.getElementById("tc-cancelled").textContent = _orders.filter(function (o) { return o.status === "Annulée"; }).length;
+
+    if (filtered.length === 0) { list.innerHTML = '<div class="card"><p style="color:#999;font-size:13px;">Aucune commande dans cette catégorie.</p></div>'; return; }
+    list.innerHTML = filtered.map(function (o) {
+      var itemsText = (o.items || []).map(function (i) { return esc(i.titre) + " ×" + i.qty; }).join(" · ");
+      var adminPill = '<span class="v-pill ' + (o.admin_confirmed ? "v-done" : "v-pending") + '">' + (o.admin_confirmed ? "✓ Admin confirmé" : "◯ Admin") + '</span>';
+      var clientPill = '<span class="v-pill ' + (o.client_confirmed ? "v-done" : "v-pending") + '">' + (o.client_confirmed ? "✓ Client confirmé" : "◯ Client") + '</span>';
+      
+      var cancelReqHtml = o.cancel_requested
+        ? '<div style="background:#fee4e2;border:1.5px solid #fda29b;color:#b42318;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;margin:10px 0 0 0;">⚠ Le client a demandé l\'annulation.<br><span style="color:#912018;font-size:12px;font-weight:500;">Raison : ' + esc(o.cancel_reason || "Non précisée") + '</span></div>'
+        : '';
+        
+      var nextInfo = getNextStatusInfo(o);
+      var statusBtn = nextInfo
+        ? '<button class="btn ' + nextInfo.style + ' btn-sm" data-status-btn="' + o.id + '">' + nextInfo.label + '</button>'
+        : '';
+
+      return '<div class="order-card" id="oc-' + o.id + '">'
+        + '<div class="order-header"><div class="order-id">Commande #' + esc(o.id) + ' — ' + esc(o.customer_name) + '</div><span class="order-status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></div>'
+        + '<div class="order-meta">📧 ' + esc(o.customer_email) + ' · 📞 ' + esc(o.customer_phone || "—") + ' · 📍 ' + esc(o.delivery_zone) + ' · <strong>' + money(o.total) + '</strong></div>'
+        + (itemsText ? '<div class="order-items-inline">🛒 ' + itemsText + '</div>' : '')
+        + '<div class="validation-pills">' + adminPill + clientPill + (o.validated_at ? '<span class="v-pill v-done">✓ Validée le ' + fmtDateShort(o.validated_at) + '</span>' : '') + '</div>'
+        + cancelReqHtml
+        + '<div class="order-footer">'
+        + '<button class="btn btn-info btn-sm" data-detail="' + o.id + '">Voir détails</button>'
+        + statusBtn
+        + '</div>'
+        + '</div>';
+    }).join("");
+
+    list.querySelectorAll("[data-detail]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var o = _orders.find(function (x) { return String(x.id) === btn.getAttribute("data-detail"); });
+        if (o) openOrderModal(o);
+      });
+    });
+    list.querySelectorAll("[data-status-btn]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var o = _orders.find(function (x) { return String(x.id) === btn.getAttribute("data-status-btn"); });
+        if (o) openStatusModal(o);
+      });
+    });
+  }
+
+  function loadOrders() {
+    get("/api/admin/orders").then(function (orders) {
+      _orders = orders;
+      renderOrders();
+    });
+  }
+
+  function openOrderModal(o) {
+    var itemsHtml = (o.items || []).length > 0
+      ? o.items.map(function (i) { return '<div class="modal-item-row"><span>' + esc(i.titre) + ' — ' + esc(i.auteur) + '</span><span>' + esc(i.qty) + ' × ' + money(i.prix) + ' = <strong>' + money(i.qty * i.prix) + '</strong></span></div>'; }).join("")
+      : '<p style="color:#999;font-size:13px;">Aucun article.</p>';
+    var cancelSection = o.cancel_requested
+      ? '<div class="modal-section" style="background:#fee4e2;border:1px solid #fda29b;padding:12px;border-radius:8px;margin-bottom:12px;">'
+        + '<h4 style="color:#b42318;margin:0 0 6px;">⚠ Demande d\'annulation du client</h4>'
+        + '<p style="font-size:13px;color:#912018;margin:0 0 10px;"><strong>Raison :</strong> ' + esc(o.cancel_reason || "Non précisée") + '</p>'
+        + '<button class="btn btn-danger btn-sm" id="modal-accept-cancel">Accepter la demande d\'annulation</button>'
+        + '</div>'
+      : '';
+
+    var canAdminCancel = ["En attente", "Confirmée"].indexOf(o.status) !== -1;
+    var nextInfo = getNextStatusInfo(o);
+    var statusActionHtml = '';
+    if (nextInfo) {
+      statusActionHtml = '<div class="modal-status-row" style="margin-top:12px;display:flex;gap:10px;align-items:center;">'
+        + '<button class="btn ' + nextInfo.style + '" id="modal-next-status-btn" data-next-val="' + nextInfo.next + '" style="flex:1;">' + nextInfo.label + '</button>'
+        + (canAdminCancel ? '<button class="btn btn-outline-danger" id="modal-cancel-order-btn" style="flex-shrink:0;">Annuler la commande</button>' : '')
+        + '</div>';
+    } else if (canAdminCancel) {
+      statusActionHtml = '<div class="modal-status-row" style="margin-top:12px;">'
+        + '<button class="btn btn-outline-danger btn-block" id="modal-cancel-order-btn">Annuler la commande</button>'
+        + '</div>';
+    }
+
+    var html = '<div class="modal-field"><div class="modal-field-label">Numéro</div><div class="modal-field-value">#' + esc(o.id) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Statut</div><div class="modal-field-value"><span class="order-status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></div></div>'
+      + '<div class="modal-section"><h4>Client</h4>'
+      + '<div class="modal-field"><div class="modal-field-label">Nom</div><div class="modal-field-value">' + esc(o.customer_name) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Email</div><div class="modal-field-value">' + esc(o.customer_email) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Téléphone</div><div class="modal-field-value">' + esc(o.customer_phone || "—") + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Zone de livraison</div><div class="modal-field-value">' + esc(o.delivery_zone) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Adresse</div><div class="modal-field-value">' + esc(o.delivery_address || "—") + '</div></div>'
+      + '</div>'
+      + '<div class="modal-section"><h4>Produits commandés</h4>' + itemsHtml + '</div>'
+      + '<div class="modal-section"><h4>Résumé financier</h4>'
+      + '<div class="modal-field"><div class="modal-field-label">Total</div><div class="modal-field-value" style="font-size:20px;font-weight:700;color:#ff690c;">' + money(o.total) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Passée le</div><div class="modal-field-value">' + fmtDate(o.created_at) + '</div></div>'
+      + (o.updated_at && o.updated_at !== o.created_at ? '<div class="modal-field"><div class="modal-field-label">Mise à jour</div><div class="modal-field-value">' + fmtDate(o.updated_at) + '</div></div>' : '')
+      + (o.validated_at ? '<div class="modal-field"><div class="modal-field-label">Validée le</div><div class="modal-field-value">' + fmtDate(o.validated_at) + '</div></div>' : '')
+      + '</div>'
+      + cancelSection
+      + '<div class="modal-section"><h4>Double validation</h4>'
+      + '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">'
+      + '<span class="v-pill ' + (o.admin_confirmed ? "v-done" : "v-pending") + '" style="padding:4px 12px;font-size:13px;">' + (o.admin_confirmed ? "✓ Admin a confirmé la livraison" : "◯ En attente confirmation admin") + '</span>'
+      + '<span class="v-pill ' + (o.client_confirmed ? "v-done" : "v-pending") + '" style="padding:4px 12px;font-size:13px;">' + (o.client_confirmed ? "✓ Client a confirmé la réception" : "◯ En attente confirmation client") + '</span>'
+      + '</div>'
+      + statusActionHtml
+      + '</div>';
+
+    openModal("Commande #" + o.id + " — " + o.customer_name, html);
+
+    var nextBtn = document.getElementById("modal-next-status-btn");
+    if (nextBtn) {
+      nextBtn.addEventListener("click", function () {
+        var targetStatus = nextBtn.getAttribute("data-next-val");
+        nextBtn.disabled = true;
+        put("/api/admin/orders/" + o.id + "/status", { status: targetStatus })
+          .then(function (updated) {
+            toast("Statut mis à jour vers : " + updated.status);
+            closeModal();
+            loadOrders();
+          })
+          .catch(function (e) { toast((e && e.error) || "Erreur.", "error"); nextBtn.disabled = false; });
+      });
+    }
+
+    var cancelBtn = document.getElementById("modal-cancel-order-btn");
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", function () {
+        if (!confirm("Voulez-vous vraiment annuler la commande #" + o.id + " ?")) return;
+        cancelBtn.disabled = true;
+        put("/api/admin/orders/" + o.id + "/status", { status: "Annulée" })
+          .then(function () {
+            toast("Commande annulée avec succès.");
+            closeModal();
+            loadOrders();
+          })
+          .catch(function (e) { toast((e && e.error) || "Erreur.", "error"); cancelBtn.disabled = false; });
+      });
+    }
+
+    var acceptCancelBtn = document.getElementById("modal-accept-cancel");
+    if (acceptCancelBtn) {
+      acceptCancelBtn.addEventListener("click", function () {
+        if (!confirm("Voulez-vous vraiment accepter cette demande d'annulation et annuler la commande ?")) return;
+        acceptCancelBtn.disabled = true;
+        put("/api/admin/orders/" + o.id + "/status", { status: "Annulée" })
+          .then(function () {
+            toast("Commande annulée avec succès.");
+            closeModal();
+            loadOrders();
+          })
+          .catch(function (e) { toast((e && e.error) || "Erreur.", "error"); acceptCancelBtn.disabled = false; });
+      });
+    }
+  }
+
+  function openStatusModal(o) {
+    var nextInfo = getNextStatusInfo(o);
+    if (!nextInfo) {
+      toast("Aucune action de statut suivante disponible pour cette commande.", "info");
+      return;
+    }
+    
+    var canAdminCancel = ["En attente", "Confirmée"].indexOf(o.status) !== -1;
+    var html = '<div class="modal-field"><div class="modal-field-label">Commande</div><div class="modal-field-value">#' + esc(o.id) + ' — ' + esc(o.customer_name) + '</div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Statut actuel</div><div class="modal-field-value"><span class="order-status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></div></div>'
+      + '<div class="modal-field"><div class="modal-field-label">Action suivante</div><div class="modal-field-value"><strong>' + nextInfo.label + '</strong> (Statut cible : ' + nextInfo.next + ')</div></div>'
+      + '<p style="font-size:13.5px;color:#666;margin:14px 0;">Cette action va faire avancer l\'état de la commande de manière sécurisée et notifier les systèmes de livraison.</p>'
+      + '<div style="display:flex;gap:12px;margin-top:16px;">'
+      + '<button class="btn ' + nextInfo.style + '" id="status-modal-next-btn" style="flex:1;">' + nextInfo.label + '</button>'
+      + (canAdminCancel ? '<button class="btn btn-outline-danger" id="status-modal-cancel-btn">Annuler la commande</button>' : '')
+      + '</div>';
+      
+    openModal("Action de statut — Commande #" + o.id, html);
+    
+    document.getElementById("status-modal-next-btn").addEventListener("click", function () {
+      var btn = document.getElementById("status-modal-next-btn");
+      btn.disabled = true;
+      put("/api/admin/orders/" + o.id + "/status", { status: nextInfo.next })
+        .then(function (updated) {
+          toast("Statut mis à jour vers : " + updated.status);
+          closeModal();
+          loadOrders();
+        })
+        .catch(function (e) { toast((e && e.error) || "Erreur.", "error"); btn.disabled = false; });
+    });
+    
+    var statusCancelBtn = document.getElementById("status-modal-cancel-btn");
+    if (statusCancelBtn) {
+      statusCancelBtn.addEventListener("click", function () {
+        if (!confirm("Voulez-vous vraiment annuler la commande #" + o.id + " ?")) return;
+        statusCancelBtn.disabled = true;
+        put("/api/admin/orders/" + o.id + "/status", { status: "Annulée" })
+          .then(function () {
+            toast("Commande annulée avec succès.");
+            closeModal();
+            loadOrders();
+          })
+          .catch(function (e) { toast((e && e.error) || "Erreur.", "error"); statusCancelBtn.disabled = false; });
+      });
+    }
+  }
+
+  /* ── ADS ── */
+  document.getElementById("ad-save-btn").addEventListener("click", function () {
+    post("/api/admin/ads", { title: document.getElementById("ad-title").value, message: document.getElementById("ad-message").value, link: document.getElementById("ad-link").value, active: true })
+      .then(function () { toast("Publicité publiée."); document.getElementById("ad-title").value = ""; document.getElementById("ad-message").value = ""; document.getElementById("ad-link").value = ""; loadAds(); })
+      .catch(function (e) { toast((e && e.error) || "Erreur.", "error"); });
+  });
+
+  function loadAds() {
+    get("/api/admin/ads").then(function (ads) {
+      var list = document.getElementById("ads-list");
+      if (ads.length === 0) { list.innerHTML = '<p style="color:#999;font-size:13px;">Aucune publicité.</p>'; return; }
+      list.innerHTML = ads.map(function (a) {
+        return '<div class="ad-item" data-aid="' + a.id + '">'
+          + '<div class="ad-info"><strong>' + esc(a.title) + '</strong><small>' + esc(a.message) + (a.link ? ' — <a href="' + esc(a.link) + '" target="_blank" onclick="event.stopPropagation()">Lien ↗</a>' : '') + '</small></div>'
+          + '<button class="btn btn-danger btn-sm" data-ad-del="' + a.id + '" style="flex-shrink:0;">Supprimer</button></div>';
+      }).join("");
+      list.querySelectorAll(".ad-item").forEach(function (item) {
+        item.addEventListener("click", function (e) {
+          if (e.target.closest("button")) return;
+          var a = ads.find(function (x) { return String(x.id) === item.getAttribute("data-aid"); });
+          if (!a) return;
+          openModal("Publicité — " + a.title,
+            '<div class="modal-field"><div class="modal-field-label">Titre</div><div class="modal-field-value">' + esc(a.title) + '</div></div>'
+            + '<div class="modal-field"><div class="modal-field-label">Message</div><div class="modal-field-value" style="white-space:pre-wrap;">' + esc(a.message) + '</div></div>'
+            + (a.link ? '<div class="modal-field"><div class="modal-field-label">Lien</div><div class="modal-field-value"><a href="' + esc(a.link) + '" target="_blank" style="color:#ff690c;">' + esc(a.link) + '</a></div></div>' : '')
+            + '<div class="modal-field"><div class="modal-field-label">Créée le</div><div class="modal-field-value">' + fmtDate(a.created_at) + '</div></div>'
+          );
+        });
+      });
+      list.querySelectorAll("[data-ad-del]").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          del("/api/admin/ads/" + btn.getAttribute("data-ad-del")).then(function () { toast("Publicité supprimée."); loadAds(); }).catch(function () { toast("Suppression impossible.", "error"); });
+        });
+      });
+    });
+  }
+
+  /* ── INIT ── */
+  function applyRoleVisibility(role) {
+    var isSuper = role === "super";
+    document.querySelectorAll('[data-super-only]').forEach(function (el) {
+      el.style.display = isSuper ? "" : "none";
+    });
+  }
+  applyRoleVisibility(window.MAGMA_ADMIN_ROLE || null);
+
+  get("/api/admin/status").then(function (s) {
+    applyRoleVisibility(s.role || window.MAGMA_ADMIN_ROLE || null);
+    if (s.authenticated) { loginScreen.style.display = "none"; dashboard.style.display = "block"; loadDashboard(); }
+  }).catch(function () {});
+})();
+</script>
+</body>
+</html>
