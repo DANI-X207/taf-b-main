@@ -680,16 +680,38 @@
       var pass = document.getElementById("login-password").value;
       var remember = !!document.getElementById("remember-me").checked;
       if (!email || !pass) { toast("Veuillez saisir votre email et mot de passe.", "error"); return; }
+      
+      var btn = document.getElementById("login-submit");
+      btn.disabled = true;
+      var originalHtml = btn.innerHTML;
+      
+      // Inject spin style dynamically if missing
+      if (!document.getElementById("magma-spin-style")) {
+        var styleEl = document.createElement("style");
+        styleEl.id = "magma-spin-style";
+        styleEl.textContent = "@keyframes magma-spin { to { transform: rotate(360deg); } }";
+        document.head.appendChild(styleEl);
+      }
+      
+      btn.innerHTML = '<span class="spinner" style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:magma-spin 0.8s linear infinite;vertical-align:middle;margin-right:8px;"></span> Connexion...';
+      btn.style.background = "#ffa870";
+      btn.style.cursor = "not-allowed";
+      
       post("/api/auth/login", { email: email, password: pass, remember: remember })
         .then(function () {
-          // Mémorise (ou efface) l'email côté navigateur selon le choix de l'utilisateur
           try {
             if (remember) localStorage.setItem("magma_remember_email", email);
             else localStorage.removeItem("magma_remember_email");
           } catch (e) {}
           window.location.href = "/";
         })
-        .catch(function (err) { toast((err && err.error) || "Email ou mot de passe incorrect.", "error"); });
+        .catch(function (err) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+          btn.style.background = "#ff690c";
+          btn.style.cursor = "pointer";
+          toast((err && err.error) || "Email ou mot de passe incorrect.", "error");
+        });
     });
 
     ["login-email", "login-password"].forEach(function (id) {
@@ -773,6 +795,22 @@
       var pass = document.getElementById("reg-password").value;
       if (!name || !email || !phone || !pass) { toast("Veuillez remplir tous les champs.", "error"); return; }
       if (phone.replace(/\D+/g, "").length !== 9) { toast("Le numéro doit comporter 9 chiffres (ex: XX-XXX-XXXX).", "error"); return; }
+      
+      var btn = document.getElementById("reg-submit");
+      btn.disabled = true;
+      var originalHtml = btn.innerHTML;
+      
+      if (!document.getElementById("magma-spin-style")) {
+        var styleEl = document.createElement("style");
+        styleEl.id = "magma-spin-style";
+        styleEl.textContent = "@keyframes magma-spin { to { transform: rotate(360deg); } }";
+        document.head.appendChild(styleEl);
+      }
+      
+      btn.innerHTML = '<span class="spinner" style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:magma-spin 0.8s linear infinite;vertical-align:middle;margin-right:8px;"></span> Inscription...';
+      btn.style.background = "#ffa870";
+      btn.style.cursor = "not-allowed";
+
       fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name, email: email, phone: phone, password: pass }) })
         .then(function (r) {
           return r.json().then(function (d) {
@@ -785,7 +823,13 @@
             }
           });
         })
-        .catch(function (err) { toast((err && err.error) || "Inscription impossible.", "error"); });
+        .catch(function (err) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+          btn.style.background = "#ff690c";
+          btn.style.cursor = "pointer";
+          toast((err && err.error) || "Inscription impossible.", "error");
+        });
     });
 
     ["reg-name", "reg-email", "reg-phone", "reg-password"].forEach(function (id) {

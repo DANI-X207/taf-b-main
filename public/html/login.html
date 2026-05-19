@@ -162,6 +162,24 @@
     transition: background .2s;
   }
   .btn-login:hover { background: #e55a00; }
+  .btn-login:disabled {
+    background: #ffa870;
+    cursor: not-allowed;
+  }
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
 
   .register-link {
     margin-top: 18px;
@@ -222,6 +240,17 @@
 
 <script>
 (function () {
+  var form = document.getElementById("login-form");
+  if (form) {
+    form.addEventListener("submit", function () {
+      var btn = form.querySelector(".btn-login");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Connexion...';
+      }
+    });
+  }
+
   var params = new URLSearchParams(window.location.search);
   var info = params.get("info");
   var err = params.get("error");

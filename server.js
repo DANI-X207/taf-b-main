@@ -12,10 +12,24 @@ const { router: ordersRouter } = require("./src/routes/orders");
 const reviewsRouter = require("./src/routes/reviews");
 const adminRouter = require("./src/routes/admin");
 const { router: pagesRouter } = require("./src/routes/pages");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 
 app.set("trust proxy", 1);
+
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  message: { error: "Trop de requêtes depuis cette adresse IP, veuillez réessayer plus tard." }
+});
+app.use(limiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
