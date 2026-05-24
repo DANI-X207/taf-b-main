@@ -57,7 +57,7 @@ async function sendOrderEmail(order, items) {
     });
     await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER || "no-reply@librairie-magma.local",
-      to: process.env.ORDER_EMAIL || "moussokiexauce7@gmail.com",
+      to: process.env.ORDER_EMAIL || "magmateam369@gmail.com",
       subject: `Commande Librairie Magma #${order.id}`,
       text: lines.join("\n"),
     });
@@ -239,7 +239,7 @@ router.post("/api/orders/:id/request-cancel", requireUser(), async (req, res) =>
         });
         await transporter.sendMail({
           from: process.env.SMTP_FROM || process.env.SMTP_USER || "no-reply@librairie-magma.local",
-          to: process.env.ORDER_EMAIL || "moussokiexauce7@gmail.com",
+          to: process.env.ORDER_EMAIL || "magmateam369@gmail.com",
           subject: `[DEMANDE D'ANNULATION] Commande #${orderId}`,
           text: `Le client ${order.customer_name} (${order.customer_email}, ${order.customer_phone}) a demandé l'annulation de sa commande #${orderId}.\n\nRaison : ${reason}\n\nZone : ${order.delivery_zone}\nMontant : ${order.total} FCFA\nStatut actuel : ${order.status}\nDate commande : ${order.created_at}`,
         });
@@ -345,7 +345,7 @@ router.post("/api/orders/:id/report-not-received", requireUser(), async (req, re
         });
         await transporter.sendMail({
           from: process.env.SMTP_FROM || process.env.SMTP_USER || "no-reply@librairie-magma.local",
-          to: process.env.ORDER_EMAIL || "moussokiexauce7@gmail.com",
+          to: process.env.ORDER_EMAIL || "magmateam369@gmail.com",
           subject: `[ALERTE] Commande #${orderId} signalée non reçue`,
           text: `Le client ${updated.customer_name} (${updated.customer_email}, ${updated.customer_phone}) a signalé que la commande #${orderId} n'a pas été reçue.\n\nRaison : ${reason}\n\nZone : ${updated.delivery_zone}\nMontant : ${updated.total} FCFA\nStatut actuel : ${updated.status}\nDate commande : ${updated.created_at}`,
         });
