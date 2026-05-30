@@ -967,7 +967,7 @@
 
       return '<div class="order-card" id="oc-' + o.id + '">'
         + '<div class="order-header"><div class="order-id">Commande #' + esc(o.id) + ' — ' + esc(o.customer_name) + '</div><span class="order-status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></div>'
-        + '<div class="order-meta">📧 ' + esc(o.customer_email) + ' · 📞 ' + esc(o.customer_phone || "—") + ' · 📍 ' + esc(o.delivery_zone) + ' · <strong>' + money(o.total) + '</strong></div>'
+        + '<div class="order-meta">📧 ' + esc(o.customer_email) + ' · 📞 ' + esc(o.customer_phone || "—") + ' · 📍 ' + esc(o.delivery_zone) + (o.delivery_address ? ' — ' + esc(o.delivery_address) : '') + ' · <strong>' + money(o.total) + '</strong></div>'
         + (itemsText ? '<div class="order-items-inline">🛒 ' + itemsText + '</div>' : '')
         + '<div class="validation-pills">' + adminPill + clientPill + (o.validated_at ? '<span class="v-pill v-done">✓ Validée le ' + fmtDateShort(o.validated_at) + '</span>' : '') + '</div>'
         + cancelReqHtml

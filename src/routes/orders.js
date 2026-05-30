@@ -1,9 +1,8 @@
 const express = require("express");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
 const PDFDocument = require("pdfkit");
 const { getDb, nowIso } = require("../db");
-const { cleanText, cleanInt, cleanEmail, cleanPhone, rowToBook } = require("../helpers");
+const { cleanText, cleanInt, cleanEmail, cleanPhone, normalizePhone, rowToBook } = require("../helpers");
 const { requireUser, getCurrentUser, isAuthenticated } = require("../middleware");
 
 const router = express.Router();
@@ -31,42 +30,7 @@ async function userCanAccessOrder(req, order) {
   return !!(user && order.user_id && parseInt(order.user_id) === parseInt(user.id));
 }
 
-async function sendOrderEmail(order, items) {
-  const host = process.env.SMTP_HOST;
-  if (!host) { console.warn("SMTP_HOST not configured — order email not sent."); return "smtp_not_configured"; }
-  const lines = [
-    `Nouvelle commande #${order.id}`,
-    `Statut : ${order.status}`,
-    `Client : ${order.customer_name}`,
-    `Email : ${order.customer_email}`,
-    `Téléphone : ${order.customer_phone}`,
-    `Zone : ${order.delivery_zone}`,
-    `Adresse : ${order.delivery_address}`,
-    `Suivi : /api/orders/${order.id}?token=${order.tracking_token}`,
-    "",
-    "Produits :",
-    ...items.map((i) => `- ${i.titre} (${i.auteur}) x${i.qty} : ${i.prix * i.qty} FCFA`),
-    "",
-    `Total : ${order.total} FCFA`,
-  ];
-  try {
-    const transporter = nodemailer.createTransport({
-      host,
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD } : undefined,
-    });
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER || "no-reply@librairie-magma.local",
-      to: process.env.ORDER_EMAIL || "magmateam369@gmail.com",
-      subject: `Commande Librairie Magma #${order.id}`,
-      text: lines.join("\n"),
-    });
-    return "sent";
-  } catch (e) {
-    console.error("Unable to send order email:", e.message);
-    return "failed";
-  }
-}
+
 
 function generateReceiptPdf(order, items, res) {
   const doc = new PDFDocument({ margin: 50 });
@@ -122,10 +86,16 @@ router.post("/api/orders", requireUser(), async (req, res) => {
     const customer_name = cleanText(data.customer_name || (user || {}).name, 140, true);
     const customer_email = cleanEmail(data.customer_email || (user || {}).email);
     const customer_phone = cleanPhone(data.customer_phone || (user || {}).phone);
+    const normalized_phone = normalizePhone(customer_phone);
+    if (normalized_phone.length !== 9) {
+      return res.status(400).json({ error: "Le numéro de téléphone doit comporter exactement 9 chiffres (format local) pour le paiement à la livraison." });
+    }
     const delivery_zone = cleanText(data.delivery_zone, 120, true);
-    const delivery_address = cleanText(data.delivery_address || data.delivery_zone, 260, true);
+    const delivery_address = cleanText(data.delivery_address, 260, true);
     if (!ALLOWED_DELIVERY_ZONES.includes(delivery_zone))
       return res.status(400).json({ error: "Livraison impossible : cette adresse est hors zone. Zones autorisées : Potopoto la gare, Total vers Saint Exupérie, Présidence, OSH, CHU." });
+    if (!delivery_address)
+      return res.status(400).json({ error: "Veuillez indiquer votre adresse complète (quartier, rue, repère)." });
 
     const db = await getDb();
     const validItems = [];
@@ -140,11 +110,25 @@ router.post("/api/orders", requireUser(), async (req, res) => {
       total += book.prix * qty;
     }
 
+    if (total > 50000) {
+      return res.status(400).json({ error: "Le montant de votre commande dépasse la limite autorisée de 50 000 FCFA pour le paiement à la livraison." });
+    }
+
+    if (user && user.id) {
+      const failedOrdersRow = await db.get(
+        "SELECT COUNT(*) as cnt FROM orders WHERE user_id = ? AND (status = 'Annulée' OR not_received_reported_at IS NOT NULL)",
+        user.id
+      );
+      if (failedOrdersRow && failedOrdersRow.cnt >= 3) {
+        return res.status(403).json({ error: "Votre compte présente trop de commandes annulées ou non reçues. Le paiement à la livraison est bloqué pour votre profil. Veuillez contacter le support." });
+      }
+    }
+
     const created_at = nowIso();
     const tracking_token = crypto.randomBytes(18).toString("base64url");
     const orderResult = await db.run(
-      "INSERT INTO orders (user_id, customer_name, customer_email, customer_phone, delivery_zone, delivery_address, total, status, email_status, tracking_token, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
-      (user || {}).id || null, customer_name, customer_email, customer_phone, delivery_zone, delivery_address, total, "En attente", "pending", tracking_token, created_at, created_at
+      "INSERT INTO orders (user_id, customer_name, customer_email, customer_phone, delivery_zone, delivery_address, total, status, tracking_token, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+      (user || {}).id || null, customer_name, customer_email, customer_phone, delivery_zone, delivery_address, total, "En attente", tracking_token, created_at, created_at
     );
     const orderId = orderResult.lastID;
 
@@ -159,10 +143,6 @@ router.post("/api/orders", requireUser(), async (req, res) => {
       );
       await db.run("UPDATE books SET stock = MAX(stock - ?, 0), sales = sales + ? WHERE id = ?", item.qty, item.qty, item.book_id);
     }
-    await db.run("UPDATE orders SET email_status = 'pending' WHERE id = ?", orderId);
-
-    const emailStatus = await sendOrderEmail({ id: orderId, customer_name, customer_email, customer_phone, delivery_zone, delivery_address, total, status: "En attente", tracking_token, created_at }, validItems);
-    await db.run("UPDATE orders SET email_status = ? WHERE id = ?", emailStatus, orderId);
     const order = await db.get("SELECT * FROM orders WHERE id = ?", orderId);
 
     req.session.cart = [];
@@ -228,26 +208,6 @@ router.post("/api/orders/:id/request-cancel", requireUser(), async (req, res) =>
     const reason = cleanText((req.body || {}).reason || "Non précisée", 300, true);
     const now = nowIso();
     await db.run("UPDATE orders SET cancel_requested = 1, cancel_reason = ?, updated_at = ? WHERE id = ?", reason, now, orderId);
-    
-    try {
-      const host = process.env.SMTP_HOST;
-      if (host) {
-        const transporter = nodemailer.createTransport({
-          host,
-          port: parseInt(process.env.SMTP_PORT || "587"),
-          auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD } : undefined,
-        });
-        await transporter.sendMail({
-          from: process.env.SMTP_FROM || process.env.SMTP_USER || "no-reply@librairie-magma.local",
-          to: process.env.ORDER_EMAIL || "magmateam369@gmail.com",
-          subject: `[DEMANDE D'ANNULATION] Commande #${orderId}`,
-          text: `Le client ${order.customer_name} (${order.customer_email}, ${order.customer_phone}) a demandé l'annulation de sa commande #${orderId}.\n\nRaison : ${reason}\n\nZone : ${order.delivery_zone}\nMontant : ${order.total} FCFA\nStatut actuel : ${order.status}\nDate commande : ${order.created_at}`,
-        });
-      }
-    } catch (e) {
-      console.error("Notification email admin d'annulation échouée:", e.message);
-    }
-    
     res.json({ success: true, message: "Demande d'annulation envoyée à l'administrateur." });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -335,24 +295,6 @@ router.post("/api/orders/:id/report-not-received", requireUser(), async (req, re
     await db.run("UPDATE orders SET not_received_reported_at = ?, not_received_reason = ?, updated_at = ? WHERE id = ?", now, reason, now, orderId);
     const updated = await db.get("SELECT * FROM orders WHERE id = ?", orderId);
     const items = await db.all("SELECT * FROM order_items WHERE order_id = ?", orderId);
-    try {
-      const host = process.env.SMTP_HOST;
-      if (host) {
-        const transporter = nodemailer.createTransport({
-          host,
-          port: parseInt(process.env.SMTP_PORT || "587"),
-          auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD } : undefined,
-        });
-        await transporter.sendMail({
-          from: process.env.SMTP_FROM || process.env.SMTP_USER || "no-reply@librairie-magma.local",
-          to: process.env.ORDER_EMAIL || "magmateam369@gmail.com",
-          subject: `[ALERTE] Commande #${orderId} signalée non reçue`,
-          text: `Le client ${updated.customer_name} (${updated.customer_email}, ${updated.customer_phone}) a signalé que la commande #${orderId} n'a pas été reçue.\n\nRaison : ${reason}\n\nZone : ${updated.delivery_zone}\nMontant : ${updated.total} FCFA\nStatut actuel : ${updated.status}\nDate commande : ${updated.created_at}`,
-        });
-      } else {
-        console.warn(`[ADMIN-NOTIFY] Commande #${orderId} signalée non reçue — raison: ${reason}`);
-      }
-    } catch (e) { console.error("Notification admin échouée:", e.message); }
     res.json(rowToOrder(updated, items));
   } catch (e) {
     res.status(500).json({ error: e.message });

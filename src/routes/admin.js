@@ -39,7 +39,7 @@ function safeEqual(a, b) {
   return A.length === B.length && crypto.timingSafeEqual(A, B);
 }
 
-const ORDER_STATUSES = ["En attente", "Confirmée", "En livraison", "Livrée", "Annulée"];
+const ORDER_STATUSES = ["En attente", "Confirmée", "En livraison", "Livrée", "Reçue", "Annulée"];
 
 function rowToOrder(row, items = []) {
   const order = { ...row };
@@ -190,6 +190,7 @@ router.put("/api/admin/orders/:id/status", requireAdmin(), async (req, res) => {
     } else {
       await db.run("UPDATE orders SET status = ?, updated_at = ? WHERE id = ?", status, now, orderId);
     }
+
 
     const updatedOrder = await tryValidateOrder(db, orderId);
     const items = await db.all("SELECT * FROM order_items WHERE order_id = ?", orderId);

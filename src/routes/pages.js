@@ -239,7 +239,7 @@ router.get("/api/source-railway.zip", (req, res) => {
     deploy: { startCommand: "node server.js", restartPolicyType: "ON_FAILURE", restartPolicyMaxRetries: 10 },
   }, null, 2) + "\n";
   const nixpacks = "[phases.setup]\nnixPkgs = ['nodejs_20']\n\n[start]\ncmd = 'node server.js'\n";
-  const envExample = "PORT=5000\nSESSION_SECRET=change-me\nADMIN_PASSWORD=TAF1-FLEMME\nADMIN_PASSWORD_SUPER=MMDE2007\n# SMTP_HOST=\n# SMTP_PORT=587\n# SMTP_USER=\n# SMTP_PASSWORD=\n# SMTP_FROM=\n# ORDER_EMAIL=\n";
+  const envExample = "PORT=5000\nSESSION_SECRET=change-me\nADMIN_PASSWORD=TAF1-FLEMME\nADMIN_PASSWORD_SUPER=MMDE2007\n";
   const readme = "# Librairie Magma — Déploiement Railway\n\n1. Créez un nouveau projet Railway et importez ce dossier.\n2. Définissez les variables d'environnement (voir `.env.example`).\n3. Railway détecte Node.js automatiquement et utilise `node server.js` comme commande de démarrage.\n4. L'application écoute sur le port défini par `PORT` (5000 par défaut).\n";
   archive.append(procfile, { name: "Procfile" });
   archive.append(railwayJson, { name: "railway.json" });
@@ -286,7 +286,7 @@ router.get("/api/source-render.zip", (req, res) => {
       - key: ADMIN_PASSWORD_SUPER
         sync: false
 `;
-  const envExample = "PORT=5000\nSESSION_SECRET=change-me\nADMIN_PASSWORD=TAF1-FLEMME\nADMIN_PASSWORD_SUPER=MMDE2007\n# SMTP_HOST=\n# SMTP_PORT=587\n# SMTP_USER=\n# SMTP_PASSWORD=\n# SMTP_FROM=\n# ORDER_EMAIL=\n";
+  const envExample = "PORT=5000\nSESSION_SECRET=change-me\nADMIN_PASSWORD=TAF1-FLEMME\nADMIN_PASSWORD_SUPER=MMDE2007\n";
   const readme =
 `# Librairie Magma — Déploiement Render
 
@@ -301,7 +301,6 @@ router.get("/api/source-render.zip", (req, res) => {
 4. Définissez vos variables secrètes dans le dashboard Render :
    - \`ADMIN_PASSWORD\`
    - \`ADMIN_PASSWORD_SUPER\`
-   - (optionnel) \`SMTP_HOST\`, \`SMTP_USER\`, \`SMTP_PASSWORD\`, \`SMTP_FROM\`
 5. \`SESSION_SECRET\` est généré automatiquement par Render.
 6. L'application écoute sur le port défini par la variable \`PORT\` injectée par Render.
 

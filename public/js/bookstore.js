@@ -365,17 +365,27 @@
           profileBlock +
           '<label class="magma-co__label" for="co-zone">Zone de livraison</label>' +
           '<select id="co-zone" class="magma-co__field"><option value="">Choisir la zone de livraison</option>' + zones.map(function (z) { return '<option value="' + esc(z) + '">' + esc(z) + '</option>'; }).join("") + '</select>' +
+          '<input id="co-address" placeholder="Adresse complète (Quartier, rue, repère)" class="magma-co__field" style="margin-top:10px;">' +
+          '<div id="co-address-err" style="display:none;color:#b42318;font-size:12px;margin-top:4px;padding:6px 10px;background:#fee4e2;border-radius:6px;">⚠️ Veuillez renseigner votre adresse complète (quartier, rue, repère).</div>' +
           phoneFallback +
           '<button id="co-submit" type="button" class="magma-co__submit">Valider la commande</button>' +
           '<div id="co-result" class="magma-co__result"></div>';
         document.getElementById("co-submit").addEventListener("click", function () {
+          var addressVal = (document.getElementById("co-address").value || "").trim();
+          var addressErr = document.getElementById("co-address-err");
+          if (!addressVal) {
+            addressErr.style.display = "block";
+            document.getElementById("co-address").focus();
+            return;
+          }
+          addressErr.style.display = "none";
           var phoneVal = hasPhone ? user.phone : (document.getElementById("co-phone") || {}).value;
           post("/api/orders", {
             customer_name: user.name || "",
             customer_email: user.email || "",
             customer_phone: phoneVal || "",
             delivery_zone: document.getElementById("co-zone").value,
-            delivery_address: user.name ? ("Compte: " + user.name) : "Livraison à domicile"
+            delivery_address: addressVal
           }).then(function (res) {
             updateCartBadge();
             document.getElementById("co-result").innerHTML = '<div style="background:#ecfdf3;border:1px solid #abefc6;padding:12px;border-radius:12px;color:#067647;">Commande validée #' + res.order.id + '. <a href="' + res.receipt_url + '">Télécharger le reçu PDF</a><br><button type="button" id="cancel-order" style="margin-top:8px;background:#fef3c7;border:1px solid #fde68a;color:#92400e;border-radius:6px;padding:4px 8px;cursor:pointer;">Demander l\'annulation de la commande</button></div>';
@@ -426,6 +436,7 @@
             + '</div>'
             + (itemsList ? '<div style="margin:0 0 12px;">' + itemsList + '</div>' : '')
             + '<div style="font-size:13px;color:#666;margin-bottom:10px;">📍 ' + esc(o.delivery_zone) + (o.delivery_address ? ' — ' + esc(o.delivery_address) : '') + '</div>'
+            + (o.status === "En livraison" ? '<div style="font-size:13px;padding:10px 14px;background:#fffbe0;color:#926800;border:1px solid #ffe68a;border-radius:8px;margin-bottom:10px;font-weight:700;">🚨 Votre livreur est en route ! Préparez ' + money(o.total) + ' en espèces.</div>' : '')
             + (o.client_confirmed ? '<div style="font-size:12px;padding:6px 12px;background:#dcfce7;color:#166534;border-radius:999px;display:inline-block;margin-bottom:8px;">✓ Vous avez confirmé la réception</div>' : '')
             + (o.cancel_requested ? '<div style="font-size:12px;padding:6px 12px;background:#fee4e2;color:#b42318;border-radius:999px;display:inline-block;margin-bottom:8px;font-weight:600;">⚠ Demande d\'annulation en cours</div>' : '')
             + (canConfirm ? '<div><button class="confirm-btn" data-oid="' + o.id + '" style="background:#ff690c;color:#fff;border:0;border-radius:999px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;margin-right:8px;">Confirmer la réception</button></div>' : '')
