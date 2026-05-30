@@ -4,7 +4,7 @@
 <link rel="icon" type="image/png" href="/img/ICON-1.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Librairie Magma — Catalogue</title>
+<title>Librairie Magma — Meilleures ventes</title>
 <!-- skip-inject: magma-fixes.css -->
 <script>window.MAGMA_CATALOG_CUSTOM=true;</script>
 <style>
@@ -143,8 +143,8 @@
 </header>
 
 <section class="page-hero">
-  <h1>Notre catalogue</h1>
-  <p>Découvrez tous les livres de la Librairie Magma — romans, jeunesse, sciences, développement personnel et bien plus.</p>
+  <h1>Meilleures ventes</h1>
+  <p>Découvrez les livres les plus populaires et les grands favoris de nos lecteurs à la Librairie Magma.</p>
 </section>
 
 <main class="wrap">
@@ -159,7 +159,6 @@
       <option value="price-desc">Prix décroissant</option>
       <option value="title">Titre (A–Z)</option>
     </select>
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="cat-stock"> En stock</label>
     <button class="reset" type="button" id="cat-reset">Réinitialiser</button>
   </div>
 
@@ -244,13 +243,17 @@ function applyFilters(){
   ACTIVE_GENRE = g;
   const sort = document.getElementById('cat-sort').value;
   let list = ALL_BOOKS.slice();
-  
-  if (q) list = list.filter(b => (b.titre||'').toLowerCase().includes(q) || (b.auteur||'').toLowerCase().includes(q));
-  if (ACTIVE_GENRE) list = list.filter(b => (b.genre||'').toLowerCase() === ACTIVE_GENRE.toLowerCase());
-  
-  const onlyStock = document.getElementById('cat-stock').checked;
-  if(onlyStock) list = list.filter(b => Number(b.stock||0) > 0);
-  
+  if(g) list = list.filter(b => (b.genre||'')===g);
+  if(q) list = list.filter(b => (b.titre||'').toLowerCase().includes(q) || (b.auteur||'').toLowerCase().includes(q));
+  // Tri spécifique : par nombre de commandes (sales) puis par mise en avant (featured)
+  list.sort((a,b) => {
+    const sA = Number(a.sales) || 0;
+    const sB = Number(b.sales) || 0;
+    if (sA !== sB) return sB - sA;
+    return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+  });
+  // On ne conserve que les 15 meilleures ventes
+  list = list.slice(0, 15);
   if(sort==='price-asc') list.sort((a,b)=>Number(a.prix)-Number(b.prix));
   else if(sort==='price-desc') list.sort((a,b)=>Number(b.prix)-Number(a.prix));
   else if(sort==='title') list.sort((a,b)=>String(a.titre||'').localeCompare(String(b.titre||'')));
@@ -344,12 +347,10 @@ ACTIVE_GENRE = initialG;
 document.getElementById('cat-search').addEventListener('input', applyFilters);
 document.getElementById('cat-genre').addEventListener('change', applyFilters);
 document.getElementById('cat-sort').addEventListener('change', applyFilters);
-document.getElementById('cat-stock').addEventListener('change', applyFilters);
 document.getElementById('cat-reset').addEventListener('click', ()=>{
   document.getElementById('cat-search').value='';
   document.getElementById('cat-genre').value='';
   document.getElementById('cat-sort').value='recent';
-  document.getElementById('cat-stock').checked=false;
   ACTIVE_GENRE='';
   applyFilters();
 });

@@ -56,6 +56,7 @@ body { margin:0; min-height:100vh; background:linear-gradient(135deg,#fff7ef,#f3
         '<li><span class="lbl">Téléphone</span><span class="val">'+esc(u.phone||"—")+'</span></li>'+
         '<li><span class="lbl">Date d\'inscription</span><span class="val">'+esc(fmtDate(u.created_at))+'</span></li>'+
       '</ul>'+
+      '<a href="/favoris.html" style="display:block;margin-bottom:14px;background:#fff2e8;padding:12px;border-radius:6px;text-align:center;font-weight:700;color:#ff690c;text-decoration:none;transition:background .2s;">❤️ Voir mes favoris</a>'+
       '<button type="button" class="mc-logout" id="mc-logout-btn">Se déconnecter</button>';
       
     document.getElementById("mc-edit-btn").addEventListener("click", function() { renderEditMode(card); });
@@ -84,9 +85,13 @@ body { margin:0; min-height:100vh; background:linear-gradient(135deg,#fff7ef,#f3
           '<label style="display:block;font-size:.85rem;color:#555;margin-bottom:6px;">Email</label>'+
           '<input type="email" name="email" value="'+esc(u.email)+'" required style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-family:inherit;box-sizing:border-box;">'+
         '</div>'+
-        '<div style="margin-bottom:24px;">'+
+        '<div style="margin-bottom:14px;">'+
           '<label style="display:block;font-size:.85rem;color:#555;margin-bottom:6px;">Téléphone</label>'+
           '<input type="text" name="phone" value="'+esc(u.phone)+'" required style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-family:inherit;box-sizing:border-box;">'+
+        '</div>'+
+        '<div style="margin-bottom:24px;">'+
+          '<label style="display:block;font-size:.85rem;color:#555;margin-bottom:6px;">Nouveau mot de passe <small style="color:#aaa;">(optionnel)</small></label>'+
+          '<input type="password" name="password" placeholder="••••••••" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-family:inherit;box-sizing:border-box;">'+
         '</div>'+
         '<div style="display:flex;gap:10px;">'+
           '<button type="button" id="mc-cancel-btn" style="flex:1;background:#f0f0f0;color:#333;border:none;padding:12px;border-radius:6px;cursor:pointer;font-weight:600;">Annuler</button>'+
@@ -133,6 +138,9 @@ body { margin:0; min-height:100vh; background:linear-gradient(135deg,#fff7ef,#f3
         phone: this.phone.value,
         avatar: currentAvatarBase64
       };
+      if (this.password && this.password.value.trim() !== "") {
+        payload.password = this.password.value;
+      }
       
       fetch("/api/users/me", {
         method: "PUT",

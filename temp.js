@@ -1,0 +1,1 @@
+window.MAGMA_DETAIL_CUSTOM=true;

@@ -259,10 +259,19 @@ router.put("/api/users/me", async (req, res) => {
     const oldInfo = { name: user.name, email: user.email, phone: user.phone, avatar: user.avatar };
     const newInfo = { name, email, phone, avatar };
     
-    const changed = oldInfo.name !== newInfo.name || oldInfo.email !== newInfo.email || oldInfo.phone !== newInfo.phone || oldInfo.avatar !== newInfo.avatar;
+    let passwordHash = user.password_hash;
+    let pwdChanged = false;
+    if (data.password && data.password.trim().length >= 8) {
+      passwordHash = await bcrypt.hash(data.password, 12);
+      pwdChanged = true;
+    } else if (data.password && data.password.trim().length > 0) {
+      throw new Error("Le mot de passe doit faire au moins 8 caractères.");
+    }
+
+    const changed = pwdChanged || oldInfo.name !== newInfo.name || oldInfo.email !== newInfo.email || oldInfo.phone !== newInfo.phone || oldInfo.avatar !== newInfo.avatar;
 
     if (changed) {
-      await db.run("UPDATE users SET name = ?, email = ?, phone = ?, avatar = ? WHERE id = ?", name, email, phone, avatar, user.id);
+      await db.run("UPDATE users SET name = ?, email = ?, phone = ?, avatar = ?, password_hash = ? WHERE id = ?", name, email, phone, avatar, passwordHash, user.id);
       await db.run(
         "INSERT INTO user_modifications (user_id, old_data, new_data, created_at, is_read) VALUES (?, ?, ?, ?, 0)",
         user.id, JSON.stringify(oldInfo), JSON.stringify(newInfo), nowIso()

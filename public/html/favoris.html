@@ -4,7 +4,7 @@
 <link rel="icon" type="image/png" href="/img/ICON-1.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Librairie Magma — Catalogue</title>
+<title>Librairie Magma — Mes Favoris</title>
 <!-- skip-inject: magma-fixes.css -->
 <script>window.MAGMA_CATALOG_CUSTOM=true;</script>
 <style>
@@ -143,8 +143,8 @@
 </header>
 
 <section class="page-hero">
-  <h1>Notre catalogue</h1>
-  <p>Découvrez tous les livres de la Librairie Magma — romans, jeunesse, sciences, développement personnel et bien plus.</p>
+  <h1>Mes Favoris</h1>
+  <p>Retrouvez ici tous les livres que vous avez mis de côté.</p>
 </section>
 
 <main class="wrap">
@@ -159,7 +159,6 @@
       <option value="price-desc">Prix décroissant</option>
       <option value="title">Titre (A–Z)</option>
     </select>
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="cat-stock"> En stock</label>
     <button class="reset" type="button" id="cat-reset">Réinitialiser</button>
   </div>
 
@@ -210,7 +209,8 @@ let ALL_BOOKS = [];
 let ACTIVE_GENRE = '';
 
 async function loadBooks(){
-  const r = await fetch('/api/books',{credentials:'same-origin'});
+  const r = await fetch('/api/wishlist',{credentials:'same-origin'});
+  if (r.status === 401) { window.location.href = '/login.html?next=/favoris.html'; return; }
   ALL_BOOKS = r.ok ? await r.json() : [];
   renderChips();
   applyFilters();
@@ -244,12 +244,8 @@ function applyFilters(){
   ACTIVE_GENRE = g;
   const sort = document.getElementById('cat-sort').value;
   let list = ALL_BOOKS.slice();
-  
-  if (q) list = list.filter(b => (b.titre||'').toLowerCase().includes(q) || (b.auteur||'').toLowerCase().includes(q));
-  if (ACTIVE_GENRE) list = list.filter(b => (b.genre||'').toLowerCase() === ACTIVE_GENRE.toLowerCase());
-  
-  const onlyStock = document.getElementById('cat-stock').checked;
-  if(onlyStock) list = list.filter(b => Number(b.stock||0) > 0);
+  if(g) list = list.filter(b => (b.genre||'')===g);
+  if(q) list = list.filter(b => (b.titre||'').toLowerCase().includes(q) || (b.auteur||'').toLowerCase().includes(q));
   
   if(sort==='price-asc') list.sort((a,b)=>Number(a.prix)-Number(b.prix));
   else if(sort==='price-desc') list.sort((a,b)=>Number(b.prix)-Number(a.prix));
@@ -344,12 +340,10 @@ ACTIVE_GENRE = initialG;
 document.getElementById('cat-search').addEventListener('input', applyFilters);
 document.getElementById('cat-genre').addEventListener('change', applyFilters);
 document.getElementById('cat-sort').addEventListener('change', applyFilters);
-document.getElementById('cat-stock').addEventListener('change', applyFilters);
 document.getElementById('cat-reset').addEventListener('click', ()=>{
   document.getElementById('cat-search').value='';
   document.getElementById('cat-genre').value='';
   document.getElementById('cat-sort').value='recent';
-  document.getElementById('cat-stock').checked=false;
   ACTIVE_GENRE='';
   applyFilters();
 });

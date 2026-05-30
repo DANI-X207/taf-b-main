@@ -25,7 +25,7 @@ const PAGE_TITLES = {
   Admin: `${SITE_NAME} — Admin`,
 };
 
-const PROTECTED_PAGES = new Set(["index.html", "Accueil-v2.html", "PAGEMOD-Accueil.html", "Mon-panier.html", "Formulaire.html", "mon-compte.html", "mes-commandes.html", "parametres.html"]);
+const PROTECTED_PAGES = new Set(["index.html", "Accueil-v2.html", "PAGEMOD-Accueil.html", "Mon-panier.html", "mon-compte.html", "mes-commandes.html", "parametres.html"]);
 const AUTH_PAGES = new Set(["login.html", "connexion.html", "register.html", "inscription.html"]);
 
 const HEAD_COMPAT = `<script>
@@ -124,10 +124,10 @@ function serveHtml(filename, req, res) {
     content = content.replace("</head>", HEAD_COMPAT);
   }
   if (!content.includes("magma-fixes.css")) {
-    content = content.replace("</head>", '<link rel="stylesheet" type="text/css" href="/magma-fixes.css"></head>');
+    content = content.replace("</head>", '<script>try{document.documentElement.setAttribute("data-magma-theme", localStorage.getItem("magma-theme") || "light");}catch(e){}</script>\n<link rel="stylesheet" type="text/css" href="/magma-fixes.css?v=2"></head>');
   }
   if (!content.includes("/js/bookstore.js")) {
-    content = content.replace("</body>", '<script src="/js/bookstore.js"></script></body>');
+    content = content.replace("</body>", '<script src="/js/bookstore.js?v=2"></script></body>');
   }
   res.type("html").send(content);
 }
@@ -138,6 +138,10 @@ router.get("/", (req, res) => {
 });
 
 router.get("/index.html", (req, res) => res.redirect("/"));
+router.get("/MABOUTIQUE.html", (req, res) => res.redirect("/catalogue.html"));
+
+router.get("/Mon-panier.html", (req, res) => res.redirect("/panier.html"));
+router.get("/Ajout-Produit.html", (req, res) => res.redirect("/admin.html"));
 
 router.get("/favicon.ico", (req, res) => res.status(204).end());
 

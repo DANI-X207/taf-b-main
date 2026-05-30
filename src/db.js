@@ -52,6 +52,7 @@ async function initDb() {
       image TEXT,
       stock INTEGER DEFAULT 10,
       featured INTEGER DEFAULT 0,
+      sales INTEGER DEFAULT 0,
       infos TEXT DEFAULT '',
       created_at TEXT DEFAULT ''
     );
@@ -135,6 +136,16 @@ async function initDb() {
       created_at TEXT NOT NULL,
       is_read INTEGER DEFAULT 0,
       FOREIGN KEY(user_id) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS wishlists (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      book_id INTEGER NOT NULL,
+      created_at TEXT NOT NULL,
+      UNIQUE(user_id, book_id),
+      FOREIGN KEY(user_id) REFERENCES users(id),
+      FOREIGN KEY(book_id) REFERENCES books(id)
     );
   `);
 

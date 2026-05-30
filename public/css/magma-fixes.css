@@ -3,51 +3,6 @@
    Ne modifie pas les couleurs, uniquement l'agencement.
    ============================================================= */
 
-/* ===== Sous-barre noire commune (injectée par bookstore.js) ===== */
-#magma-subnav {
-  background: #ffffff;
-  width: 100%;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  position: relative;
-  z-index: 90;
-}
-#magma-subnav .magma-subnav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  height: 42px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-#magma-subnav .magma-subnav-inner::-webkit-scrollbar { display: none; }
-#magma-subnav .magma-subnav-link {
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-  padding: 6px 0;
-  letter-spacing: .2px;
-  opacity: .92;
-  transition: color .15s, opacity .15s;
-}
-#magma-subnav .magma-subnav-link:hover {
-  color: #ff690c;
-  opacity: 1;
-}
-@media (max-width: 640px) {
-  #magma-subnav .magma-subnav-inner {
-    padding: 0 14px;
-    gap: 18px;
-    height: 40px;
-  }
-  #magma-subnav .magma-subnav-link { font-size: 12.5px; }
-}
-
 /* ── 1. Dropdown de navigation : z-index et overflow ────────────── */
 nav.wbMenuMain,
 .wbMenuMain,
@@ -119,10 +74,42 @@ nav.wbMenuMain,
 #magma-book-list {
   display: flex !important;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
   padding: 8px;
   box-sizing: border-box;
   width: 100%;
+}
+
+.magma-book-card {
+  display: flex;
+  flex-direction: column;
+  width: calc(20% - 16px);
+  min-width: 180px;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.magma-book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.14);
+}
+
+@media (max-width: 1100px) {
+  .magma-book-card { width: calc(25% - 16px); }
+}
+@media (max-width: 900px) {
+  .magma-book-card { width: calc(33.333% - 16px); }
+}
+@media (max-width: 650px) {
+  .magma-book-card { width: calc(50% - 16px); }
+  #magma-book-list { gap: 12px; }
+}
+@media (max-width: 400px) {
+  .magma-book-card { width: 100%; min-width: 0; margin-bottom: 8px; }
 }
 
 /* Éviter que les cartes flottantes créent un grand espace vide */
@@ -1425,17 +1412,50 @@ img, video, iframe, svg { max-width: 100%; height: auto; }
 .menu-toggle svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2}
 .menu-toggle:hover{background:rgba(255,255,255,.08)}
 
+/* Overlay pour le menu coulissant */
+.magma-nav-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1000;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(3px);
+}
+.magma-nav-overlay.is-active { opacity: 1; pointer-events: auto; }
+body.magma-menu-open { overflow: hidden; }
+
 @media (max-width:980px){
   .topbar{flex-wrap:wrap !important;height:auto !important;row-gap:10px;padding:10px 14px !important}
   .topbar .logo{order:1;flex:1 1 auto}
-  .topbar .menu-toggle{display:inline-flex !important;order:2}
+  .topbar .menu-toggle{display:inline-flex !important;order:2;z-index: 1002;}
   .topbar .icons{order:3;margin-left:0;gap:8px;flex-wrap:wrap;justify-content:flex-end}
   .topbar .search{order:4;flex:1 1 100%;height:38px}
-  .topbar .topbar-nav{order:5;flex:1 1 100%;flex-direction:column;align-items:stretch;gap:0;background:#1f1d2c;margin:6px -14px -10px;padding:4px 0;display:none}
-  .topbar .topbar-nav.is-open{display:flex !important}
-  .topbar .topbar-nav a{padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;opacity:1}
+  
+  /* Menu Tiroir (Sliding Drawer) */
+  .topbar .topbar-nav{
+    position: fixed; top: 0; left: 0; bottom: 0; width: 280px; max-width: 80vw;
+    background: #1a1924; z-index: 1001; margin: 0; padding: 60px 0 20px;
+    flex-direction: column; align-items: stretch; gap: 0;
+    display: flex !important;
+    transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+    overflow-y: auto;
+  }
+  .topbar .topbar-nav.is-open{ transform: translateX(0); }
+  .topbar .topbar-nav::before {
+    content: "Menu Magma";
+    color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    padding: 0 22px 10px; display: block;
+  }
+  .topbar .topbar-nav a{
+    padding: 14px 22px; border-bottom: 1px solid rgba(255,255,255,.05);
+    font-size: 15px; font-weight: 500; opacity: 1; transition: background 0.2s, color 0.2s;
+  }
+  .topbar .topbar-nav a:hover, .topbar .topbar-nav a.active {
+    background: rgba(255,105,12,.1); color: #ff690c;
+  }
+  
   .topbar .icons .icon-btn .lbl{display:none}
   .topbar .icons .auth-btn{padding:7px 12px;font-size:12px}
+  
+  /* Masquer le subnav puisqu'il sera intégré au menu tiroir en JS */
+  #magma-subnav { display: none !important; }
 }
 @media (max-width:560px){
   .topbar{padding:8px 10px !important}
@@ -1533,6 +1553,54 @@ img, video, iframe, svg { max-width: 100%; height: auto; }
     box-shadow: 0 4px 12px rgba(0,0,0,.08);
   }
 }
+}
 @media (min-width: 701px) {
   #admin-mobile-logout { display: none !important; }
+}
+
+/* === WISHLIST === */
+.wishlist-btn { position:absolute; top:40px; right:8px; background:rgba(255,255,255,.9); border:0; border-radius:50%; width:30px; height:30px; display:grid; place-items:center; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,.15); transition:transform .2s; z-index:10; font-size:14px; }
+.wishlist-btn:hover { transform:scale(1.1); }
+html[data-magma-theme="dark"] .wishlist-btn { background:rgba(30,30,30,.9); }
+
+/* === DARK MODE === */
+html[data-magma-theme="dark"] {
+  background: #121212 !important;
+  color: #e0e0e0 !important;
+}
+html[data-magma-theme="dark"] body {
+  background: #121212 !important;
+  color: #e0e0e0 !important;
+}
+html[data-magma-theme="dark"] .pcard,
+html[data-magma-theme="dark"] .magma-cart,
+html[data-magma-theme="dark"] .pa-card,
+html[data-magma-theme="dark"] .info-card,
+html[data-magma-theme="dark"] .toolbar,
+html[data-magma-theme="dark"] .cat-chip,
+html[data-magma-theme="dark"] .empty {
+  background: #1e1e1e !important;
+  color: #e0e0e0 !important;
+  border-color: #333 !important;
+}
+html[data-magma-theme="dark"] .pcard .pname,
+html[data-magma-theme="dark"] .pa-card h1,
+html[data-magma-theme="dark"] .pa-section h2,
+html[data-magma-theme="dark"] .magma-cart__title {
+  color: #f0f0f0 !important;
+}
+html[data-magma-theme="dark"] .pcard .thumb,
+html[data-magma-theme="dark"] .info-thumb {
+  background: #2a2a2a !important;
+}
+html[data-magma-theme="dark"] .magma-cart__row,
+html[data-magma-theme="dark"] .pa-toggle {
+  background: #2a2a2a !important;
+  border-color: #333 !important;
+}
+html[data-magma-theme="dark"] input,
+html[data-magma-theme="dark"] select {
+  background: #2a2a2a !important;
+  color: #fff !important;
+  border-color: #444 !important;
 }

@@ -63,6 +63,38 @@ body { margin:0; min-height:100vh; background:linear-gradient(135deg,#fff7ef,#f3
   function fmtDate(s){if(!s)return"—";var d=new Date(s.indexOf("T")!==-1?s:s+"Z");return isNaN(d)?s:d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});}
   var STATUS_BG={"En attente":"#fef9c3","Confirmée":"#dcfce7","En livraison":"#dbeafe","Livrée":"#ede9fe","Annulée":"#fee4e2","Validée":"#d1fae5","Reçue":"#cffafe"};
   var STATUS_FG={"En attente":"#854d0e","Confirmée":"#166534","En livraison":"#1e40af","Livrée":"#5b21b6","Annulée":"#b42318","Validée":"#065f46","Reçue":"#0e7490"};
+  
+  function renderProgressBar(status) {
+    if (status === "Annulée") return '<div style="margin:20px 0 10px;padding:10px;background:#fee4e2;color:#b42318;border-radius:6px;font-weight:600;font-size:.85rem;text-align:center;">Commande annulée</div>';
+    var steps = [
+      { label: "En attente", done: true },
+      { label: "Confirmée", done: ["Confirmée","En livraison","Livrée","Validée","Reçue"].indexOf(status) !== -1 },
+      { label: "Expédiée", done: ["En livraison","Livrée","Validée","Reçue"].indexOf(status) !== -1 },
+      { label: "Livrée", done: ["Livrée","Validée","Reçue"].indexOf(status) !== -1 }
+    ];
+    var activeCount = steps.filter(function(s){return s.done;}).length;
+    var w = ((activeCount - 1) / (steps.length - 1)) * 100;
+    
+    var html = '<div style="margin:32px auto 24px;max-width:320px;">';
+    html += '<div style="position:relative;">';
+    html += '<div style="position:absolute;top:11px;left:0;right:0;height:2px;background:#e5e7eb;z-index:1;"></div>';
+    html += '<div style="position:absolute;top:11px;left:0;width:' + w + '%;height:2px;background:#ff690c;z-index:2;transition:.3s;"></div>';
+    html += '<div style="display:flex;justify-content:space-between;position:relative;z-index:3;">';
+    steps.forEach(function(s, i) {
+      var bg = s.done ? '#ff690c' : '#fff';
+      var border = s.done ? '#ff690c' : '#d1d5db';
+      var col = s.done ? '#fff' : '#9ca3af';
+      var txtCol = s.done ? '#2b293a' : '#9ca3af';
+      var fw = s.done ? '700' : '500';
+      html += '<div style="display:flex;flex-direction:column;align-items:center;width:24px;">';
+      html += '<div style="width:24px;height:24px;border-radius:50%;border:2px solid '+border+';background:'+bg+';color:'+col+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;">'+(s.done?'✓':(i+1))+'</div>';
+      html += '<div style="font-size:.65rem;margin-top:6px;color:'+txtCol+';font-weight:'+fw+';white-space:nowrap;position:absolute;top:28px;">'+s.label+'</div>';
+      html += '</div>';
+    });
+    html += '</div></div></div>';
+    return html;
+  }
+
   var allOrders=[]; var currentFilter="all";
   function render(){
     var list=document.getElementById("mo-list");
@@ -108,8 +140,8 @@ body { margin:0; min-height:100vh; background:linear-gradient(135deg,#fff7ef,#f3
       return '<div class="mo-item" data-order="'+esc(o.id)+'">'+
         '<div class="mo-row">'+
           '<div><div class="mo-id">Commande #'+esc(o.id)+'</div><div class="mo-date">'+esc(fmtDate(o.created_at))+'</div></div>'+
-          '<span class="mo-status" style="background:'+bg+';color:'+fg+'">'+esc(o.status)+'</span>'+
         '</div>'+
+        renderProgressBar(o.status) +
         '<div class="mo-details">'+
           '<div class="mo-detail"><b>Numéro</b><span>#'+esc(o.id)+'</span></div>'+
           '<div class="mo-detail"><b>Date</b><span>'+esc(fmtDate(o.created_at))+'</span></div>'+

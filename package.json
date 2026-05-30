@@ -16,6 +16,7 @@
     "express-session": "^1.19.0",
     "helmet": "^8.1.0",
     "joi": "^18.2.1",
+    "jsdom": "^29.1.1",
     "multer": "^2.1.1",
     "nodemailer": "^6.10.1",
     "pdfkit": "^0.15.2",

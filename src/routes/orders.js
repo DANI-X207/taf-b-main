@@ -157,7 +157,7 @@ router.post("/api/orders", requireUser(), async (req, res) => {
         "INSERT INTO order_items (order_id, book_id, titre, auteur, prix, qty, image) VALUES (?,?,?,?,?,?,?)",
         orderId, item.book_id, item.titre, item.auteur, item.prix, item.qty, item.image
       );
-      await db.run("UPDATE books SET stock = MAX(stock - ?, 0) WHERE id = ?", item.qty, item.book_id);
+      await db.run("UPDATE books SET stock = MAX(stock - ?, 0), sales = sales + ? WHERE id = ?", item.qty, item.qty, item.book_id);
     }
     await db.run("UPDATE orders SET email_status = 'pending' WHERE id = ?", orderId);
 

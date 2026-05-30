@@ -5,7 +5,7 @@ const { requireUser, requireAdmin } = require("../middleware");
 
 const router = express.Router();
 
-router.get("/api/books", requireUser(), async (req, res) => {
+router.get("/api/books", async (req, res) => {
   try {
     const genre = cleanText(req.query.genre || "", 80);
     const search = cleanText(req.query.search || "", 120);
@@ -26,7 +26,7 @@ router.get("/api/books", requireUser(), async (req, res) => {
   }
 });
 
-router.get("/api/books/featured", requireUser(), async (req, res) => {
+router.get("/api/books/featured", async (req, res) => {
   try {
     const db = await getDb();
     const books = (await db.all("SELECT * FROM books WHERE featured = 1 ORDER BY id DESC")).map(rowToBook);
@@ -36,7 +36,7 @@ router.get("/api/books/featured", requireUser(), async (req, res) => {
   }
 });
 
-router.get("/api/books/:id", requireUser(), async (req, res) => {
+router.get("/api/books/:id", async (req, res) => {
   try {
     const db = await getDb();
     const row = await db.get("SELECT * FROM books WHERE id = ?", parseInt(req.params.id));
@@ -100,7 +100,7 @@ router.delete("/api/books/:id", requireAdmin(), async (req, res) => {
   }
 });
 
-router.get("/api/genres", requireUser(), async (req, res) => {
+router.get("/api/genres", async (req, res) => {
   try {
     const db = await getDb();
     const genres = (await db.all("SELECT DISTINCT genre FROM books ORDER BY genre")).map((r) => r.genre);
@@ -110,11 +110,44 @@ router.get("/api/genres", requireUser(), async (req, res) => {
   }
 });
 
-router.get("/api/books/:id/reviews", requireUser(), async (req, res) => {
+router.get("/api/books/:id/reviews", async (req, res) => {
   try {
     const db = await getDb();
     const reviews = await db.all("SELECT * FROM reviews WHERE book_id = ? ORDER BY id DESC", parseInt(req.params.id));
     res.json(reviews);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get("/api/wishlist", requireUser(), async (req, res) => {
+  try {
+    const db = await getDb();
+    const rows = await db.all(`
+      SELECT books.* FROM books
+      JOIN wishlists ON books.id = wishlists.book_id
+      WHERE wishlists.user_id = ?
+      ORDER BY wishlists.created_at DESC
+    `, req.session.user.id);
+    res.json(rows.map(rowToBook));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post("/api/wishlist/toggle", requireUser(), async (req, res) => {
+  try {
+    const bookId = parseInt(req.body.id);
+    if (!bookId) return res.status(400).json({ error: "ID invalide" });
+    const db = await getDb();
+    const exist = await db.get("SELECT id FROM wishlists WHERE user_id = ? AND book_id = ?", req.session.user.id, bookId);
+    if (exist) {
+      await db.run("DELETE FROM wishlists WHERE user_id = ? AND book_id = ?", req.session.user.id, bookId);
+      res.json({ added: false });
+    } else {
+      await db.run("INSERT INTO wishlists (user_id, book_id, created_at) VALUES (?, ?, ?)", req.session.user.id, bookId, nowIso());
+      res.json({ added: true });
+    }
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

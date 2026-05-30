@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <link rel="icon" type="image/png" href="/img/ICON-1.png">
@@ -31,12 +31,12 @@
     .topbar .topbar-nav a{padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;opacity:1}
   }
 
-  .wrap{ max-width:760px; margin:60px auto; padding:0 18px;}
-  .back{ display:inline-flex; align-items:center; gap:6px; background:#000000; color:#fff; text-decoration:none; padding:10px 18px; border-radius:999px; font-weight:700; font-size:.9rem; margin-bottom:18px; }
-  .back:hover{background:#3a3850;}
+  .wrap{ max-width:900px; margin:40px auto; padding:0 24px;}
+  .back{ display:inline-flex; align-items:center; gap:6px; background:#000000; color:#fff; text-decoration:none; padding:10px 18px; border-radius:999px; font-weight:700; font-size:.9rem; margin-bottom:24px; transition: background 0.2s; }
+  .back:hover{background:#ff690c;}
 
-  .product{background:#fff;border-radius:8px;padding:28px;display:grid;grid-template-columns:340px 1fr;gap:32px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
-  .cover-wrap{background:#f0eee9;border-radius:6px;padding:16px;display:grid;place-items:center;aspect-ratio:3/4}
+  .product{background:#fff;border-radius:16px;padding:36px;display:grid;grid-template-columns:320px 1fr;gap:40px;box-shadow:0 12px 40px rgba(0,0,0,.05);border:1px solid rgba(0,0,0,0.02)}
+  .cover-wrap{background:#f8f7f5;border-radius:12px;padding:20px;display:grid;place-items:center;aspect-ratio:3/4;box-shadow:inset 0 2px 10px rgba(0,0,0,0.02)}
   .cover-wrap img{width:100%;height:100%;object-fit:contain}
   .info h1{color:#2b293a;font-size:22px;margin-bottom:6px;line-height:1.3}
   .info .author{color:#888;font-size:14px;margin-bottom:12px}
@@ -79,8 +79,13 @@
   .toast.error{background:#dc2626}
 
   @media (max-width:760px){
-    .product{grid-template-columns:1fr;padding:18px}
-    .cover-wrap{aspect-ratio:auto;max-width:240px;margin:0 auto}
+    .wrap{margin: 20px auto; padding: 0 16px;}
+    .product{grid-template-columns:1fr;padding:24px;gap:24px;border-radius:12px;}
+    .cover-wrap{max-width:220px;margin:0 auto;padding:16px;}
+    .product .info h1{font-size:24px;}
+    .actions{flex-direction:column; gap:12px;}
+    .btn{width:100%;justify-content:center;padding:14px 20px;}
+    .reviews{padding: 20px;}
   }
 </style>
 </head>
@@ -102,11 +107,13 @@
     <div class="empty" style="padding:60px">Chargement…</div>
   </div>
 
-  <div class="reviews" id="reviews-root" style="display:none">
-    <h2>Commentaires des lecteurs</h2>
+  <section class="reviews wrap" id="reviews-root" style="display:none;">
+    <h2>Avis des lecteurs</h2>
     <div class="review-list" id="review-list"></div>
-    <div id="review-form-area"></div>
-  </div>
+    <div id="review-form-area" style="margin-top:30px;"></div>
+  </section>
+
+  <div class="wrap" id="recommendations" style="margin-bottom:60px;"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -150,7 +157,8 @@ function renderProduct(b){
         '<div class="description">' + esc(b.description || "Aucun résumé disponible pour ce livre.") + '</div>' +
         '<div class="actions">' +
           '<button class="btn btn-primary" id="btn-add" ' + (inStock?'':'disabled') + '>🛒 Ajouter au panier</button>' +
-          '<a class="btn btn-outline" href="/MABOUTIQUE.html">Voir le catalogue</a>' +
+          '<button class="btn btn-primary" id="btn-buy-now" ' + (inStock?'':'disabled') + ' style="background:#000;">⚡ Achat rapide</button>' +
+          '<a class="btn btn-outline" href="/catalogue.html">Voir le catalogue</a>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -185,6 +193,49 @@ function renderProduct(b){
       });
     });
   }
+
+  var btnBuy = document.getElementById("btn-buy-now");
+  if(btnBuy){
+    btnBuy.addEventListener("click", function(){
+      if(!IS_AUTH){
+        showToast("Connectez-vous pour acheter.", "error");
+        setTimeout(function(){window.location.href = "/login.html?next=" + encodeURIComponent(window.location.pathname + window.location.search);}, 900);
+        return;
+      }
+      btnBuy.disabled = true; btnBuy.textContent = "Patientez…";
+      fetch("/api/cart/add", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: b.id, qty: 1 })
+      }).then(function(r){
+        if(r.ok) { window.location.href = "/panier.html"; }
+        else { showToast("Erreur lors de l'achat rapide.", "error"); btnBuy.disabled = false; btnBuy.textContent = "⚡ Achat rapide"; }
+      }).catch(function(){ showToast("Erreur réseau.", "error"); btnBuy.disabled = false; btnBuy.textContent = "⚡ Achat rapide"; });
+    });
+  }
+  
+  // Recommandations
+  fetch('/api/books').then(r=>r.json()).then(books=>{
+    var similar = books.filter(x => x.id !== b.id && x.genre === b.genre).slice(0, 4);
+    if(similar.length < 4) {
+       const others = books.filter(x => x.id !== b.id && !similar.find(s=>s.id===x.id)).slice(0, 4 - similar.length);
+       similar = similar.concat(others);
+    }
+    var recs = document.getElementById("recommendations");
+    if(recs && similar.length > 0) {
+      var html = '<h2 style="margin:40px 0 20px;font-size:1.5rem;color:#2b293a;">Vous aimerez aussi...</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;">';
+      similar.forEach(s => {
+        html += '<a href="/PI_Produit.html?id='+s.id+'" style="display:flex;flex-direction:column;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);text-decoration:none;color:inherit;transition:transform .2s;" onmouseover="this.style.transform=\'translateY(-4px)\'" onmouseout="this.style.transform=\'none\'">'+
+                '<div style="aspect-ratio:3/4;background:#f0eee9;overflow:hidden;"><img src="'+esc(s.image||FALLBACK_IMG)+'" style="width:100%;height:100%;object-fit:cover;"></div>'+
+                '<div style="padding:12px;flex:1;display:flex;flex-direction:column;">'+
+                  '<div style="font-size:13px;font-weight:700;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">'+esc(s.titre)+'</div>'+
+                  '<div style="font-size:14px;color:#ff690c;font-weight:800;margin-top:auto;">'+money(s.prix)+'</div>'+
+                '</div></a>';
+      });
+      html += '</div>';
+      recs.innerHTML = html;
+    }
+  }).catch(()=>{});
+
 }
 
 function renderReviews(reviews){
@@ -195,6 +246,7 @@ function renderReviews(reviews){
     list.innerHTML = reviews.map(function(r){
       return '<div class="review-card">' +
         '<div class="review-head"><span class="author">' + esc(r.customer_name||r.author||"Anonyme") + '</span>' +
+          '<span style="color:#00a650;font-size:11px;font-weight:700;margin-left:8px;background:#e5f6ec;padding:2px 6px;border-radius:10px;">✓ Achat vérifié</span>' +
           '<span class="review-stars">' + stars(r.rating) + '</span>' +
         '</div>' +
         '<div class="review-text">' + esc(r.comment||"") + '</div>' +
@@ -252,8 +304,8 @@ function loadReviews(){
 }
 
 function init(){
-  if(!BOOK_ID){
-    document.getElementById("product-root").innerHTML = '<div class="empty" style="padding:60px">Livre introuvable. <a href="/MABOUTIQUE.html" style="color:#ff690c">Voir le catalogue</a></div>';
+  if(!BOOK_ID || isNaN(BOOK_ID)){
+    document.getElementById("product-root").innerHTML = '<div class="empty" style="padding:60px;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05);text-align:center;"><h2>Livre introuvable</h2><p style="margin:12px 0 24px;color:#666;">Le lien que vous avez suivi est incomplet ou le livre n\'existe plus.</p><a href="/catalogue.html" class="btn btn-primary" style="display:inline-block">Voir le catalogue</a></div>';
     return;
   }
   Promise.all([
@@ -267,8 +319,9 @@ function init(){
     renderProduct(arr[1]);
     renderReviewForm();
     loadReviews();
-  }).catch(function(){
-    document.getElementById("product-root").innerHTML = '<div class="empty" style="padding:60px">Livre introuvable. <a href="/MABOUTIQUE.html" style="color:#ff690c">Voir le catalogue</a></div>';
+  }).catch(function(err){
+    console.error("Erreur de chargement du produit:", err);
+    document.getElementById("product-root").innerHTML = '<div class="empty" style="padding:60px;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05);text-align:center;"><h2>Livre introuvable</h2><p style="margin:12px 0 24px;color:#666;">Une erreur est survenue lors du chargement des détails du livre.</p><a href="/catalogue.html" class="btn btn-primary" style="display:inline-block">Voir le catalogue</a></div>';
   });
 }
 

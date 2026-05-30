@@ -188,15 +188,15 @@
 
   function bookCard(book) {
     var card = document.createElement("div");
-    card.style.cssText = "display:inline-block;width:190px;margin:8px;vertical-align:top;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.14);font-family:Arial,sans-serif;";
+    card.className = "magma-book-card";
     card.innerHTML =
       '<img src="' + esc(book.image || "") + '" alt="' + esc(book.titre) + '" style="width:100%;height:180px;object-fit:cover;background:#eee;" onerror="this.src=\'https://via.placeholder.com/190x180?text=Livre\'">' +
-      '<div style="padding:10px;">' +
-      '<strong style="display:block;color:#2b293a;font-size:14px;line-height:1.25;min-height:36px;">' + esc(book.titre) + '</strong>' +
-      '<span style="display:block;color:#777;font-size:12px;margin:5px 0;">' + esc(book.auteur) + '</span>' +
-      '<span style="display:block;color:#ff690c;font-size:12px;font-weight:700;">' + esc(book.genre) + '</span>' +
+      '<div style="padding:10px; flex:1; display:flex; flex-direction:column;">' +
+      '<strong style="display:block;color:#2b293a;font-size:14px;line-height:1.25;margin-bottom:4px;">' + esc(book.titre) + '</strong>' +
+      '<span style="display:block;color:#777;font-size:12px;margin-bottom:4px;">' + esc(book.auteur) + '</span>' +
+      '<span style="display:block;color:#ff690c;font-size:12px;font-weight:700;margin-bottom:auto;">' + esc(book.genre) + '</span>' +
       '<strong style="display:block;margin:8px 0;color:#111;">' + money(book.prix) + '</strong>' +
-      '<button type="button" data-id="' + book.id + '" style="width:100%;border:0;background:#ff690c;color:#fff;padding:8px 10px;border-radius:999px;cursor:pointer;font-weight:700;">Ajouter au panier</button>' +
+      '<button type="button" data-id="' + book.id + '" style="width:100%;border:0;background:#ff690c;color:#fff;padding:8px 10px;border-radius:999px;cursor:pointer;font-weight:700;transition:background 0.15s;">Ajouter au panier</button>' +
       '</div>';
     card.querySelector("button").addEventListener("click", function () {
       post("/api/cart/add", { id: book.id, qty: 1 }).then(function () {
@@ -296,7 +296,7 @@
         container.classList.add("magma-cart");
         container.innerHTML = '<header class="magma-cart__head"><h2>Mon panier</h2><span class="magma-cart__count">' + totalQty + ' article' + (totalQty > 1 ? 's' : '') + '</span></header>';
         if (!cart.length) {
-          container.innerHTML += '<div class="magma-cart__empty"><p>Votre panier est vide.</p><a href="/MABOUTIQUE.html" class="magma-cart__shopbtn">Découvrir le catalogue</a></div>';
+          container.innerHTML += '<div class="magma-cart__empty"><p>Votre panier est vide.</p><a href="/catalogue.html" class="magma-cart__shopbtn">Découvrir le catalogue</a></div>';
           return;
         }
         var list = document.createElement("div");
@@ -1262,6 +1262,16 @@
     var topbar = document.querySelector(".topbar");
     if (!topbar) return;
     var nav = topbar.querySelector(".topbar-nav");
+
+    // Créer l'overlay s'il n'existe pas déjà
+    var overlay = document.getElementById("magma-nav-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "magma-nav-overlay";
+      overlay.className = "magma-nav-overlay";
+      document.body.appendChild(overlay);
+    }
+
     if (!topbar.querySelector(".menu-toggle")) {
       var btn = document.createElement("button");
       btn.type = "button";
@@ -1272,11 +1282,38 @@
       var logo = topbar.querySelector(".logo");
       if (logo && logo.nextSibling) topbar.insertBefore(btn, logo.nextSibling);
       else topbar.appendChild(btn);
-      btn.addEventListener("click", function () {
+
+      function toggleMenu() {
         if (!nav) return;
         var open = nav.classList.toggle("is-open");
         btn.setAttribute("aria-expanded", open ? "true" : "false");
-      });
+        document.body.classList.toggle("magma-menu-open", open);
+        overlay.classList.toggle("is-active", open);
+        
+        // Copier les liens de la sous-barre dans le menu mobile si ce n'est pas fait
+        if (open && window.innerWidth <= 980 && !nav.dataset.subnavInjected) {
+          nav.dataset.subnavInjected = "true";
+          var subnavLinks = [
+            {href: "/Formulaire.html", text: "Devenir vendeur"},
+            {href: "/catalogue.html", text: "Produit"},
+            {href: "/meilleures-ventes.html", text: "Meilleures ventes"},
+            {href: "/categories.html", text: "Catégories"},
+            {href: "/boutiques.html", text: "Boutiques"}
+          ];
+          var div = document.createElement("div");
+          div.style.cssText = "height: 1px; background: rgba(255,255,255,.1); margin: 15px 22px 5px;";
+          nav.appendChild(div);
+          subnavLinks.forEach(function(l) {
+            var a = document.createElement("a");
+            a.href = l.href;
+            a.textContent = l.text;
+            nav.appendChild(a);
+          });
+        }
+      }
+
+      btn.addEventListener("click", toggleMenu);
+      overlay.addEventListener("click", toggleMenu);
     }
   }
 
@@ -1315,11 +1352,11 @@
     bar.setAttribute("aria-label", "Navigation secondaire");
     bar.innerHTML =
       '<div class="magma-subnav-inner">' +
-        '<a class="magma-subnav-link" href="/a-propos.html">Devenir vendeur</a>' +
+        '<a class="magma-subnav-link" href="/Formulaire.html">Devenir vendeur</a>' +
         '<a class="magma-subnav-link" href="/catalogue.html">Produit</a>' +
-        '<a class="magma-subnav-link" href="/catalogue.html?tri=ventes">Meilleures ventes</a>' +
-        '<a class="magma-subnav-link" href="/catalogue.html">Catégories</a>' +
-        '<a class="magma-subnav-link" href="/MABOUTIQUE.html">Boutiques</a>' +
+        '<a class="magma-subnav-link" href="/meilleures-ventes.html">Meilleures ventes</a>' +
+        '<a class="magma-subnav-link" href="/categories.html">Catégories</a>' +
+        '<a class="magma-subnav-link" href="/boutiques.html">Boutiques</a>' +
       '</div>';
 
     // Insertion : juste après le header personnalisé (.topbar) si présent,
@@ -1429,4 +1466,104 @@
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
+  /* === AUTOCOMPLÉTION === */
+  (function initAutocomplete(){
+    const inputs = document.querySelectorAll('input[name="q"], #hdr-search, input[type="search"]');
+    if(!inputs.length) return;
+    
+    const style = document.createElement('style');
+    style.textContent = `
+      .magma-ac { position:absolute; background:#fff; border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,.12); z-index:9999; max-height:400px; overflow-y:auto; width:100%; top:calc(100% + 4px); left:0; border:1px solid #eee; display:none; }
+      html[data-magma-theme="dark"] .magma-ac { background:#1e1e1e; border-color:#333; }
+      .magma-ac-item { display:flex; gap:12px; padding:10px 14px; text-decoration:none; color:inherit; border-bottom:1px solid #fafafa; align-items:center; transition:background .15s; }
+      html[data-magma-theme="dark"] .magma-ac-item { border-color:#2a2a2a; }
+      .magma-ac-item:hover { background:#fcfcfc; }
+      html[data-magma-theme="dark"] .magma-ac-item:hover { background:#2a2a2a; }
+      .magma-ac-img { width:32px; height:44px; object-fit:cover; border-radius:4px; background:#f0f0f0; }
+      .magma-ac-info { flex:1; min-width:0; }
+      .magma-ac-title { font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+      .magma-ac-author { font-size:11px; color:#888; }
+      .magma-ac-price { font-size:12px; font-weight:700; color:#ff690c; white-space:nowrap; }
+    `;
+    document.head.appendChild(style);
+
+    inputs.forEach(input => {
+      const parent = input.parentElement;
+      parent.style.position = 'relative';
+      const list = document.createElement('div');
+      list.className = 'magma-ac';
+      parent.appendChild(list);
+
+      let debounceTimer;
+      input.addEventListener('input', function(e) {
+        clearTimeout(debounceTimer);
+        const q = e.target.value.trim().toLowerCase();
+        if(q.length < 2) { list.style.display = 'none'; return; }
+        
+        debounceTimer = setTimeout(() => {
+          fetch('/api/books')
+            .then(r => r.json())
+            .then(books => {
+              const matches = books.filter(b => (b.titre||'').toLowerCase().includes(q) || (b.auteur||'').toLowerCase().includes(q)).slice(0, 5);
+              if(matches.length === 0) { list.style.display = 'none'; return; }
+              
+              list.innerHTML = matches.map(b => `
+                <a href="/PI_Produit.html?id=${b.id}" class="magma-ac-item">
+                  <img class="magma-ac-img" src="${b.image || 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 130%22><rect width=%22100%22 height=%22130%22 fill=%22%23eee%22/></svg>'}" alt="">
+                  <div class="magma-ac-info">
+                    <div class="magma-ac-title">${esc(b.titre)}</div>
+                    <div class="magma-ac-author">${esc(b.auteur)}</div>
+                  </div>
+                  <div class="magma-ac-price">${money(b.prix)}</div>
+                </a>
+              `).join('');
+              list.style.display = 'block';
+            }).catch(()=>{});
+        }, 300);
+      });
+
+      document.addEventListener('click', e => {
+        if(!parent.contains(e.target)) list.style.display = 'none';
+      });
+      input.addEventListener('focus', () => {
+        if(input.value.length >= 2 && list.innerHTML !== '') list.style.display = 'block';
+      });
+    });
+  })();
+  /* === WISHLIST === */
+  (function initWishlist(){
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('.wishlist-btn');
+      if(!btn) return;
+      e.preventDefault(); e.stopPropagation();
+      const id = btn.dataset.id;
+      const ico = btn.querySelector('.ico');
+      fetch('/api/wishlist/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id })
+      }).then(r => {
+        if(r.status === 401) { window.location.href = '/login.html'; throw new Error("unauth"); }
+        return r.json();
+      }).then(res => {
+        if(res.added) {
+          btn.classList.add('active');
+          if(ico) ico.textContent = '❤️';
+        } else {
+          btn.classList.remove('active');
+          if(ico) ico.textContent = '🤍';
+        }
+      }).catch(()=>{});
+    });
+    fetch('/api/wishlist').then(r=>r.ok?r.json():[]).then(list=>{
+      const ids = list.map(b=>Number(b.id));
+      document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        if(ids.includes(Number(btn.dataset.id))) {
+          btn.classList.add('active');
+          btn.innerHTML = '<span class="ico">❤️</span>';
+        }
+      });
+    }).catch(()=>{});
+  })();
+
 })();
