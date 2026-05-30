@@ -66,7 +66,7 @@ PROTECTED_PAGES = {
     "Formulaire.html",
 }
 SEED_ADMIN_PHONES = [
-    ("065487909", 1),  # Super Admin
+    ("065487909", 0),  # Admin simple
     ("050271841", 1),  # Super Admin
     ("064280982", 0),  # Admin simple
     ("066342094", 0),  # Admin simple
