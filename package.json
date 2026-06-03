@@ -16,10 +16,8 @@
     "express-session": "^1.19.0",
     "helmet": "^8.1.0",
     "joi": "^18.2.1",
-    "jsdom": "^29.1.1",
     "multer": "^2.1.1",
     "pdfkit": "^0.15.2",
-    "puppeteer-core": "^24.42.0",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
   },
