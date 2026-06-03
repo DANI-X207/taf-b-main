@@ -4,19 +4,17 @@
 <link rel="icon" type="image/png" href="/img/ICON-1.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>login</title>
+<title>Connexion — Librairie Mayombe</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: Arial, sans-serif;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #e8e8e8;
+    background: linear-gradient(135deg, #ff690c 0%, #f59e0b 45%, #2b293a 100%);
   }
-
   .container {
     display: flex;
     width: min(900px, 96vw);
@@ -25,12 +23,10 @@
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0,0,0,.18);
   }
-
-  /* ── LEFT PANEL ── */
   .panel-left {
     flex: 1;
     position: relative;
-    background: url('/img/vlad-ciutacu-rNvGfllb0u4-unsplash.png') center center / cover no-repeat;
+    background: url('/img/WhatsApp%20Image%202025-11-19%20at%2012.10.23.jpeg') center center / cover no-repeat;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -45,7 +41,6 @@
     z-index: 0;
   }
   .panel-left > * { position: relative; z-index: 1; }
-
   .logo-wrap {
     width: 54px;
     height: 54px;
@@ -55,8 +50,8 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+    border-radius: 50%;
   }
-
   .panel-left h2 {
     font-size: 28px;
     font-weight: 900;
@@ -64,8 +59,6 @@
     line-height: 1.25;
     letter-spacing: .3px;
   }
-
-  /* ── RIGHT PANEL ── */
   .panel-right {
     width: 380px;
     flex-shrink: 0;
@@ -75,21 +68,18 @@
     justify-content: center;
     padding: 48px 40px;
   }
-
   .panel-right h1 {
     font-size: 32px;
     font-weight: 400;
     color: #888;
     margin-bottom: 8px;
   }
-
   .panel-right .subtitle {
     font-size: 14px;
     color: #888;
     margin-bottom: 28px;
     line-height: 1.5;
   }
-
   .error-msg {
     background: #fee4e2;
     color: #b42318;
@@ -97,6 +87,7 @@
     border-radius: 6px;
     margin-bottom: 16px;
     font-size: 13px;
+    display: none;
   }
   .info-msg {
     background: #e0f2fe;
@@ -105,19 +96,15 @@
     border-radius: 6px;
     margin-bottom: 16px;
     font-size: 13px;
+    display: none;
   }
-
-  .field-group {
-    margin-bottom: 18px;
-  }
-
+  .field-group { margin-bottom: 18px; }
   .field-group label {
     display: block;
     font-size: 13px;
     color: #555;
     margin-bottom: 6px;
   }
-
   .field-group input {
     width: 100%;
     padding: 10px 12px;
@@ -129,11 +116,7 @@
     outline: none;
     transition: border-color .2s;
   }
-  .field-group input:focus {
-    border-color: #ff690c;
-    background: #fff;
-  }
-
+  .field-group input:focus { border-color: #ff690c; background: #fff; }
   .remember {
     display: flex;
     align-items: center;
@@ -143,12 +126,8 @@
     margin-bottom: 24px;
   }
   .remember input[type="checkbox"] {
-    width: 15px;
-    height: 15px;
-    accent-color: #ff690c;
-    cursor: pointer;
+    width: 15px; height: 15px; accent-color: #ff690c; cursor: pointer;
   }
-
   .btn-login {
     width: 100%;
     padding: 13px;
@@ -162,38 +141,19 @@
     transition: background .2s;
   }
   .btn-login:hover { background: #e55a00; }
-  .btn-login:disabled {
-    background: #ffa870;
-    cursor: not-allowed;
-  }
+  .btn-login:disabled { background: #ffa870; cursor: not-allowed; }
   .spinner {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 0.8s linear infinite;
-    vertical-align: middle;
-    margin-right: 8px;
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
+    border-top-color: #fff; animation: spin 0.8s linear infinite;
+    vertical-align: middle; margin-right: 8px;
   }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
+  @keyframes spin { to { transform: rotate(360deg); } }
   .register-link {
-    margin-top: 18px;
-    font-size: 13px;
-    color: #888;
-    text-align: center;
+    margin-top: 18px; font-size: 13px; color: #888; text-align: center;
   }
-  .register-link a {
-    color: #ff690c;
-    text-decoration: none;
-    font-weight: 600;
-  }
+  .register-link a { color: #ff690c; text-decoration: none; font-weight: 600; }
   .register-link a:hover { text-decoration: underline; }
-
   @media (max-width: 620px) {
     .panel-left { display: none; }
     .panel-right { width: 100%; padding: 40px 28px; }
@@ -203,35 +163,34 @@
 <body>
 
 <div class="container">
-  <!-- LEFT -->
   <div class="panel-left">
     <div class="logo-wrap">
-      <img src="/img/Logo version mobile.png" alt="Logo Magma">
+      <img src="/img/Logo version mobile.png" alt="Logo Mayombe">
     </div>
-    <h2>Connecter vous sur<br>Magma</h2>
+    <h2>Connectez-vous sur<br>Mayombe</h2>
   </div>
 
-  <!-- RIGHT -->
   <div class="panel-right">
-    <h1>Login</h1>
-    <p class="subtitle">Bienvenu entrer votre identifiant<br>s'il vous plait</p>
+    <h1>Connexion</h1>
+    <p class="subtitle">Bienvenue, entrez votre identifiant<br>s'il vous plaît</p>
 
-    <div id="error-container"></div>
+    <div id="error-msg" class="error-msg"></div>
+    <div id="info-msg" class="info-msg"></div>
 
-    <form id="login-form" method="post" action="/auth/login">
+    <form id="login-form">
       <div class="field-group">
-        <label for="email">Nom d'utilisateur ou Email</label>
-        <input type="text" id="email" name="email" required autocomplete="username email" placeholder="">
+        <label for="email">N° de téléphone ou Email</label>
+        <input type="text" id="email" required autocomplete="username email" placeholder="">
       </div>
       <div class="field-group">
         <label for="password">Mot de passe</label>
-        <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="">
+        <input type="password" id="password" required autocomplete="current-password" placeholder="">
       </div>
       <div class="remember">
-        <input type="checkbox" id="remember" name="remember">
+        <input type="checkbox" id="remember">
         <label for="remember">Se souvenir de moi</label>
       </div>
-      <button type="submit" class="btn-login">Login</button>
+      <button type="submit" class="btn-login" id="login-submit">Se connecter</button>
     </form>
 
     <p class="register-link">Pas encore de compte ? <a href="/register.html">Créer un compte</a></p>
@@ -239,35 +198,65 @@
 </div>
 
 <script>
-(function () {
-  var form = document.getElementById("login-form");
-  if (form) {
-    form.addEventListener("submit", function () {
-      var btn = form.querySelector(".btn-login");
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> Connexion...';
-      }
-    });
+document.addEventListener("DOMContentLoaded", function() {
+  const params = new URLSearchParams(window.location.search);
+  const info = params.get("info");
+  const err = params.get("error");
+  
+  if (info) {
+    const el = document.getElementById("info-msg");
+    el.textContent = decodeURIComponent(info);
+    el.style.display = "block";
+  }
+  if (err) {
+    const el = document.getElementById("error-msg");
+    el.textContent = decodeURIComponent(err);
+    el.style.display = "block";
   }
 
-  var params = new URLSearchParams(window.location.search);
-  var info = params.get("info");
-  var err = params.get("error");
-  var container = document.getElementById("error-container");
-  if (info && container) {
-    var d = document.createElement("div");
-    d.className = "info-msg";
-    d.textContent = decodeURIComponent(info);
-    container.appendChild(d);
+  // Auto-fill remember
+  const remEmail = localStorage.getItem("magma_remember_email");
+  if (remEmail) {
+    document.getElementById("email").value = remEmail;
+    document.getElementById("remember").checked = true;
   }
-  if (err && container) {
-    var d2 = document.createElement("div");
-    d2.className = "error-msg";
-    d2.textContent = decodeURIComponent(err);
-    container.appendChild(d2);
-  }
-})();
+
+  const form = document.getElementById("login-form");
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const btn = document.getElementById("login-submit");
+    const errEl = document.getElementById("error-msg");
+    
+    const email = document.getElementById("email").value.trim();
+    const pass = document.getElementById("password").value;
+    const remember = document.getElementById("remember").checked;
+
+    errEl.style.display = "none";
+    btn.disabled = true;
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Connexion...';
+
+    fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, password: pass, remember: remember })
+    })
+    .then(res => res.json().then(data => ({ok: res.ok, data: data})))
+    .then(res => {
+      if (!res.ok) throw new Error(res.data.error || "Erreur de connexion");
+      if (remember) localStorage.setItem("magma_remember_email", email);
+      else localStorage.removeItem("magma_remember_email");
+      window.location.href = "/";
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.innerHTML = origHtml;
+      errEl.textContent = err.message;
+      errEl.style.display = "block";
+    });
+  });
+});
 </script>
+
 </body>
 </html>

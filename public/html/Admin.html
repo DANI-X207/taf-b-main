@@ -4,7 +4,7 @@
 <link rel="icon" type="image/png" href="/img/ICON-1.png">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Librairie Magma — Administration</title>
+  <title>Librairie Mayombe — Administration</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; background: #f0f2f5; color: #2b293a; min-height: 100vh; }
@@ -74,7 +74,7 @@
     }
     .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
     .nav-item.active { background: rgba(255,105,12,.15); color: #ff690c; border-left-color: #ff690c; }
-    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-item .icon { width: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.1); }
     .sidebar-footer a { display: block; color: rgba(255,255,255,.5); font-size: 13px; text-decoration: none; margin-bottom: 10px; }
     .sidebar-footer a:hover { color: #fff; }
@@ -219,32 +219,22 @@
 </head>
 <body>
 
-<div id="admin-login-screen">
-  <div class="login-box">
-    <div class="logo"><img src="/img/Logo version mobile.png" alt="Magma"></div>
-    <h1>Espace Administrateur</h1>
-    <p>Accès protégé — Librairie Magma</p>
-    <div id="login-error" class="login-error" style="display:none;"></div>
-    <input type="password" id="admin-password" placeholder="Mot de passe administrateur" autocomplete="current-password">
-    <button id="admin-login-btn">Se connecter</button>
-    <a href="/" class="btn-back" id="admin-back-btn">← Retour à l'accueil</a>
-  </div>
-</div>
+
 
 <div id="admin-dashboard">
   <aside class="sidebar">
     <div class="sidebar-brand">
       <img src="/img/Logo version mobile.png" alt="Logo">
-      <div><span>Magma<small>Administration</small></span></div>
+      <div><span>Mayombe<small>Administration</small></span></div>
     </div>
     <nav class="sidebar-nav">
-      <div class="nav-item active" data-section="dashboard"><span class="icon">📊</span><span>Tableau de bord</span></div>
-      <div class="nav-item" data-section="users"><span class="icon">👥</span><span>Utilisateurs</span></div>
-      <div class="nav-item" data-section="modifs"><span class="icon">🔔</span><span>Modifications</span></div>
-      <div class="nav-item" data-section="books"><span class="icon">📚</span><span>Livres</span></div>
-      <div class="nav-item" data-section="orders"><span class="icon">📦</span><span>Commandes</span></div>
-      <div class="nav-item" data-section="ads"><span class="icon">📢</span><span>Publicités</span></div>
-      <div class="nav-item" data-section="downloads" data-super-only="1"><span class="icon">⬇️</span><span>Téléchargements</span></div>
+      <div class="nav-item active" data-section="dashboard"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg></span><span>Tableau de bord</span></div>
+      <div class="nav-item" data-section="users"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span>Utilisateurs</span></div>
+      <div class="nav-item" data-section="modifs"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></span><span>Modifications</span></div>
+      <div class="nav-item" data-section="books"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg></span><span>Livres</span></div>
+      <div class="nav-item" data-section="orders"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></span><span>Commandes</span></div>
+      <div class="nav-item" data-section="ads"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg></span><span>Publicités</span></div>
+      <div class="nav-item" data-section="downloads" data-super-only="1"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span><span>Téléchargements</span></div>
     </nav>
     <div class="sidebar-footer">
       <a href="/">← Retour au catalogue</a>
@@ -258,12 +248,20 @@
     <div class="section active" id="section-dashboard">
       <div class="page-header"><div><h2>Tableau de bord</h2><p>Vue d'ensemble de la librairie</p></div></div>
       <div class="stats-row">
+        <div class="stat-box" style="border:2px solid #ff690c;position:relative;" title="Chiffre d'affaires total">
+          <div class="stat-label" style="color:#ff690c;">Chiffre d'affaires</div>
+          <div class="stat-value" id="stat-revenue">—</div>
+          <div class="stat-sub" id="stat-revenue-sub">cumul des ventes</div>
+          <button id="btn-reset-revenue" title="Remettre le CA à zéro" style="position:absolute;top:10px;right:10px;background:none;border:1px solid #fca5a5;color:#e53e3e;border-radius:4px;font-size:11px;padding:3px 8px;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'">↺ Réinit.</button>
+        </div>
         <div class="stat-box" data-go="books" title="Voir les livres"><div class="stat-label">Livres</div><div class="stat-value" id="stat-books">—</div><div class="stat-sub">dans le catalogue</div></div>
         <div class="stat-box" data-go="users" title="Voir les utilisateurs"><div class="stat-label">Utilisateurs</div><div class="stat-value" id="stat-users">—</div><div class="stat-sub">comptes clients</div></div>
         <div class="stat-box" data-go="orders" title="Voir les commandes"><div class="stat-label">Commandes</div><div class="stat-value" id="stat-orders">—</div><div class="stat-sub">au total</div></div>
         <div class="stat-box" data-go="orders" data-tab="active" title="Voir les commandes en cours"><div class="stat-label">En attente</div><div class="stat-value" id="stat-pending">—</div><div class="stat-sub">à traiter</div></div>
-        <div class="stat-box" data-go="orders" data-tab="validated" title="Voir les commandes validées"><div class="stat-label">Validées</div><div class="stat-value" id="stat-validated">—</div><div class="stat-sub">double confirmation</div></div>
-        <div class="stat-box" data-go="ads" title="Voir les publicités"><div class="stat-label">Publicités</div><div class="stat-value" id="stat-ads">—</div><div class="stat-sub">actives</div></div>
+      </div>
+      <div class="card" style="border: 2px solid #e53e3e; background: #fffdfd;">
+        <h3 style="color: #e53e3e;">⚠️ Alertes de Stock (Critique)</h3>
+        <div id="dashboard-stock-alerts">Chargement…</div>
       </div>
       <div class="card">
         <h3>Dernières commandes</h3>
@@ -318,6 +316,10 @@
         <div><h2>Modifications de Profils</h2><p>Historique des changements effectués par les clients</p></div>
         <button class="btn btn-secondary btn-sm" id="modifs-refresh-btn">↻ Actualiser</button>
       </div>
+      <div class="card" style="padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="modifs-search" placeholder="🔍 Rechercher une modification par nom ou email." style="flex:1;min-width:220px;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:#fafafa;outline:none;font-family:inherit;">
+        <button class="btn btn-secondary btn-sm" id="modifs-search-clear" type="button">Effacer</button>
+      </div>
       <div class="card" style="padding:0;overflow:hidden;">
         <table class="data-table">
           <thead>
@@ -368,8 +370,18 @@
         </div>
       </div>
       <div class="card" style="padding:0;overflow:hidden;">
-        <div style="padding:16px 20px 0;display:flex;justify-content:space-between;align-items:center;">
+        <div style="padding:16px 20px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
           <h3 style="border:none;padding:0;margin:0;">Catalogue <span id="books-count" style="font-weight:400;color:#999;"></span></h3>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="books-search" placeholder="🔍 Rechercher (titre, auteur)" style="padding:6px 12px;border:1px solid #ddd;border-radius:4px;font-size:13px;outline:none;min-width:200px;">
+            <select id="admin-books-sort" style="padding:6px 12px;border:1px solid #ddd;border-radius:4px;font-size:13px;outline:none;background:#fafafa;">
+              <option value="recent">Plus récents d'abord</option>
+              <option value="stock_asc">Stock (croissant)</option>
+              <option value="stock_desc">Stock (décroissant)</option>
+              <option value="price_asc">Prix (croissant)</option>
+              <option value="price_desc">Prix (décroissant)</option>
+            </select>
+          </div>
         </div>
         <table class="data-table" style="margin-top:12px;">
           <thead>
@@ -389,6 +401,10 @@
       <div class="page-header">
         <div><h2>Gestion des commandes</h2><p>Suivez et mettez à jour les statuts</p></div>
         <button class="btn btn-secondary btn-sm" id="orders-refresh-btn">↻ Actualiser</button>
+      </div>
+      <div class="card" style="padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="orders-search" placeholder="🔍 Rechercher une commande (nom, ID, email, téléphone)" style="flex:1;min-width:220px;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:#fafafa;outline:none;font-family:inherit;">
+        <button class="btn btn-secondary btn-sm" id="orders-search-clear" type="button">Effacer</button>
       </div>
       <div class="tab-bar" id="orders-tab-bar">
         <button class="tab-btn active" data-tab="all">Toutes <span class="tab-count" id="tc-all">0</span></button>
@@ -425,7 +441,7 @@
       <div class="page-header"><div><h2>Téléchargements</h2><p>Ressources accessibles uniquement à l'administrateur</p></div></div>
       <div class="card">
         <h3>Code source du projet</h3>
-        <p style="font-size:13px;color:#888;margin-bottom:20px;">Téléchargez l'intégralité du code source de la Librairie Magma au format ZIP. Cette option est réservée à l'administration.</p>
+        <p style="font-size:13px;color:#888;margin-bottom:20px;">Téléchargez l'intégralité du code source de la Librairie Mayombe au format ZIP. Cette option est réservée à l'administration.</p>
         <a href="/api/source.zip" class="download-card">
           <div class="dl-icon">📦</div>
           <div class="dl-info">
@@ -453,8 +469,6 @@
 
 <script>
 (function () {
-  var loginScreen = document.getElementById("admin-login-screen");
-  var dashboard = document.getElementById("admin-dashboard");
   var modal = document.getElementById("admin-modal");
 
   /* ── UTILS ── */
@@ -549,21 +563,26 @@
       .catch(function () { window.location.replace("/"); });
   });
 
-  /* ── LOGIN ── */
-  var loginErr = document.getElementById("login-error");
-  function doLogin() {
-    var pw = document.getElementById("admin-password").value;
-    loginErr.style.display = "none";
-    post("/api/admin/login", { password: pw })
-      .then(function () { loginScreen.style.display = "none"; dashboard.style.display = "block"; loadDashboard(); })
-      .catch(function (e) { loginErr.textContent = (e && e.error) || "Mot de passe incorrect."; loginErr.style.display = "block"; });
-  }
-  document.getElementById("admin-login-btn").addEventListener("click", doLogin);
-  document.getElementById("admin-password").addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
-
   /* ── DASHBOARD ── */
   function loadDashboard() {
-    get("/api/books").then(function (b) { document.getElementById("stat-books").textContent = b.length; }).catch(function () {});
+    get("/api/books").then(function (b) {
+      document.getElementById("stat-books").textContent = b.length;
+      var criticalStock = b.filter(function(x) { return (parseInt(x.stock) || 0) <= 3; }).sort(function(x, y) { return parseInt(x.stock) - parseInt(y.stock); });
+      var stockContainer = document.getElementById("dashboard-stock-alerts");
+      if (criticalStock.length === 0) {
+        stockContainer.innerHTML = '<p style="color:#166534;font-size:14px;font-weight:600;padding:10px 0;">✅ Tous les stocks sont au-dessus du seuil d\'alerte.</p>';
+      } else {
+        stockContainer.innerHTML = criticalStock.map(function(bk) {
+          var s = parseInt(bk.stock) || 0;
+          var color = s === 0 ? "#e53e3e" : "#dd6b20";
+          var badge = s === 0 ? "ÉPUISÉ" : "Reste " + s;
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f4f4f4;cursor:pointer;" onclick="document.querySelector(\'[data-section=\\\'books\\\']\').click()">'
+            + '<div><strong style="font-size:14px;">' + esc(bk.titre) + '</strong><br><small style="color:#888;">' + esc(bk.auteur) + '</small></div>'
+            + '<span class="badge" style="background:' + color + ';color:#fff;">' + badge + '</span></div>';
+        }).join("");
+      }
+    }).catch(function () {});
+    
     get("/api/admin/users").then(function (users) {
       document.getElementById("stat-users").textContent = users.length;
       var recent = users.slice(0, 5);
@@ -575,20 +594,74 @@
             + '<small style="color:#aaa;">' + fmtDateShort(u.created_at) + '</small></div>';
         }).join("");
     }).catch(function () {});
-    get("/api/admin/orders").then(function (orders) {
-      document.getElementById("stat-orders").textContent = orders.length;
-      document.getElementById("stat-pending").textContent = orders.filter(function (o) { return o.status === "En attente"; }).length;
-      document.getElementById("stat-validated").textContent = orders.filter(function (o) { return o.status === "Validée"; }).length;
-      var recent = orders.slice(0, 5);
-      document.getElementById("dashboard-orders").innerHTML = recent.length === 0
-        ? '<p style="color:#999;font-size:13px;">Aucune commande.</p>'
-        : recent.map(function (o) {
-          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f4f4f4;">'
-            + '<div><strong style="font-size:14px;">#' + esc(o.id) + ' — ' + esc(o.customer_name) + '</strong><br><small style="color:#888;">' + esc(o.delivery_zone) + ' · ' + money(o.total) + '</small></div>'
-            + '<span class="order-status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></div>';
-        }).join("");
+    
+    // Charger la date de reset PUIS les commandes (pour éviter la race condition)
+    get("/api/admin/revenue-reset").then(function(setting) {
+      var resetAt = setting.revenue_reset_at || null;
+
+      // Mettre à jour le sous-titre
+      var subEl = document.getElementById("stat-revenue-sub");
+      if (subEl) {
+        if (resetAt) {
+          var resetDate = new Date(resetAt + "Z");
+          var opts = { day: "2-digit", month: "2-digit", year: "numeric" };
+          subEl.textContent = "depuis le " + resetDate.toLocaleDateString("fr-FR", opts);
+        } else {
+          subEl.textContent = "cumul des ventes";
+        }
+      }
+
+      return get("/api/admin/orders").then(function (orders) {
+        document.getElementById("stat-orders").textContent = orders.length;
+        document.getElementById("stat-pending").textContent = orders.filter(function (o) { return o.status === "En attente"; }).length;
+        var ca = 0;
+        orders.forEach(function(o) {
+          if (o.status === "Annulée") return;
+          if (resetAt && o.created_at && o.created_at <= resetAt) return;
+          ca += (parseInt(o.total) || 0);
+        });
+        var revEl = document.getElementById("stat-revenue");
+        if (revEl) revEl.textContent = money(ca);
+
+        var recent = orders.slice(0, 5);
+        document.getElementById("dashboard-orders").innerHTML = recent.length === 0
+          ? '<p style="color:#999;font-size:13px;">Aucune commande.</p>'
+          : recent.map(function (o) {
+            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f4f4f4;">'
+              + '<div><strong style="font-size:14px;">#' + esc(o.id) + ' — ' + esc(o.customer_name) + '</strong><br><small style="color:#888;">' + esc(o.delivery_zone) + ' · ' + money(o.total) + '</small></div>'
+              + '<span class="order-status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></div>';
+          }).join("");
+      });
     }).catch(function () {});
-    get("/api/admin/ads").then(function (ads) { document.getElementById("stat-ads").textContent = ads.filter(function (a) { return a.active; }).length; }).catch(function () {});
+
+    // Bouton reset CA
+    var btnResetRevenue = document.getElementById("btn-reset-revenue");
+    if (btnResetRevenue && !btnResetRevenue._wired) {
+      btnResetRevenue._wired = true;
+      btnResetRevenue.addEventListener("click", function() {
+        if (!confirm("Remettre le chiffre d'affaires à 0 FCFA ?\n\nLes commandes existantes ne seront pas supprimées — seul le compteur repart de zéro.")) return;
+        btnResetRevenue.disabled = true;
+        btnResetRevenue.textContent = "…";
+        post("/api/admin/reset-revenue").then(function(r) {
+          if (r.success) {
+            var revEl = document.getElementById("stat-revenue");
+            if (revEl) revEl.textContent = money(0);
+            var subEl = document.getElementById("stat-revenue-sub");
+            var now = new Date();
+            var opts = { day: "2-digit", month: "2-digit", year: "numeric" };
+            if (subEl) subEl.textContent = "depuis le " + now.toLocaleDateString("fr-FR", opts);
+            btnResetRevenue.textContent = "↺ Réinit.";
+            btnResetRevenue.disabled = false;
+            loadDashboard();
+          }
+        }).catch(function() {
+          btnResetRevenue.textContent = "↺ Réinit.";
+          btnResetRevenue.disabled = false;
+          alert("Erreur serveur. Vérifiez que le serveur tourne correctement.");
+        });
+      });
+    }
+    // get("/api/admin/ads").then(function (ads) { document.getElementById("stat-ads").textContent = ads.filter(function (a) { return a.active; }).length; }).catch(function () {});
     
     get("/api/admin/user-modifications").then(function (mods) {
       var container = document.getElementById("dashboard-modifs");
@@ -731,30 +804,69 @@
   }
 
   /* ── MODIFS ── */
+  var _modifs = [];
+  var _modifSearch = "";
   document.getElementById("modifs-refresh-btn").addEventListener("click", loadModifs);
+  
+  var modifSearchInput = document.getElementById("modifs-search");
+  var modifSearchClear = document.getElementById("modifs-search-clear");
+  if (modifSearchInput) {
+    modifSearchInput.addEventListener("input", function() {
+      _modifSearch = modifSearchInput.value.trim().toLowerCase();
+      renderModifs();
+    });
+  }
+  if (modifSearchClear) {
+    modifSearchClear.addEventListener("click", function() {
+      _modifSearch = "";
+      if (modifSearchInput) modifSearchInput.value = "";
+      renderModifs();
+    });
+  }
+
+  function filteredModifs() {
+    if (!_modifSearch) return _modifs;
+    return _modifs.filter(function(m) {
+      var name = String(m.user_name || "").toLowerCase();
+      var email = String(m.user_email || "").toLowerCase();
+      return name.indexOf(_modifSearch) !== -1 || email.indexOf(_modifSearch) !== -1;
+    });
+  }
+
+  function renderModifs() {
+    var tbody = document.getElementById("modifs-tbody");
+    if(!tbody) return;
+    var filtered = filteredModifs();
+    if(filtered.length === 0) { 
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#999;">Aucune modification.</td></tr>'; 
+      return; 
+    }
+    tbody.innerHTML = filtered.map(function(m) {
+      var oldD = JSON.parse(m.old_data || "{}");
+      var newD = JSON.parse(m.new_data || "{}");
+      var changes = [];
+      if(oldD.name !== newD.name) changes.push("Nom: <s>" + esc(oldD.name) + "</s> ➔ " + esc(newD.name));
+      if(oldD.email !== newD.email) changes.push("Email: <s>" + esc(oldD.email) + "</s> ➔ " + esc(newD.email));
+      if(oldD.phone !== newD.phone) changes.push("Tél: <s>" + esc(oldD.phone) + "</s> ➔ " + esc(newD.phone));
+      if(oldD.avatar !== newD.avatar) changes.push("Photo de profil modifiée");
+      
+      var isRead = !!m.is_read;
+      return '<tr style="background:'+(isRead?'transparent':'#fffcf5')+'">'
+        + '<td style="color:#888;font-size:12px;">'+fmtDate(m.created_at)+'</td>'
+        + '<td><strong>'+esc(m.user_name)+'</strong><br><small style="color:#888;">'+esc(m.user_email)+'</small></td>'
+        + '<td style="font-size:12px;color:#555;line-height:1.6;">'+changes.join("<br>")+'</td>'
+        + '<td>'+(isRead?'<span class="badge badge-neutral">Lu</span>':'<span class="badge badge-active" style="background:#ff690c;color:#fff;">Nouveau</span>')+'</td>'
+        + '<td>'+(isRead?'':'<button class="btn btn-sm btn-secondary" onclick="markModifRead('+m.id+', this)">Marquer lu</button>')+'</td>'
+        + '</tr>';
+    }).join("");
+  }
+
   function loadModifs() {
     var tbody = document.getElementById("modifs-tbody");
     if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:#999;">Chargement…</td></tr>';
     get("/api/admin/user-modifications").then(function(mods) {
-      if(mods.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#999;">Aucune modification récente.</td></tr>'; return; }
-      tbody.innerHTML = mods.map(function(m) {
-        var oldD = JSON.parse(m.old_data || "{}");
-        var newD = JSON.parse(m.new_data || "{}");
-        var changes = [];
-        if(oldD.name !== newD.name) changes.push("Nom: <s>" + esc(oldD.name) + "</s> ➔ " + esc(newD.name));
-        if(oldD.email !== newD.email) changes.push("Email: <s>" + esc(oldD.email) + "</s> ➔ " + esc(newD.email));
-        if(oldD.phone !== newD.phone) changes.push("Tél: <s>" + esc(oldD.phone) + "</s> ➔ " + esc(newD.phone));
-        if(oldD.avatar !== newD.avatar) changes.push("Photo de profil modifiée");
-        
-        var isRead = !!m.is_read;
-        return '<tr style="background:'+(isRead?'transparent':'#fffcf5')+'">'
-          + '<td style="color:#888;font-size:12px;">'+fmtDate(m.created_at)+'</td>'
-          + '<td><strong>'+esc(m.user_name)+'</strong><br><small style="color:#888;">'+esc(m.user_email)+'</small></td>'
-          + '<td style="font-size:12px;color:#555;line-height:1.6;">'+changes.join("<br>")+'</td>'
-          + '<td>'+(isRead?'<span class="badge badge-neutral">Lu</span>':'<span class="badge badge-active" style="background:#ff690c;color:#fff;">Nouveau</span>')+'</td>'
-          + '<td>'+(isRead?'':'<button class="btn btn-sm btn-secondary" onclick="markModifRead('+m.id+', this)">Marquer lu</button>')+'</td>'
-          + '</tr>';
-      }).join("");
+      _modifs = mods;
+      renderModifs();
     }).catch(function(e) {
       if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:#c33;">Erreur.</td></tr>';
     });
@@ -830,13 +942,57 @@
       });
   });
 
+  var _books = [];
+  var _bookSort = "recent";
+  var _bookSearch = "";
+
+  var bookSearchInput = document.getElementById("books-search");
+  if (bookSearchInput) {
+    bookSearchInput.addEventListener("input", function() {
+      _bookSearch = bookSearchInput.value.trim().toLowerCase();
+      renderBooks();
+    });
+  }
+
   function loadBooks() {
     get("/api/books").then(function (books) {
-      var count = document.getElementById("books-count");
-      if (count) count.textContent = "(" + books.length + ")";
-      var tbody = document.getElementById("admin-books-list");
-      if (books.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="padding:24px;text-align:center;color:#999;">Aucun livre dans le catalogue.</td></tr>'; return; }
-      tbody.innerHTML = books.map(function (b) {
+      _books = books;
+      renderBooks();
+    });
+  }
+
+  document.getElementById("admin-books-sort").addEventListener("change", function(e) {
+    _bookSort = e.target.value;
+    renderBooks();
+  });
+
+  function renderBooks() {
+    var count = document.getElementById("books-count");
+    if (count) count.textContent = "(" + _books.length + ")";
+    var tbody = document.getElementById("admin-books-list");
+    var filtered = _books.filter(function(b) {
+      if (!_bookSearch) return true;
+      var titre = String(b.titre || "").toLowerCase();
+      var auteur = String(b.auteur || "").toLowerCase();
+      return titre.indexOf(_bookSearch) !== -1 || auteur.indexOf(_bookSearch) !== -1;
+    });
+
+    if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="padding:24px;text-align:center;color:#999;">Aucun livre ne correspond à la recherche.</td></tr>'; return; }
+    
+    var sorted = filtered.slice();
+    if (_bookSort === "stock_asc") {
+      sorted.sort(function(a, b) { return (parseInt(a.stock) || 0) - (parseInt(b.stock) || 0); });
+    } else if (_bookSort === "stock_desc") {
+      sorted.sort(function(a, b) { return (parseInt(b.stock) || 0) - (parseInt(a.stock) || 0); });
+    } else if (_bookSort === "price_asc") {
+      sorted.sort(function(a, b) { return (parseInt(a.prix) || 0) - (parseInt(b.prix) || 0); });
+    } else if (_bookSort === "price_desc") {
+      sorted.sort(function(a, b) { return (parseInt(b.prix) || 0) - (parseInt(a.prix) || 0); });
+    } else {
+      sorted.sort(function(a, b) { return b.id - a.id; }); // Assuming higher ID means more recent
+    }
+
+    tbody.innerHTML = sorted.map(function (b) {
         return '<tr class="clickable" data-bid="' + b.id + '">'
           + '<td class="td-img"><img src="' + esc(b.image || "") + '" alt="" onerror="this.style.opacity=\'0\'"></td>'
           + '<td><strong>' + esc(b.titre) + '</strong>' + (b.featured ? ' <span style="color:#ff690c;font-size:11px;">⭐</span>' : '') + '</td>'
@@ -851,7 +1007,7 @@
       tbody.querySelectorAll("tr.clickable").forEach(function (row) {
         row.addEventListener("click", function (e) {
           if (e.target.closest("button")) return;
-          var b = books.find(function (x) { return String(x.id) === row.getAttribute("data-bid"); });
+          var b = _books.find(function (x) { return String(x.id) === row.getAttribute("data-bid"); });
           if (!b) return;
           openModal("Fiche livre — " + b.titre,
             (b.image ? '<img class="modal-img" src="' + esc(b.image) + '" alt="" onerror="this.style.display=\'none\'">' : '')
@@ -869,7 +1025,7 @@
       tbody.querySelectorAll("[data-edit]").forEach(function (btn) {
         btn.addEventListener("click", function (e) {
           e.stopPropagation();
-          var b = books.find(function (x) { return String(x.id) === btn.getAttribute("data-edit"); });
+          var b = _books.find(function (x) { return String(x.id) === btn.getAttribute("data-edit"); });
           if (!b) return;
           document.getElementById("book-id").value = b.id;
           document.getElementById("book-title").value = b.titre;
@@ -897,13 +1053,29 @@
             .catch(function (e) { toast((e && e.error) || "Suppression impossible.", "error"); });
         });
       });
-    });
   }
 
   /* ── ORDERS ── */
   var _orders = [];
   var _orderTab = "all";
+  var _orderSearch = "";
   var STATUSES = ["En attente", "Confirmée", "En livraison", "Livrée", "Annulée"];
+
+  var orderSearchInput = document.getElementById("orders-search");
+  var orderSearchClear = document.getElementById("orders-search-clear");
+  if (orderSearchInput) {
+    orderSearchInput.addEventListener("input", function() {
+      _orderSearch = orderSearchInput.value.trim().toLowerCase();
+      renderOrders();
+    });
+  }
+  if (orderSearchClear) {
+    orderSearchClear.addEventListener("click", function() {
+      _orderSearch = "";
+      if (orderSearchInput) orderSearchInput.value = "";
+      renderOrders();
+    });
+  }
 
   function getNextStatusInfo(o) {
     var status = o.status;
@@ -932,11 +1104,17 @@
   });
 
   function filteredOrders() {
-    if (_orderTab === "pending") return _orders.filter(function (o) { return o.status === "En attente"; });
-    if (_orderTab === "active") return _orders.filter(function (o) { return ["Confirmée", "En livraison", "Livrée"].includes(o.status); });
-    if (_orderTab === "validated") return _orders.filter(function (o) { return ["Reçue", "Validée"].includes(o.status); });
-    if (_orderTab === "cancelled") return _orders.filter(function (o) { return o.status === "Annulée"; });
-    return _orders;
+    var list = _orders;
+    if (_orderTab === "pending") list = _orders.filter(function (o) { return o.status === "En attente"; });
+    else if (_orderTab === "active") list = _orders.filter(function (o) { return ["Confirmée", "En livraison", "Livrée"].includes(o.status); });
+    else if (_orderTab === "validated") list = _orders.filter(function (o) { return ["Reçue", "Validée"].includes(o.status); });
+    else if (_orderTab === "cancelled") list = _orders.filter(function (o) { return o.status === "Annulée"; });
+
+    if (!_orderSearch) return list;
+    return list.filter(function(o) {
+      var searchStr = (String(o.id) + " " + String(o.customer_name || "") + " " + String(o.customer_email || "") + " " + String(o.customer_phone || "")).toLowerCase();
+      return searchStr.indexOf(_orderSearch) !== -1;
+    });
   }
 
   function renderOrders() {
@@ -967,7 +1145,7 @@
 
       return '<div class="order-card" id="oc-' + o.id + '">'
         + '<div class="order-header"><div class="order-id">Commande #' + esc(o.id) + ' — ' + esc(o.customer_name) + '</div><span class="order-status ' + statusClass(o.status) + '">' + esc(o.status) + '</span></div>'
-        + '<div class="order-meta">📧 ' + esc(o.customer_email) + ' · 📞 ' + esc(o.customer_phone || "—") + ' · 📍 ' + esc(o.delivery_zone) + (o.delivery_address ? ' — ' + esc(o.delivery_address) : '') + ' · <strong>' + money(o.total) + '</strong></div>'
+        + '<div class="order-meta">📧 ' + esc(o.customer_email) + ' · 📞 ' + esc(o.customer_phone || "—") + ' · 📍 ' + esc(o.delivery_zone) + ' · <strong>' + money(o.total) + '</strong></div>'
         + (itemsText ? '<div class="order-items-inline">🛒 ' + itemsText + '</div>' : '')
         + '<div class="validation-pills">' + adminPill + clientPill + (o.validated_at ? '<span class="v-pill v-done">✓ Validée le ' + fmtDateShort(o.validated_at) + '</span>' : '') + '</div>'
         + cancelReqHtml
@@ -998,6 +1176,25 @@
       renderOrders();
     });
   }
+
+  window.printDeliverySlip = function(orderId) {
+    var o = _orders.find(function(x) { return String(x.id) === String(orderId); });
+    if (!o) return;
+    var win = window.open("", "_blank");
+    var itemsHtml = (o.items || []).map(function(i) { return "<li style='margin-bottom:10px;font-size:16px;'>" + i.qty + "x <strong>" + esc(i.titre) + "</strong> — " + esc(i.auteur) + "</li>"; }).join("");
+    win.document.write("<html><head><title>Bon de livraison #" + o.id + "</title><style>body{font-family:Arial,sans-serif;padding:40px;color:#000;}h2,h3{margin:0;}hr{border:1px solid #ccc;margin:20px 0;}</style></head><body>");
+    win.document.write("<div style='display:flex;justify-content:space-between;align-items:center;'>");
+    win.document.write("<h2>📦 BON DE LIVRAISON</h2><h2>#" + o.id + "</h2>");
+    win.document.write("</div><hr>");
+    win.document.write("<p style='font-size:18px;'><strong>Client :</strong> " + esc(o.customer_name) + "</p>");
+    win.document.write("<p style='font-size:18px;'><strong>Téléphone :</strong> " + esc(o.customer_phone || "—") + "</p>");
+    win.document.write("<p style='font-size:18px;'><strong>Adresse / Zone :</strong> " + esc(o.delivery_zone) + " " + (o.delivery_address ? "— " + esc(o.delivery_address) : "") + "</p><hr>");
+    win.document.write("<h3>Articles à livrer :</h3><ul style='margin-top:20px;'>" + itemsHtml + "</ul>");
+    win.document.write("<br><br><br><br><br><hr><p style='text-align:right;font-size:16px;'><strong>Signature du client à la réception :</strong></p><br><br><br>");
+    win.document.write("<" + "/body><" + "/html>");
+    win.document.close();
+    setTimeout(function() { win.print(); }, 500);
+  };
 
   function openOrderModal(o) {
     var itemsHtml = (o.items || []).length > 0
@@ -1041,6 +1238,11 @@
       + (o.updated_at && o.updated_at !== o.created_at ? '<div class="modal-field"><div class="modal-field-label">Mise à jour</div><div class="modal-field-value">' + fmtDate(o.updated_at) + '</div></div>' : '')
       + (o.validated_at ? '<div class="modal-field"><div class="modal-field-label">Validée le</div><div class="modal-field-value">' + fmtDate(o.validated_at) + '</div></div>' : '')
       + '</div>'
+      + '<div class="modal-section"><h4>Notes Internes (Privé)</h4>'
+      + '<div style="display:flex;gap:10px;flex-direction:column;">'
+      + '<textarea id="modal-admin-note" placeholder="Ajouter une note interne..." style="width:100%;min-height:60px;padding:8px;border:1px solid #ddd;border-radius:4px;font-family:Arial;">' + esc(o.admin_notes || "") + '</textarea>'
+      + '<button class="btn btn-secondary btn-sm" id="modal-save-note" style="align-self:flex-start;">Sauvegarder la note</button>'
+      + '</div></div>'
       + cancelSection
       + '<div class="modal-section"><h4>Double validation</h4>'
       + '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">'
@@ -1048,9 +1250,23 @@
       + '<span class="v-pill ' + (o.client_confirmed ? "v-done" : "v-pending") + '" style="padding:4px 12px;font-size:13px;">' + (o.client_confirmed ? "✓ Client a confirmé la réception" : "◯ En attente confirmation client") + '</span>'
       + '</div>'
       + statusActionHtml
+      + '<div style="margin-top:16px;padding-top:16px;border-top:1px solid #eee;">'
+      + '<button class="btn btn-secondary" onclick="printDeliverySlip(' + o.id + ')">🖨️ Imprimer Bon de Livraison</button>'
+      + '</div>'
       + '</div>';
 
     openModal("Commande #" + o.id + " — " + o.customer_name, html);
+
+    var noteBtn = document.getElementById("modal-save-note");
+    if (noteBtn) {
+      noteBtn.addEventListener("click", function() {
+        var note = document.getElementById("modal-admin-note").value;
+        noteBtn.disabled = true; noteBtn.textContent = "Sauvegarde...";
+        post("/api/admin/orders/" + o.id + "/note", { admin_notes: note })
+          .then(function(updated) { toast("Note sauvegardée."); loadOrders(); noteBtn.disabled = false; noteBtn.textContent = "Sauvegarder la note"; })
+          .catch(function(e) { toast("Erreur de sauvegarde.", "error"); noteBtn.disabled = false; noteBtn.textContent = "Sauvegarder la note"; });
+      });
+    }
 
     var nextBtn = document.getElementById("modal-next-status-btn");
     if (nextBtn) {
@@ -1194,7 +1410,11 @@
 
   get("/api/admin/status").then(function (s) {
     applyRoleVisibility(s.role || window.MAGMA_ADMIN_ROLE || null);
-    if (s.authenticated) { loginScreen.style.display = "none"; dashboard.style.display = "block"; loadDashboard(); }
+    if (s.authenticated) { 
+      var dash = document.getElementById("admin-dashboard");
+      if (dash) dash.style.display = "block"; 
+      loadDashboard(); 
+    }
   }).catch(function () {});
 })();
 </script>

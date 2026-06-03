@@ -9,7 +9,7 @@ const { authPageHtml } = require("./pages");
 const router = express.Router();
 
 function resetPasswordHtml(content) {
-  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Librairie Magma — Réinitialisation</title><style>body{margin:0;min-height:100vh;background:#e8e8e8;font-family:Arial,sans-serif;color:#333;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;}main{width:min(480px,100%);background:#fff;border-radius:6px;padding:34px;box-shadow:0 8px 32px rgba(0,0,0,.18);}h1{font-size:26px;font-weight:400;color:#888;margin:0 0 18px;}label{display:block;font-size:13px;color:#555;margin:14px 0 6px;}input{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:3px;font-size:14px;background:#f0f0f0;color:#333;box-sizing:border-box;}button,.link{display:inline-block;width:100%;padding:13px;background:#ff690c;color:#fff;font-size:15px;font-weight:600;border:none;border-radius:3px;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;margin-top:18px;}.error{background:#fee4e2;color:#b42318;padding:10px 14px;border-radius:4px;font-size:13px;}.success{background:#ecfdf3;color:#1f7a4d;padding:10px 14px;border-radius:4px;font-size:13px;}.small{font-size:13px;color:#888;line-height:1.5;word-break:break-word;}</style></head><body><main>${content}</main></body></html>`;
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Librairie Mayombe — Réinitialisation</title><style>body{margin:0;min-height:100vh;background:#e8e8e8;font-family:Arial,sans-serif;color:#333;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;}main{width:min(480px,100%);background:#fff;border-radius:6px;padding:34px;box-shadow:0 8px 32px rgba(0,0,0,.18);}h1{font-size:26px;font-weight:400;color:#888;margin:0 0 18px;}label{display:block;font-size:13px;color:#555;margin:14px 0 6px;}input{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:3px;font-size:14px;background:#f0f0f0;color:#333;box-sizing:border-box;}button,.link{display:inline-block;width:100%;padding:13px;background:#ff690c;color:#fff;font-size:15px;font-weight:600;border:none;border-radius:3px;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;margin-top:18px;}.error{background:#fee4e2;color:#b42318;padding:10px 14px;border-radius:4px;font-size:13px;}.success{background:#ecfdf3;color:#1f7a4d;padding:10px 14px;border-radius:4px;font-size:13px;}.small{font-size:13px;color:#888;line-height:1.5;word-break:break-word;}</style></head><body><main>${content}</main></body></html>`;
 }
 
 function buildResetLink(req, token) {
@@ -36,12 +36,7 @@ async function findResetUser(db, name, phone, email) {
   const enteredName = name.toLowerCase();
   const storedName = String(user.name || "").trim().toLowerCase();
   const nameMatches = storedName === enteredName || storedName.includes(enteredName) || enteredName.includes(storedName);
-  const storedPhone = normalizePhone(user.phone);
   if (nameMatches && (await phoneMatchesUser(db, user, phone))) return user;
-  if (!storedPhone) {
-    await db.run("UPDATE users SET name = ?, phone = ? WHERE id = ?", name, phone, user.id);
-    return { ...user, name, phone };
-  }
   return null;
 }
 

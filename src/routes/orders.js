@@ -2,8 +2,8 @@ const express = require("express");
 const crypto = require("crypto");
 const PDFDocument = require("pdfkit");
 const { getDb, nowIso } = require("../db");
-const { cleanText, cleanInt, cleanEmail, cleanPhone, normalizePhone, rowToBook } = require("../helpers");
-const { requireUser, getCurrentUser, isAuthenticated } = require("../middleware");
+const { cleanText, cleanInt, cleanEmail, cleanPhone, rowToBook } = require("../helpers");
+const { requireUser, getCurrentUser, isAuthenticated, getCurrentAdminRole, getCurrentUserAdminEntry } = require("../middleware");
 
 const router = express.Router();
 
@@ -22,7 +22,8 @@ function rowToOrder(row, items = []) {
 }
 
 async function userCanAccessOrder(req, order) {
-  if (req.session.admin_authenticated) return true;
+  const adminRole = await getCurrentAdminRole(req);
+  if (adminRole) return true;
   const user = await getCurrentUser(req);
   const token = req.query.token || req.body.token;
   if (token && order.tracking_token && Buffer.from(token).length === Buffer.from(order.tracking_token).length &&
@@ -30,14 +31,12 @@ async function userCanAccessOrder(req, order) {
   return !!(user && order.user_id && parseInt(order.user_id) === parseInt(user.id));
 }
 
-
-
 function generateReceiptPdf(order, items, res) {
   const doc = new PDFDocument({ margin: 50 });
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", `attachment; filename="recu-commande-${order.id}.pdf"`);
   doc.pipe(res);
-  doc.fontSize(24).font("Helvetica-Bold").text("Librairie Magma", { align: "center" });
+  doc.fontSize(24).font("Helvetica-Bold").text("Librairie Mayombe", { align: "center" });
   doc.moveDown(0.3);
   doc.fontSize(16).font("Helvetica-Bold").text(`Reçu de commande #${order.id}`, { align: "center" });
   doc.moveDown(0.5);
@@ -69,7 +68,7 @@ function generateReceiptPdf(order, items, res) {
   doc.moveDown(0.3);
   doc.font("Helvetica-Bold").fontSize(12).text(`Total : ${order.total} FCFA`, { align: "right" });
   doc.moveDown(0.5);
-  doc.font("Helvetica-Oblique").fontSize(9).text("Annulation possible uniquement dans les 5 minutes suivant la validation.");
+  doc.font("Helvetica-Oblique").fontSize(9).text("Pour toute demande d'annulation, contactez l'administration via votre espace Mes Commandes.");
   doc.end();
 }
 
@@ -86,16 +85,10 @@ router.post("/api/orders", requireUser(), async (req, res) => {
     const customer_name = cleanText(data.customer_name || (user || {}).name, 140, true);
     const customer_email = cleanEmail(data.customer_email || (user || {}).email);
     const customer_phone = cleanPhone(data.customer_phone || (user || {}).phone);
-    const normalized_phone = normalizePhone(customer_phone);
-    if (normalized_phone.length !== 9) {
-      return res.status(400).json({ error: "Le numéro de téléphone doit comporter exactement 9 chiffres (format local) pour le paiement à la livraison." });
-    }
     const delivery_zone = cleanText(data.delivery_zone, 120, true);
-    const delivery_address = cleanText(data.delivery_address, 260, true);
+    const delivery_address = cleanText(data.delivery_address || data.delivery_zone, 260, true);
     if (!ALLOWED_DELIVERY_ZONES.includes(delivery_zone))
       return res.status(400).json({ error: "Livraison impossible : cette adresse est hors zone. Zones autorisées : Potopoto la gare, Total vers Saint Exupérie, Présidence, OSH, CHU." });
-    if (!delivery_address)
-      return res.status(400).json({ error: "Veuillez indiquer votre adresse complète (quartier, rue, repère)." });
 
     const db = await getDb();
     const validItems = [];
@@ -110,25 +103,11 @@ router.post("/api/orders", requireUser(), async (req, res) => {
       total += book.prix * qty;
     }
 
-    if (total > 50000) {
-      return res.status(400).json({ error: "Le montant de votre commande dépasse la limite autorisée de 50 000 FCFA pour le paiement à la livraison." });
-    }
-
-    if (user && user.id) {
-      const failedOrdersRow = await db.get(
-        "SELECT COUNT(*) as cnt FROM orders WHERE user_id = ? AND (status = 'Annulée' OR not_received_reported_at IS NOT NULL)",
-        user.id
-      );
-      if (failedOrdersRow && failedOrdersRow.cnt >= 3) {
-        return res.status(403).json({ error: "Votre compte présente trop de commandes annulées ou non reçues. Le paiement à la livraison est bloqué pour votre profil. Veuillez contacter le support." });
-      }
-    }
-
     const created_at = nowIso();
     const tracking_token = crypto.randomBytes(18).toString("base64url");
     const orderResult = await db.run(
-      "INSERT INTO orders (user_id, customer_name, customer_email, customer_phone, delivery_zone, delivery_address, total, status, tracking_token, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-      (user || {}).id || null, customer_name, customer_email, customer_phone, delivery_zone, delivery_address, total, "En attente", tracking_token, created_at, created_at
+      "INSERT INTO orders (user_id, customer_name, customer_email, customer_phone, delivery_zone, delivery_address, total, status, email_status, tracking_token, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+      (user || {}).id || null, customer_name, customer_email, customer_phone, delivery_zone, delivery_address, total, "En attente", "pending", tracking_token, created_at, created_at
     );
     const orderId = orderResult.lastID;
 
@@ -143,6 +122,7 @@ router.post("/api/orders", requireUser(), async (req, res) => {
       );
       await db.run("UPDATE books SET stock = MAX(stock - ?, 0), sales = sales + ? WHERE id = ?", item.qty, item.qty, item.book_id);
     }
+    await db.run("UPDATE orders SET email_status = 'not_configured' WHERE id = ?", orderId);
     const order = await db.get("SELECT * FROM orders WHERE id = ?", orderId);
 
     req.session.cart = [];
@@ -175,7 +155,8 @@ router.post("/api/orders/:id/cancel", requireUser(), async (req, res) => {
     if (!(await userCanAccessOrder(req, order))) return res.status(403).json({ error: "Accès à cette commande refusé." });
     
     // Only admins can directly cancel orders now
-    if (!req.session.admin_authenticated) {
+    const isAdmin = req.session.admin_authenticated || await getCurrentUserAdminEntry(req);
+    if (!isAdmin) {
       return res.status(400).json({ error: "L'annulation directe n'est pas autorisée. Veuillez faire une demande d'annulation." });
     }
     
@@ -208,6 +189,7 @@ router.post("/api/orders/:id/request-cancel", requireUser(), async (req, res) =>
     const reason = cleanText((req.body || {}).reason || "Non précisée", 300, true);
     const now = nowIso();
     await db.run("UPDATE orders SET cancel_requested = 1, cancel_reason = ?, updated_at = ? WHERE id = ?", reason, now, orderId);
+
     res.json({ success: true, message: "Demande d'annulation envoyée à l'administrateur." });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -317,4 +299,5 @@ router.get("/api/my-orders", requireUser(), async (req, res) => {
   }
 });
 
-module.exports = { router, ORDER_STATUSES };
+module.exports = { router, ORDER_STATUSES, rowToOrder };
+

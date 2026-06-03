@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <link rel="icon" type="image/png" href="/img/ICON-1.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Librairie Magma — Détail du livre</title>
+<title>Librairie Mayombe — Détail du livre</title>
 <script>window.MAGMA_DETAIL_CUSTOM=true;</script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
@@ -16,7 +16,7 @@
   .topbar{background:#000000;color:#fff;min-height:56px;display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;z-index:100;flex-wrap:wrap}
   .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;text-decoration:none;color:inherit}
   .logo-mark{width:28px;height:28px;background:#ff690c;border-radius:6px;display:grid;place-items:center;font-size:14px}
-  .logo-img{height:42px;width:auto;display:block;object-fit:contain}
+  .logo-img{height:54px;width:auto;display:block;object-fit:contain;border-radius:50%;}
   .nav{display:flex;gap:18px;font-size:13px;margin-left:auto}
   .nav a{opacity:.85}.nav a:hover{opacity:1}
   .menu-toggle{display:none;background:transparent;border:0;color:#fff;cursor:pointer;padding:6px 8px;border-radius:4px;align-items:center;justify-content:center}
@@ -92,7 +92,7 @@
 <body>
 
 <header class="topbar">
-  <a href="/" class="logo" aria-label="Librairie Magma"><img class="logo-img" src="/img/Copilot_20260402_080209.png" alt="Librairie Magma"></a>
+  <a href="/" class="logo" aria-label="Librairie Mayombe"><img class="logo-img" src="/img/Logo version mobile.png" alt="Librairie Mayombe"></a>
   <nav class="nav topbar-nav">
     <a href="/">Accueil</a>
     <a href="/catalogue.html">Catalogue</a>
@@ -150,7 +150,7 @@ function renderProduct(b){
         '<div class="author">par ' + esc(b.auteur||"Auteur inconnu") + '</div>' +
         '<div class="badges">' +
           (b.genre ? '<span class="badge">' + esc(b.genre) + '</span>' : '') +
-          (b.featured ? '<span class="badge featured">Sélection Magma</span>' : '') +
+          (b.featured ? '<span class="badge featured">Sélection Mayombe</span>' : '') +
         '</div>' +
         '<div class="price">' + money(b.prix) + '</div>' +
         '<div class="stock' + (inStock?'':' out') + '">' + (inStock ? '✓ En stock' + (b.stock!=null ? ' (' + b.stock + ' disponibles)' : '') : '✕ Rupture de stock') + '</div>' +

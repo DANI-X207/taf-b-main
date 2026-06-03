@@ -5,7 +5,8 @@ const fs = require("fs");
 const multer = require("multer");
 const { getDb, nowIso } = require("../db");
 const { cleanText, cleanUrl } = require("../helpers");
-const { requireAdmin } = require("../middleware");
+const { requireAdmin, getCurrentAdminRole } = require("../middleware");
+const { ORDER_STATUSES, rowToOrder } = require("./orders");
 
 const router = express.Router();
 
@@ -30,26 +31,6 @@ const uploadCover = multer({
   },
 });
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "TAF1-FLEMME";
-const ADMIN_PASSWORD_SUPER = process.env.ADMIN_PASSWORD_SUPER || "MMDE2007";
-
-function safeEqual(a, b) {
-  const A = Buffer.from(a);
-  const B = Buffer.from(b);
-  return A.length === B.length && crypto.timingSafeEqual(A, B);
-}
-
-const ORDER_STATUSES = ["En attente", "Confirmée", "En livraison", "Livrée", "Reçue", "Annulée"];
-
-function rowToOrder(row, items = []) {
-  const order = { ...row };
-  order.items = items;
-  const created = new Date(row.created_at + "Z");
-  const deadline = new Date(created.getTime() + 5 * 60 * 1000);
-  order.can_cancel = ["En attente", "Confirmée"].includes(row.status) && new Date() <= deadline;
-  order.tracking_steps = ORDER_STATUSES.slice(0, -1);
-  return order;
-}
 
 async function tryValidateOrder(db, orderId) {
   const order = await db.get("SELECT * FROM orders WHERE id = ?", orderId);
@@ -62,7 +43,6 @@ async function tryValidateOrder(db, orderId) {
   return order;
 }
 
-const { getCurrentAdminRole } = require("../middleware");
 
 router.get("/api/admin/status", async (req, res) => {
   const role = await getCurrentAdminRole(req);
@@ -74,22 +54,6 @@ router.get("/api/admin/status", async (req, res) => {
     is_super: role === "super",
     via_phone: viaPhone,
   });
-});
-
-router.post("/api/admin/login", (req, res) => {
-  const data = req.body || {};
-  const password = String(data.password || "");
-  if (safeEqual(password, ADMIN_PASSWORD_SUPER)) {
-    req.session.admin_authenticated = true;
-    req.session.admin_role = "super";
-    return res.json({ success: true, role: "super" });
-  }
-  if (safeEqual(password, ADMIN_PASSWORD)) {
-    req.session.admin_authenticated = true;
-    req.session.admin_role = "normal";
-    return res.json({ success: true, role: "normal" });
-  }
-  return res.status(401).json({ error: "Mot de passe administrateur incorrect." });
 });
 
 router.post("/api/admin/logout", (req, res) => {
@@ -191,7 +155,6 @@ router.put("/api/admin/orders/:id/status", requireAdmin(), async (req, res) => {
       await db.run("UPDATE orders SET status = ?, updated_at = ? WHERE id = ?", status, now, orderId);
     }
 
-
     const updatedOrder = await tryValidateOrder(db, orderId);
     const items = await db.all("SELECT * FROM order_items WHERE order_id = ?", orderId);
     res.json(rowToOrder(updatedOrder, items));
@@ -203,6 +166,21 @@ router.put("/api/admin/orders/:id/status", requireAdmin(), async (req, res) => {
 router.post("/api/admin/orders/:id/status", requireAdmin(), (req, res, next) => {
   req.method = "PUT";
   next();
+});
+
+router.post("/api/admin/orders/:id/note", requireAdmin(), async (req, res) => {
+  try {
+    const db = await getDb();
+    const orderId = parseInt(req.params.id);
+    const note = (req.body.admin_notes || "").trim();
+    await db.run("UPDATE orders SET admin_notes = ? WHERE id = ?", note, orderId);
+    
+    const updatedOrder = await db.get("SELECT * FROM orders WHERE id = ?", orderId);
+    const items = await db.all("SELECT * FROM order_items WHERE order_id = ?", orderId);
+    res.json(rowToOrder(updatedOrder, items));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 router.get("/api/admin/ads", requireAdmin(), async (req, res) => {
@@ -274,6 +252,43 @@ router.post("/api/admin/user-modifications/:id/read", requireAdmin(), async (req
     const db = await getDb();
     await db.run("UPDATE user_modifications SET is_read = 1 WHERE id = ?", parseInt(req.params.id));
     res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/* ── CHIFFRE D'AFFAIRES : date de reset ── */
+router.get("/api/admin/revenue-reset", requireAdmin(), async (req, res) => {
+  try {
+    const db = await getDb();
+    // Créer la table si elle n'existe pas encore (sécurité)
+    await db.exec(`CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`);
+    const row = await db.get("SELECT value FROM settings WHERE key = 'revenue_reset_at'");
+    res.json({ revenue_reset_at: row ? row.value : null });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post("/api/admin/reset-revenue", requireAdmin(), async (req, res) => {
+  try {
+    const db = await getDb();
+    // Créer la table si elle n'existe pas encore (sécurité)
+    await db.exec(`CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`);
+    const now = nowIso();
+    await db.run(
+      "INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('revenue_reset_at', ?, ?)",
+      now, now
+    );
+    res.json({ success: true, reset_at: now });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

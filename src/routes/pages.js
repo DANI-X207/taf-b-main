@@ -2,11 +2,11 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const archiver = require("archiver");
-const { isAuthenticated } = require("../middleware");
+const { isAuthenticated, getCurrentAdminRole } = require("../middleware");
 
 const router = express.Router();
 
-const SITE_NAME = "Librairie Magma";
+const SITE_NAME = "Librairie Mayombe";
 const PUBLIC_HTML = path.join(__dirname, "..", "..", "public", "html");
 const PUBLIC_CSS = path.join(__dirname, "..", "..", "public", "css");
 const PUBLIC_IMG = path.join(__dirname, "..", "..", "public", "img");
@@ -98,7 +98,7 @@ ${msg}
 <p class="small"><a href="#" id="forgot-password-link">Mot de passe oublié</a></p>
 </section>
 </div>
-<p><a class="link admin" href="/Admin.html">Connexion Admin</a> <a class="link" href="/api/source.zip">Télécharger le code source</a></p>
+<p><a class="link" href="/api/source.zip">Télécharger le code source</a></p>
 <p class="small">Session sécurisée : cookie HttpOnly, Secure, SameSite strict, expiration configurable à 7 jours par défaut.</p>
 </main>
 </body>
@@ -119,15 +119,16 @@ function serveHtml(filename, req, res) {
   const pageKey = filename.replace(/\.html$/, "");
   const newTitle = PAGE_TITLES[pageKey] || SITE_NAME;
   content = content.replace(/<title>[^<]*<\/title>/, `<title>${newTitle}</title>`);
-  content = content.replace(/(>)([^<]*)Mayombe([^<]*<)/g, (m, a, b, c) => a + b + SITE_NAME + c);
+  content = content.replace(/Librairie Mayombe/g, SITE_NAME);
   if (!content.includes("window.clWDUtil")) {
     content = content.replace("</head>", HEAD_COMPAT);
   }
-  if (!content.includes("magma-fixes.css")) {
-    content = content.replace("</head>", '<script>try{document.documentElement.setAttribute("data-magma-theme", localStorage.getItem("magma-theme") || "light");}catch(e){}</script>\n<link rel="stylesheet" type="text/css" href="/magma-fixes.css?v=2"></head>');
+  const isStandalonePage = filename === "login.html" || filename === "register.html";
+  if (!isStandalonePage && !content.includes("magma-fixes.css")) {
+    content = content.replace("</head>", '<script>try{document.documentElement.setAttribute("data-magma-theme", localStorage.getItem("magma-theme") || "light");}catch(e){}</script>\n<link rel="stylesheet" type="text/css" href="/magma-fixes.css?v=6"></head>');
   }
-  if (!content.includes("/js/bookstore.js")) {
-    content = content.replace("</body>", '<script src="/js/bookstore.js?v=2"></script></body>');
+  if (!isStandalonePage && !content.includes("/js/bookstore.js")) {
+    content = content.replace("</body>", '<script src="/js/bookstore.js?v=6"></script></body>');
   }
   res.type("html").send(content);
 }
@@ -145,10 +146,11 @@ router.get("/Ajout-Produit.html", (req, res) => res.redirect("/admin.html"));
 
 router.get("/favicon.ico", (req, res) => res.status(204).end());
 
-function serveAdminDashboard(role, req, res) {
-  if (!req.session.admin_authenticated) return res.redirect("/Admin.html");
-  if (req.session.admin_role !== role) {
-    return res.redirect(req.session.admin_role === "super" ? "/super-admin.html" : "/admin.html");
+async function serveAdminDashboard(role, req, res) {
+  const actualRole = await getCurrentAdminRole(req);
+  if (!actualRole) return res.redirect("/");
+  if (actualRole !== role) {
+    return res.redirect(actualRole === "super" ? "/super-admin.html" : "/admin.html");
   }
   const filepath = path.join(PUBLIC_HTML, "Admin.html");
   let content = fs.readFileSync(filepath, "utf8");
@@ -172,11 +174,11 @@ function serveAdminDashboard(role, req, res) {
 
 // Case-sensitive guard: only the lowercase paths are role-locked dashboards.
 // /Admin.html (capital A) is the original WEBDEV login page and must fall through to serveHtml.
-router.get("/admin.html", (req, res, next) => {
+router.get("/admin.html", async (req, res, next) => {
   if (req.path !== "/admin.html") return next();
   return serveAdminDashboard("normal", req, res);
 });
-router.get("/super-admin.html", (req, res, next) => {
+router.get("/super-admin.html", async (req, res, next) => {
   if (req.path !== "/super-admin.html") return next();
   return serveAdminDashboard("super", req, res);
 });
@@ -239,7 +241,7 @@ router.get("/api/source-railway.zip", (req, res) => {
     deploy: { startCommand: "node server.js", restartPolicyType: "ON_FAILURE", restartPolicyMaxRetries: 10 },
   }, null, 2) + "\n";
   const nixpacks = "[phases.setup]\nnixPkgs = ['nodejs_20']\n\n[start]\ncmd = 'node server.js'\n";
-  const envExample = "PORT=5000\nSESSION_SECRET=change-me\nADMIN_PASSWORD=TAF1-FLEMME\nADMIN_PASSWORD_SUPER=MMDE2007\n";
+  const envExample = "PORT=5000\nSESSION_SECRET=change-me\n";
   const readme = "# Librairie Magma — Déploiement Railway\n\n1. Créez un nouveau projet Railway et importez ce dossier.\n2. Définissez les variables d'environnement (voir `.env.example`).\n3. Railway détecte Node.js automatiquement et utilise `node server.js` comme commande de démarrage.\n4. L'application écoute sur le port défini par `PORT` (5000 par défaut).\n";
   archive.append(procfile, { name: "Procfile" });
   archive.append(railwayJson, { name: "railway.json" });
@@ -281,12 +283,8 @@ router.get("/api/source-render.zip", (req, res) => {
         value: 20
       - key: SESSION_SECRET
         generateValue: true
-      - key: ADMIN_PASSWORD
-        sync: false
-      - key: ADMIN_PASSWORD_SUPER
-        sync: false
 `;
-  const envExample = "PORT=5000\nSESSION_SECRET=change-me\nADMIN_PASSWORD=TAF1-FLEMME\nADMIN_PASSWORD_SUPER=MMDE2007\n";
+  const envExample = "PORT=5000\nSESSION_SECRET=change-me\n";
   const readme =
 `# Librairie Magma — Déploiement Render
 
@@ -298,11 +296,8 @@ router.get("/api/source-render.zip", (req, res) => {
    - Runtime : Node 20
    - Build : \`npm install\`
    - Start : \`node server.js\`
-4. Définissez vos variables secrètes dans le dashboard Render :
-   - \`ADMIN_PASSWORD\`
-   - \`ADMIN_PASSWORD_SUPER\`
-5. \`SESSION_SECRET\` est généré automatiquement par Render.
-6. L'application écoute sur le port défini par la variable \`PORT\` injectée par Render.
+4. \`SESSION_SECRET\` est généré automatiquement par Render.
+5. L'application écoute sur le port défini par la variable \`PORT\` injectée par Render.
 
 ## Note SQLite
 La base SQLite (\`data/bookstore.db\`) est créée au démarrage. Sur le plan
