@@ -95,7 +95,7 @@ const PORT = parseInt(process.env.PORT || "5000");
 initDb()
   .then(() => {
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Librairie Mayombe running on http://0.0.0.0:${PORT}`);
+      console.log(`Librairie Magma running on http://0.0.0.0:${PORT}`);
     });
   })
   .catch((err) => {
