@@ -36,7 +36,7 @@ function generateReceiptPdf(order, items, res) {
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", `attachment; filename="recu-commande-${order.id}.pdf"`);
   doc.pipe(res);
-  doc.fontSize(24).font("Helvetica-Bold").text("Librairie Mayombe", { align: "center" });
+  doc.fontSize(24).font("Helvetica-Bold").text("Librairie Magma", { align: "center" });
   doc.moveDown(0.3);
   doc.fontSize(16).font("Helvetica-Bold").text(`Reçu de commande #${order.id}`, { align: "center" });
   doc.moveDown(0.5);

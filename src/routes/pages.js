@@ -6,7 +6,7 @@ const { isAuthenticated, getCurrentAdminRole } = require("../middleware");
 
 const router = express.Router();
 
-const SITE_NAME = "Librairie Mayombe";
+const SITE_NAME = "Librairie Magma";
 const PUBLIC_HTML = path.join(__dirname, "..", "..", "public", "html");
 const PUBLIC_CSS = path.join(__dirname, "..", "..", "public", "css");
 const PUBLIC_IMG = path.join(__dirname, "..", "..", "public", "img");
@@ -119,7 +119,7 @@ function serveHtml(filename, req, res) {
   const pageKey = filename.replace(/\.html$/, "");
   const newTitle = PAGE_TITLES[pageKey] || SITE_NAME;
   content = content.replace(/<title>[^<]*<\/title>/, `<title>${newTitle}</title>`);
-  content = content.replace(/Librairie Mayombe/g, SITE_NAME);
+  content = content.replace(/Librairie Magma/g, SITE_NAME);
   if (!content.includes("window.clWDUtil")) {
     content = content.replace("</head>", HEAD_COMPAT);
   }

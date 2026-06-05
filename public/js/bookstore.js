@@ -646,7 +646,7 @@
           '<div style="position:absolute;inset:0;background:rgba(30,40,30,.35);z-index:0;"></div>' +
           '<div style="position:relative;z-index:1;">' +
             '<div style="width:54px;height:54px;margin-bottom:28px;"><img src="/img/Logo version mobile.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>' +
-            '<h2 style="font-size:28px;font-weight:900;color:#fff;line-height:1.25;letter-spacing:.3px;margin:0;">Connecter vous sur<br>Mayombe</h2>' +
+            '<h2 style="font-size:28px;font-weight:900;color:#fff;line-height:1.25;letter-spacing:.3px;margin:0;">Connecter vous sur<br>Magma</h2>' +
           '</div>' +
         '</div>' +
         '<div class="magma-auth-right" style="width:380px;flex-shrink:0;background:#f9f9f9;display:flex;flex-direction:column;justify-content:center;padding:48px 40px;">' +
@@ -750,7 +750,7 @@
         '<div class="magma-auth-left" style="flex:1;position:relative;background:#2b293a;display:flex;flex-direction:column;justify-content:space-between;padding:36px 32px 40px;min-width:260px;">' +
           '<div>' +
             '<div style="width:54px;height:54px;margin-bottom:32px;"><img src="/img/Logo version mobile.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1);border-radius:50%;"></div>' +
-            '<h2 style="font-size:26px;font-weight:900;color:#fff;line-height:1.3;margin:0 0 12px;">Rejoignez<br>Librairie Mayombe</h2>' +
+            '<h2 style="font-size:26px;font-weight:900;color:#fff;line-height:1.3;margin:0 0 12px;">Rejoignez<br>Librairie Magma</h2>' +
             '<p style="color:rgba(255,255,255,.65);font-size:14px;line-height:1.6;margin:0;">Accédez à notre catalogue,<br>gérez votre panier et<br>suivez vos commandes.</p>' +
           '</div>' +
           '<div style="border-top:1px solid rgba(255,255,255,.15);padding-top:20px;">' +
