@@ -54,8 +54,10 @@ router.post("/auth/register", async (req, res) => {
     const existingName = await db.get("SELECT id FROM users WHERE LOWER(TRIM(name)) = LOWER(TRIM(?))", name);
     if (existingName) throw new Error("Ce nom complet est déjà utilisé, veuillez en choisir un autre par précaution.");
     
-    const existingEmail = await db.get("SELECT id FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))", email);
-    if (existingEmail) throw new Error("Cet email est déjà associé à un autre compte.");
+    if (email !== "") {
+      const existingEmail = await db.get("SELECT id FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))", email);
+      if (existingEmail) throw new Error("Cet email est déjà associé à un autre compte.");
+    }
     
     const existingPhone = await db.get("SELECT id FROM users WHERE phone = ?", phone);
     if (existingPhone && phone !== "") throw new Error("Ce numéro de téléphone est déjà associé à un compte.");
@@ -89,9 +91,10 @@ router.post("/auth/login", async (req, res) => {
     const remember = data.remember === "on" || data.remember === true || data.remember === "true";
     const db = await getDb();
     let matchedRow = null;
+    const phoneId = normalizePhone(identifier);
     const candidates = await db.all(
-      "SELECT * FROM users WHERE LOWER(TRIM(email)) = LOWER(?) OR LOWER(TRIM(name)) = LOWER(?)",
-      identifier, identifier
+      "SELECT * FROM users WHERE LOWER(TRIM(email)) = LOWER(?) OR LOWER(TRIM(name)) = LOWER(?) OR REPLACE(REPLACE(phone, '-', ''), ' ', '') = ?",
+      identifier, identifier, phoneId || "---"
     );
     for (const candidate of candidates) {
       if (candidate.password_hash && await bcrypt.compare(password, candidate.password_hash)) {
@@ -242,7 +245,7 @@ router.put("/api/users/me", async (req, res) => {
       const exist = await db.get("SELECT id FROM users WHERE LOWER(TRIM(name)) = LOWER(TRIM(?))", name);
       if (exist) throw new Error("Ce nom complet est déjà utilisé, veuillez en choisir un autre par précaution.");
     }
-    if (email.toLowerCase() !== user.email.toLowerCase()) {
+    if (email !== "" && email.toLowerCase() !== (user.email || "").toLowerCase()) {
       const exist = await db.get("SELECT id FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))", email);
       if (exist) throw new Error("Cet email est déjà associé à un autre compte.");
     }

@@ -13,7 +13,8 @@ function cleanInt(value, minValue = 0, defaultVal = 0) {
 }
 
 function cleanEmail(value) {
-  const email = cleanText(value, 180, true).toLowerCase();
+  const email = cleanText(value, 180, false).toLowerCase();
+  if (!email) return "";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Adresse email invalide");
   return email;
 }
@@ -46,9 +47,6 @@ function normalizePhone(value) {
 
 function formatPhone(value) {
   const digits = normalizePhone(value);
-  if (digits.length === 9) {
-    return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(5, 9)}`;
-  }
   return digits || (value ? String(value) : "");
 }
 

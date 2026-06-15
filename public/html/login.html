@@ -8,43 +8,50 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #ff690c 0%, #f59e0b 45%, #2b293a 100%);
+    background: #2b293a; /* Fond principal sombre pour faire ressortir la carte */
   }
   .container {
     display: flex;
-    width: min(900px, 96vw);
-    min-height: 480px;
-    border-radius: 6px;
+    width: min(960px, 92vw);
+    min-height: 540px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    background: #fff;
   }
   .panel-left {
-    flex: 1;
+    flex: 1.2;
     position: relative;
     background: url('/img/WhatsApp%20Image%202025-11-19%20at%2012.10.23.jpeg') center center / cover no-repeat;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    padding: 28px 32px 32px;
-    min-width: 260px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+    min-width: 320px;
   }
   .panel-left::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(30,40,30,.35);
+    background: linear-gradient(135deg, rgba(255,105,12,0.85) 0%, rgba(43,41,58,0.9) 100%);
     z-index: 0;
   }
   .panel-left > * { position: relative; z-index: 1; }
   .logo-wrap {
-    width: 54px;
-    height: 54px;
-    margin-bottom: 28px;
+    width: 110px;
+    height: 110px;
+    margin-bottom: 24px;
+    background: #fff;
+    padding: 8px;
+    border-radius: 50%;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
   }
   .logo-wrap img {
     width: 100%;
@@ -53,31 +60,31 @@
     border-radius: 50%;
   }
   .panel-left h2 {
-    font-size: 28px;
-    font-weight: 900;
+    font-size: 32px;
+    font-weight: 800;
     color: #fff;
-    line-height: 1.25;
-    letter-spacing: .3px;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
   }
   .panel-right {
-    width: 380px;
-    flex-shrink: 0;
-    background: #f9f9f9;
+    flex: 1;
+    background: #ffffff;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 48px 40px;
+    padding: 50px;
   }
   .panel-right h1 {
     font-size: 32px;
-    font-weight: 400;
-    color: #888;
+    font-weight: 800;
+    color: #2b293a;
     margin-bottom: 8px;
   }
   .panel-right .subtitle {
-    font-size: 14px;
-    color: #888;
-    margin-bottom: 28px;
+    font-size: 14.5px;
+    color: #666;
+    margin-bottom: 32px;
     line-height: 1.5;
   }
   .error-msg {
@@ -98,50 +105,57 @@
     font-size: 13px;
     display: none;
   }
-  .field-group { margin-bottom: 18px; }
+  .field-group { margin-bottom: 20px; }
   .field-group label {
     display: block;
     font-size: 13px;
-    color: #555;
-    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
   }
   .field-group input {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+    padding: 12px 14px;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
     font-size: 14px;
-    background: #f0f0f0;
+    background: #fafafa;
     color: #333;
     outline: none;
-    transition: border-color .2s;
+    transition: all .25s ease;
   }
-  .field-group input:focus { border-color: #ff690c; background: #fff; }
+  .field-group input:focus { 
+    border-color: #ff690c; 
+    background: #fff; 
+    box-shadow: 0 0 0 4px rgba(255,105,12,0.1); 
+  }
   .remember {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: 13.5px;
     color: #555;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
   .remember input[type="checkbox"] {
-    width: 15px; height: 15px; accent-color: #ff690c; cursor: pointer;
+    width: 16px; height: 16px; accent-color: #ff690c; cursor: pointer;
   }
   .btn-login {
     width: 100%;
-    padding: 13px;
+    padding: 14px;
     background: #ff690c;
     color: #fff;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.5px;
     border: none;
-    border-radius: 3px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background .2s;
+    transition: all .2s ease;
+    box-shadow: 0 4px 12px rgba(255,105,12,0.3);
   }
-  .btn-login:hover { background: #e55a00; }
-  .btn-login:disabled { background: #ffa870; cursor: not-allowed; }
+  .btn-login:hover { background: #e55a00; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(255,105,12,0.4); }
+  .btn-login:disabled { background: #ffa870; cursor: not-allowed; transform: none; box-shadow: none; }
   .spinner {
     display: inline-block; width: 14px; height: 14px;
     border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
@@ -154,9 +168,32 @@
   }
   .register-link a { color: #ff690c; text-decoration: none; font-weight: 600; }
   .register-link a:hover { text-decoration: underline; }
-  @media (max-width: 620px) {
-    .panel-left { display: none; }
-    .panel-right { width: 100%; padding: 40px 28px; }
+  
+  /* Media Queries Responsive */
+  @media (max-width: 820px) {
+    .container { flex-direction: column; width: 100%; border-radius: 0; min-height: 100vh; }
+    body { align-items: flex-start; }
+    .panel-left { 
+      flex: 0 0 auto; 
+      padding: 50px 20px 70px; 
+    }
+    .panel-left h2 { font-size: 26px; }
+    .logo-wrap { width: 90px; height: 90px; }
+    
+    .panel-right { 
+      flex: 1; 
+      border-radius: 30px 30px 0 0; 
+      margin-top: -40px; 
+      position: relative; 
+      z-index: 10; 
+      padding: 40px 24px; 
+      box-shadow: 0 -10px 25px rgba(0,0,0,0.15);
+    }
+  }
+  @media (max-width: 480px) {
+    .panel-right { padding: 30px 20px; }
+    .panel-right h1 { font-size: 28px; }
+    .btn-login { padding: 16px; font-size: 16px; }
   }
 </style>
 </head>
@@ -191,9 +228,39 @@
         <label for="remember">Se souvenir de moi</label>
       </div>
       <button type="submit" class="btn-login" id="login-submit">Se connecter</button>
+      <p style="text-align:center;margin-top:16px;font-size:13px;">
+        <a href="#" id="forgot-pw-link" style="color:#ff690c;text-decoration:none;font-weight:600;">Mot de passe oublié ?</a>
+      </p>
     </form>
 
     <p class="register-link">Pas encore de compte ? <a href="/register.html">Créer un compte</a></p>
+  </div>
+</div>
+
+<div class="modal-back" id="forgot-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:9999;padding:20px;">
+  <div style="background:#fff;padding:28px;border-radius:10px;width:100%;max-width:420px;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+    <h3 style="margin-bottom:12px;font-size:20px;color:#2b293a;">Mot de passe oublié</h3>
+    <p style="font-size:13.5px;color:#666;margin-bottom:20px;line-height:1.5;">Veuillez renseigner les informations de votre compte pour générer un lien de réinitialisation.</p>
+    <div id="forgot-err" class="error-msg" style="display:none;margin-bottom:12px;"></div>
+    <div id="forgot-succ" class="info-msg" style="display:none;margin-bottom:12px;background:#e8fdf0;color:#1a7b45;border:1px solid #1a7b45;padding:12px;border-radius:6px;"></div>
+    <form id="forgot-form">
+      <div class="field-group">
+        <label>Nom complet</label>
+        <input type="text" id="forgot-name" required>
+      </div>
+      <div class="field-group">
+        <label>Email</label>
+        <input type="email" id="forgot-email" required>
+      </div>
+      <div class="field-group">
+        <label>Téléphone</label>
+        <input type="text" id="forgot-phone" required>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+        <button type="button" id="forgot-cancel" style="padding:10px 20px;background:none;border:1px solid #ddd;color:#555;border-radius:5px;cursor:pointer;font-weight:600;">Annuler</button>
+        <button type="submit" id="forgot-submit" style="padding:10px 20px;background:#ff690c;color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">Générer le lien</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -253,6 +320,54 @@ document.addEventListener("DOMContentLoaded", function() {
       btn.innerHTML = origHtml;
       errEl.textContent = err.message;
       errEl.style.display = "block";
+    });
+  });
+
+  // --- FORGOT PASSWORD ---
+  const forgotModal = document.getElementById("forgot-modal");
+  document.getElementById("forgot-pw-link").addEventListener("click", function(e){
+    e.preventDefault();
+    forgotModal.style.display = "flex";
+  });
+  document.getElementById("forgot-cancel").addEventListener("click", function(){
+    forgotModal.style.display = "none";
+  });
+  document.getElementById("forgot-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    const btn = document.getElementById("forgot-submit");
+    const err = document.getElementById("forgot-err");
+    const succ = document.getElementById("forgot-succ");
+    
+    err.style.display = "none";
+    succ.style.display = "none";
+    
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = "Génération...";
+    btn.disabled = true;
+    
+    fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        name: document.getElementById("forgot-name").value.trim(),
+        email: document.getElementById("forgot-email").value.trim(),
+        phone: document.getElementById("forgot-phone").value.trim()
+      })
+    })
+    .then(r => r.json().then(d => ({ok:r.ok, data:d})))
+    .then(r => {
+      if(!r.ok) throw new Error(r.data.error || "Erreur réseau");
+      succ.innerHTML = `Lien de réinitialisation généré avec succès !<br><br><a href="${r.data.resetLink}" style="color:#1a7b45;font-weight:bold;text-decoration:underline;word-break:break-all;">Cliquez ici pour changer votre mot de passe</a>`;
+      succ.style.display = "block";
+      document.getElementById("forgot-form").reset();
+    })
+    .catch(errObj => {
+      err.textContent = errObj.message;
+      err.style.display = "block";
+    })
+    .finally(() => {
+      btn.innerHTML = origHtml;
+      btn.disabled = false;
     });
   });
 });

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <link rel="icon" type="image/png" href="/img/ICON-1.png">
@@ -273,7 +273,7 @@
             <option value="">— Choisir une zone —</option>
           </select>
         </div>
-        <div class="field" style="display:none;">
+        <div class="field">
           <label for="co-address">Adresse précise *</label>
           <textarea id="co-address" name="delivery_address" maxlength="260" required placeholder="Quartier, rue, point de repère…"></textarea>
         </div>
@@ -496,7 +496,17 @@ async function submitCheckout(ev){
   const err = document.getElementById('checkout-err');
   err.className = 'modal-err'; err.textContent = '';
   const zone = document.getElementById('co-zone').value;
-  const address = document.getElementById('co-address').value.trim() || zone;
+  const address = document.getElementById('co-address').value.trim();
+  
+  if(!zone){
+    err.className = 'modal-err show'; err.textContent = 'Veuillez choisir une zone de livraison.';
+    return;
+  }
+  if(!address){
+    err.className = 'modal-err show'; err.textContent = 'Veuillez renseigner votre adresse précise.';
+    return;
+  }
+
   const payload = {
     customer_name: document.getElementById('co-name').value.trim(),
     customer_email: document.getElementById('co-email').value.trim(),
@@ -504,8 +514,9 @@ async function submitCheckout(ev){
     delivery_zone: zone,
     delivery_address: address
   };
-  if(!payload.customer_name || !payload.customer_email || !payload.customer_phone || !payload.delivery_zone || !payload.delivery_address){
-    err.className = 'modal-err show'; err.textContent = 'Veuillez choisir une zone de livraison.';
+  
+  if(!payload.customer_name || !payload.customer_email || !payload.customer_phone){
+    err.className = 'modal-err show'; err.textContent = 'Veuillez compléter vos informations de profil (nom, email, téléphone).';
     return;
   }
   btn.disabled = true;
