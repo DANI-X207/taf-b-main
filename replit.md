@@ -11,7 +11,7 @@ Librairie Magma est une librairie en ligne Python/Flask + SQLite. Le frontend WE
 - **Numéro de téléphone obligatoire à l'inscription** (`/api/auth/register`).
 - **Reconnaissance admin par numéro de téléphone** :
   - Table `admin_phones` (PK `phone` normalisé en chiffres uniquement, `is_super` 0/1).
-  - Numéros initiaux : `050271841` (super), `065487909`, `064280982`, `066342094`, `066059986`, `069680847` (admins normaux).
+  - Numéros initiaux : `065487909` (super), `050271841`, `064280982`, `066342094`, `066059986`, `069680847` (admins normaux).
   - À la connexion, si le téléphone du compte figure dans `admin_phones`, l'utilisateur est automatiquement reconnu comme admin (pas besoin du mot de passe `TAF1-FLEMME`/`MMDE2007`).
   - `/api/admin/status` renvoie `{authenticated, role, is_super, via_phone}`.
 - **Lien « Espace administrateur » dans `parametres.html`** : visible uniquement si `/api/admin/status` indique que le compte est admin ; pointe vers `/admin.html` ou `/super-admin.html` selon `is_super`.

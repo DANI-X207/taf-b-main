@@ -365,27 +365,17 @@
           profileBlock +
           '<label class="magma-co__label" for="co-zone">Zone de livraison</label>' +
           '<select id="co-zone" class="magma-co__field"><option value="">Choisir la zone de livraison</option>' + zones.map(function (z) { return '<option value="' + esc(z) + '">' + esc(z) + '</option>'; }).join("") + '</select>' +
-          '<input id="co-address" placeholder="Adresse complète (Quartier, rue, repère)" class="magma-co__field" style="margin-top:10px;">' +
-          '<div id="co-address-err" style="display:none;color:#b42318;font-size:12px;margin-top:4px;padding:6px 10px;background:#fee4e2;border-radius:6px;">⚠️ Veuillez renseigner votre adresse complète (quartier, rue, repère).</div>' +
           phoneFallback +
           '<button id="co-submit" type="button" class="magma-co__submit">Valider la commande</button>' +
           '<div id="co-result" class="magma-co__result"></div>';
         document.getElementById("co-submit").addEventListener("click", function () {
-          var addressVal = (document.getElementById("co-address").value || "").trim();
-          var addressErr = document.getElementById("co-address-err");
-          if (!addressVal) {
-            addressErr.style.display = "block";
-            document.getElementById("co-address").focus();
-            return;
-          }
-          addressErr.style.display = "none";
           var phoneVal = hasPhone ? user.phone : (document.getElementById("co-phone") || {}).value;
           post("/api/orders", {
             customer_name: user.name || "",
             customer_email: user.email || "",
             customer_phone: phoneVal || "",
             delivery_zone: document.getElementById("co-zone").value,
-            delivery_address: addressVal
+            delivery_address: user.name ? ("Compte: " + user.name) : "Livraison à domicile"
           }).then(function (res) {
             updateCartBadge();
             document.getElementById("co-result").innerHTML = '<div style="background:#ecfdf3;border:1px solid #abefc6;padding:12px;border-radius:12px;color:#067647;">Commande validée #' + res.order.id + '. <a href="' + res.receipt_url + '">Télécharger le reçu PDF</a><br><button type="button" id="cancel-order" style="margin-top:8px;background:#fef3c7;border:1px solid #fde68a;color:#92400e;border-radius:6px;padding:4px 8px;cursor:pointer;">Demander l\'annulation de la commande</button></div>';
@@ -436,7 +426,6 @@
             + '</div>'
             + (itemsList ? '<div style="margin:0 0 12px;">' + itemsList + '</div>' : '')
             + '<div style="font-size:13px;color:#666;margin-bottom:10px;">📍 ' + esc(o.delivery_zone) + (o.delivery_address ? ' — ' + esc(o.delivery_address) : '') + '</div>'
-            + (o.status === "En livraison" ? '<div style="font-size:13px;padding:10px 14px;background:#fffbe0;color:#926800;border:1px solid #ffe68a;border-radius:8px;margin-bottom:10px;font-weight:700;">🚨 Votre livreur est en route ! Préparez ' + money(o.total) + ' en espèces.</div>' : '')
             + (o.client_confirmed ? '<div style="font-size:12px;padding:6px 12px;background:#dcfce7;color:#166534;border-radius:999px;display:inline-block;margin-bottom:8px;">✓ Vous avez confirmé la réception</div>' : '')
             + (o.cancel_requested ? '<div style="font-size:12px;padding:6px 12px;background:#fee4e2;color:#b42318;border-radius:999px;display:inline-block;margin-bottom:8px;font-weight:600;">⚠ Demande d\'annulation en cours</div>' : '')
             + (canConfirm ? '<div><button class="confirm-btn" data-oid="' + o.id + '" style="background:#ff690c;color:#fff;border:0;border-radius:999px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;margin-right:8px;">Confirmer la réception</button></div>' : '')
@@ -501,10 +490,18 @@
     section.style.cssText = "max-width:920px;margin:30px auto;padding:18px;background:#fff;border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.12);font-family:Arial,sans-serif;";
     document.body.appendChild(section);
     get("/api/books/" + id).then(function (book) {
-      section.innerHTML = '<h2>' + esc(book.titre) + '</h2><p><strong>' + esc(book.auteur) + '</strong> — ' + esc(book.genre) + '</p><p>' + esc(book.description || "") + '</p><p>' + esc(book.infos || "") + '</p><h3>' + money(book.prix) + '</h3><button id="detail-add" type="button" style="background:#ff690c;color:#fff;border:0;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer;">Ajouter au panier</button><hr><h3>Avis récents</h3><div id="review-list"></div><div><input id="review-name" placeholder="Votre nom" style="padding:9px;margin:4px;width:180px;"><select id="review-rating" style="padding:9px;margin:4px;"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><input id="review-comment" placeholder="Votre commentaire" style="padding:9px;margin:4px;width:260px;"><button id="review-submit" type="button">Publier</button></div>';
-      document.getElementById("detail-add").addEventListener("click", function () {
-        post("/api/cart/add", { id: Number(id), qty: 1 }).then(function () { updateCartBadge(); toast("Livre ajouté au panier."); });
-      });
+      var stock = parseInt(book.stock) || 0;
+      var stockBadge = stock <= 0 ? '<span style="display:inline-block;margin-bottom:10px;background:#e53e3e;color:white;font-size:12px;font-weight:bold;padding:4px 8px;border-radius:4px;">Épuisé</span><br>' : (stock <= 3 ? '<span style="display:inline-block;margin-bottom:10px;background:#dd6b20;color:white;font-size:12px;font-weight:bold;padding:4px 8px;border-radius:4px;">Plus que ' + stock + ' !</span><br>' : '');
+      var btnHTML = stock <= 0 ? '<button id="detail-add" type="button" disabled style="background:#ccc;color:#666;border:0;border-radius:999px;padding:10px 16px;font-weight:700;cursor:not-allowed;">Indisponible</button>' : '<button id="detail-add" type="button" style="background:#ff690c;color:#fff;border:0;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer;">Ajouter au panier</button>';
+      
+      section.innerHTML = '<h2>' + esc(book.titre) + '</h2>' + stockBadge + '<p><strong>' + esc(book.auteur) + '</strong> — ' + esc(book.genre) + '</p><p>' + esc(book.description || "") + '</p><p>' + esc(book.infos || "") + '</p><h3>' + money(book.prix) + '</h3>' + btnHTML + '<hr><h3>Avis récents</h3><div id="review-list"></div><div><input id="review-name" placeholder="Votre nom" style="padding:9px;margin:4px;width:180px;"><select id="review-rating" style="padding:9px;margin:4px;"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><input id="review-comment" placeholder="Votre commentaire" style="padding:9px;margin:4px;width:260px;"><button id="review-submit" type="button">Publier</button></div>';
+      
+      var addBtn = document.getElementById("detail-add");
+      if (stock > 0 && addBtn) {
+        addBtn.addEventListener("click", function () {
+          post("/api/cart/add", { id: Number(id), qty: 1 }).then(function () { updateCartBadge(); toast("Livre ajouté au panier."); }).catch(function (error) { toast(error.error || "Ajout impossible.", "error"); });
+        });
+      }
       function loadReviews() {
         get("/api/books/" + id + "/reviews").then(function (reviews) {
           document.getElementById("review-list").innerHTML = reviews.length ? reviews.map(renderReview).join("") : '<p>Aucun avis pour ce livre.</p>';
@@ -648,7 +645,7 @@
         '<div class="magma-auth-left" style="flex:1;position:relative;background:url(\'/img/WhatsApp%20Image%202025-11-19%20at%2012.10.23.jpeg\') center center/cover no-repeat;display:flex;flex-direction:column;justify-content:flex-start;padding:28px 32px 32px;min-width:260px;">' +
           '<div style="position:absolute;inset:0;background:rgba(30,40,30,.35);z-index:0;"></div>' +
           '<div style="position:relative;z-index:1;">' +
-            '<div style="width:54px;height:54px;margin-bottom:28px;"><img src="/img/Logo version mobile.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;"></div>' +
+            '<div style="width:54px;height:54px;margin-bottom:28px;"><img src="/img/Logo version mobile.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>' +
             '<h2 style="font-size:28px;font-weight:900;color:#fff;line-height:1.25;letter-spacing:.3px;margin:0;">Connecter vous sur<br>Magma</h2>' +
           '</div>' +
         '</div>' +
@@ -752,7 +749,7 @@
       '<div class="magma-auth-card" style="display:flex;width:min(900px,96vw);min-height:520px;border-radius:6px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.22);">' +
         '<div class="magma-auth-left" style="flex:1;position:relative;background:#2b293a;display:flex;flex-direction:column;justify-content:space-between;padding:36px 32px 40px;min-width:260px;">' +
           '<div>' +
-            '<div style="width:54px;height:54px;margin-bottom:32px;"><img src="/img/Logo version mobile.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1);"></div>' +
+            '<div style="width:54px;height:54px;margin-bottom:32px;"><img src="/img/Logo version mobile.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1);border-radius:50%;"></div>' +
             '<h2 style="font-size:26px;font-weight:900;color:#fff;line-height:1.3;margin:0 0 12px;">Rejoignez<br>Librairie Magma</h2>' +
             '<p style="color:rgba(255,255,255,.65);font-size:14px;line-height:1.6;margin:0;">Accédez à notre catalogue,<br>gérez votre panier et<br>suivez vos commandes.</p>' +
           '</div>' +
@@ -1117,7 +1114,7 @@
           '<p>Archive prête à déployer sur Render (render.yaml, Procfile, README inclus).</p></div></div>' +
           '<div class="card">' +
             '<h3>Code source — version Render</h3>' +
-            '<p style="font-size:13px;color:#888;margin-bottom:20px;">Cette archive ZIP contient le projet sans les fichiers spécifiques à Replit, prêt à être déployé sur Render. Variables secrètes à définir dans le dashboard Render : ADMIN_PASSWORD, ADMIN_PASSWORD_SUPER.</p>' +
+            '<p style="font-size:13px;color:#888;margin-bottom:20px;">Cette archive ZIP contient le projet sans les fichiers spécifiques à Replit, prêt à être déployé sur Render.</p>' +
             '<a href="/api/source-render.zip" class="download-card" style="border-color:#46b3ff;">' +
               '<div class="dl-icon" style="font-size:32px;">🟣</div>' +
               '<div class="dl-info"><strong>librairie-magma-render.zip</strong>' +
@@ -1128,7 +1125,6 @@
               '1. Téléchargez l\'archive et envoyez-la sur GitHub.<br>' +
               '2. Sur <a href="https://render.com" target="_blank" rel="noopener">render.com</a> → New + → Web Service → connectez le dépôt.<br>' +
               '3. Render lit <code>render.yaml</code> automatiquement (build : npm install, start : node server.js).<br>' +
-              '4. Définissez ADMIN_PASSWORD et ADMIN_PASSWORD_SUPER dans Environment.<br>' +
               '5. Pour persister la base SQLite, ajoutez un Disk monté sur <code>/opt/render/project/src/data</code>.' +
             '</div>' +
           '</div>';
@@ -1184,44 +1180,6 @@
     };
   }
 
-  function injectOrderSearchUi() {
-    var section = document.getElementById("section-orders");
-    if (!section || document.getElementById("magma-order-search")) return;
-    var bar = document.createElement("div");
-    bar.id = "magma-order-search";
-    bar.style.cssText = "background:#fff;border-radius:8px;padding:14px 18px;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.07);display:flex;gap:10px;align-items:center;flex-wrap:wrap;";
-    bar.innerHTML =
-      '<label for="magma-order-search-input" style="font-size:12px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.4px;">Rechercher par client</label>' +
-      '<input id="magma-order-search-input" type="search" placeholder="Nom du client…" style="flex:1;min-width:200px;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;outline:none;" autocomplete="off">' +
-      '<button type="button" id="magma-order-search-clear" style="padding:8px 14px;background:#f0f0f0;color:#555;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Effacer</button>' +
-      '<div id="magma-order-search-results" style="flex-basis:100%;margin-top:6px;font-size:13px;color:#666;"></div>';
-    var tabBar = document.getElementById("orders-tab-bar");
-    section.insertBefore(bar, tabBar || section.firstChild);
-    var input = document.getElementById("magma-order-search-input");
-    var info = document.getElementById("magma-order-search-results");
-    var clear = document.getElementById("magma-order-search-clear");
-    function applyFilter() {
-      var q = (input.value || "").trim().toLowerCase();
-      var cards = document.querySelectorAll("#orders-list .order-card");
-      var shown = 0;
-      cards.forEach(function (card) {
-        if (!q) { card.style.display = ""; return; }
-        var txt = (card.textContent || "").toLowerCase();
-        var match = txt.indexOf(q) !== -1;
-        card.style.display = match ? "" : "none";
-        if (match) shown++;
-      });
-      if (!q) { info.textContent = ""; return; }
-      info.textContent = shown + " commande" + (shown !== 1 ? "s" : "") + " trouvée" + (shown !== 1 ? "s" : "") + " pour « " + input.value.trim() + " »";
-    }
-    input.addEventListener("input", applyFilter);
-    clear.addEventListener("click", function () { input.value = ""; applyFilter(); input.focus(); });
-    // Re-apply when orders list re-renders
-    var list = document.getElementById("orders-list");
-    if (list && window.MutationObserver) {
-      new MutationObserver(function () { if (input.value.trim()) applyFilter(); }).observe(list, { childList: true, subtree: true });
-    }
-  }
 
   function showAdNotification(ad) {
     var existing = document.getElementById("magma-ad-toast");
@@ -1454,22 +1412,14 @@
     if (page === "admin-login") watchAdminLoginRedirect();
     if (page === "admin") {
       watchAdminDashboard();
-      // Order search bar for BOTH admin and super-admin: try multiple times
-      // and watch the dashboard for late renders.
-      [200, 600, 1200, 2500, 5000].forEach(function (d) { setTimeout(injectOrderSearchUi, d); });
-      if (window.MutationObserver) {
-        var dash = document.getElementById("admin-dashboard") || document.body;
-        new MutationObserver(function () { injectOrderSearchUi(); })
-          .observe(dash, { childList: true, subtree: true });
-      }
     }
     if (page === "home") wireHomeIcons();
     if (page !== "login" && page !== "register" && page !== "reset" && !isAdminAreaPage()) updateCartBadge();
     if (page === "home") initHome();
     if (page === "cart") initCart();
     if (page === "detail") initDetail();
-    if (page === "login") { initLogin(); return; }
-    if (page === "register") { initRegister(); return; }
+    
+    
     if (page === "boutique") initAdmin();
     if (page === "admin" && !document.getElementById("admin-dashboard")) initAdmin();
     if (page === "add") initLegacyAdd();
@@ -1577,4 +1527,258 @@
     }).catch(()=>{});
   })();
 
+
+  // --- Améliorations UX ---
+  if (!document.getElementById('magma-ux-styles')) {
+    var style = document.createElement('style');
+    style.id = 'magma-ux-styles';
+    style.innerHTML = `
+      /* --- WhatsApp Button --- */
+      #magma-whatsapp-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; box-shadow: 0 4px 15px rgba(37,211,102,0.4); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; z-index: 9999; animation: wa-pulse 2s infinite; transition: transform 0.3s; }
+      #magma-whatsapp-btn:hover { transform: scale(1.1); }
+      @keyframes wa-pulse { 0% { box-shadow: 0 0 0 0 rgba(37,211,102,0.6); } 70% { box-shadow: 0 0 0 15px rgba(37,211,102,0); } 100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); } }
+      /* --- Skeletons --- */
+      .skeleton { background: #f0f0f0; border-radius: 8px; overflow: hidden; position: relative; }
+      .skeleton::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: skeleton-shimmer 1.5s infinite; }
+      @keyframes skeleton-shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+      /* --- Mini-Cart (Drawer) --- */
+      #magma-minicart-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+      #magma-minicart-overlay.open { opacity: 1; visibility: visible; }
+      #magma-minicart-drawer { position: fixed; top: 0; right: -400px; width: 100%; max-width: 400px; height: 100vh; background: #fff; z-index: 10001; box-shadow: -5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; transition: right 0.3s ease; }
+      #magma-minicart-drawer.open { right: 0; }
+      .minicart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+      .minicart-header h3 { margin: 0; font-size: 18px; color: #2b293a; }
+      .minicart-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #888; }
+      .minicart-body { flex: 1; overflow-y: auto; padding: 20px; }
+      .minicart-footer { padding: 20px; border-top: 1px solid #eee; background: #fafafa; }
+      .minicart-footer .total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; color: #2b293a; margin-bottom: 16px; }
+      .minicart-footer .btn-checkout { display: block; width: 100%; padding: 14px; background: #ff690c; color: #fff; text-align: center; border-radius: 8px; font-weight: 700; text-decoration: none; }
+      .minicart-item { display: flex; gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #eee; }
+      .minicart-item img { width: 60px; height: 80px; object-fit: cover; border-radius: 4px; }
+      .minicart-item-info { flex: 1; }
+      .minicart-item-title { font-weight: 700; font-size: 14px; color: #2b293a; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .minicart-item-price { font-size: 13px; color: #ff690c; font-weight: 700; }
+      .minicart-item-qty { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+      .minicart-item-qty button { background: #eee; border: none; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; }
+      .minicart-item-remove { color: #b42318; font-size: 12px; border: none; background: none; cursor: pointer; text-decoration: underline; margin-top: 8px; }
+      html[data-magma-theme="dark"] #magma-minicart-drawer { background: #1a1a24; }
+      html[data-magma-theme="dark"] .minicart-header h3, html[data-magma-theme="dark"] .minicart-footer .total, html[data-magma-theme="dark"] .minicart-item-title { color: #fff; }
+      html[data-magma-theme="dark"] .minicart-header, html[data-magma-theme="dark"] .minicart-footer, html[data-magma-theme="dark"] .minicart-item { border-color: #333; }
+      html[data-magma-theme="dark"] .minicart-footer { background: #25252f; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // 1. WhatsApp Floating Button
+  function injectWhatsApp() {
+    if (document.getElementById('magma-whatsapp-btn')) return;
+    var a = document.createElement('a');
+    a.id = 'magma-whatsapp-btn';
+    a.href = 'https://wa.me/242064280982';
+    a.target = '_blank';
+    a.title = 'Contactez-nous sur WhatsApp';
+    a.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>';
+    document.body.appendChild(a);
+  }
+
+  // 2. Mini-Cart
+  function injectMiniCart() {
+    if (document.getElementById('magma-minicart-overlay')) return;
+    var overlay = document.createElement('div');
+    overlay.id = 'magma-minicart-overlay';
+    var drawer = document.createElement('div');
+    drawer.id = 'magma-minicart-drawer';
+    drawer.innerHTML = 
+      '<div class="minicart-header">' +
+        '<h3>Mon Panier</h3>' +
+        '<button class="minicart-close">&times;</button>' +
+      '</div>' +
+      '<div class="minicart-body" id="minicart-items">' +
+        '<div style="text-align:center;color:#888;padding:40px 0;">Chargement...</div>' +
+      '</div>' +
+      '<div class="minicart-footer">' +
+        '<div class="total"><span>Total :</span> <span id="minicart-total">0 FCFA</span></div>' +
+        '<a href="/panier.html" class="btn-checkout">Passer la commande</a>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    document.body.appendChild(drawer);
+
+    var closeBtn = drawer.querySelector('.minicart-close');
+    var closeFn = function() {
+      overlay.classList.remove('open');
+      drawer.classList.remove('open');
+    };
+    closeBtn.addEventListener('click', closeFn);
+    overlay.addEventListener('click', closeFn);
+  }
+
+  window.openMiniCart = function() {
+    injectMiniCart();
+    document.getElementById('magma-minicart-overlay').classList.add('open');
+    document.getElementById('magma-minicart-drawer').classList.add('open');
+    refreshMiniCart();
+  };
+
+  function refreshMiniCart() {
+    var itemsContainer = document.getElementById('minicart-items');
+    var totalEl = document.getElementById('minicart-total');
+    if (!itemsContainer) return;
+    fetch('/api/cart').then(r => r.ok ? r.json() : []).then(items => {
+      if (items.length === 0) {
+        itemsContainer.innerHTML = '<div style="text-align:center;color:#888;padding:40px 0;">Votre panier est vide</div>';
+        totalEl.textContent = '0 FCFA';
+        return;
+      }
+      var html = '';
+      var total = 0;
+      items.forEach(item => {
+        var sub = Number(item.prix) * Number(item.qty);
+        total += sub;
+        var img = item.image || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 130"><rect width="100" height="130" fill="%23eee"/></svg>';
+        html += `
+          <div class="minicart-item">
+            <img src="${item.image || ''}" alt="">
+            <div class="minicart-item-info">
+              <div class="minicart-item-title">${item.titre || 'Livre'}</div>
+              <div class="minicart-item-price">${item.prix} FCFA</div>
+              <div class="minicart-item-qty">
+                <button onclick="updateCartItemQty(${item.id}, ${item.qty - 1})">-</button>
+                <span>${item.qty}</span>
+                <button onclick="updateCartItemQty(${item.id}, ${item.qty + 1})">+</button>
+              </div>
+              <button class="minicart-item-remove" onclick="updateCartItemQty(${item.id}, 0)">Supprimer</button>
+            </div>
+          </div>`;
+      });
+      itemsContainer.innerHTML = html;
+      totalEl.textContent = money(total);
+    }).catch(e => {
+      itemsContainer.innerHTML = '<div style="text-align:center;color:#b42318;padding:40px 0;">Erreur de chargement</div>';
+    });
+  }
+
+  window.updateCartItemQty = function(id, qty) {
+    if (qty <= 0) {
+      post('/api/cart/remove', { id: id }).then(() => {
+        refreshMiniCart();
+        if(window.updateCartBadge) window.updateCartBadge();
+        if(window.loadCartItems) window.loadCartItems();
+      });
+    } else {
+      post('/api/cart/update', { id: id, qty: qty }).then(() => {
+        refreshMiniCart();
+        if(window.updateCartBadge) window.updateCartBadge();
+        if(window.loadCartItems) window.loadCartItems();
+      });
+    }
+  };
+
+  // Intercept Add to Cart clicks globally
+  document.addEventListener('click', function(e) {
+    var addBtn = e.target.closest('.add-cart, .add');
+    if (addBtn && (addBtn.hasAttribute('data-bookid') || addBtn.hasAttribute('data-id'))) {
+      e.preventDefault();
+      e.stopPropagation();
+      var id = addBtn.getAttribute('data-bookid') || addBtn.getAttribute('data-id');
+      var orig = addBtn.textContent;
+      addBtn.disabled = true;
+      addBtn.textContent = '...';
+      post('/api/cart/add', { id: Number(id), qty: 1 }).then(() => {
+        addBtn.textContent = '✓ Ajouté';
+        if(window.updateCartBadge) window.updateCartBadge();
+        window.openMiniCart();
+        setTimeout(() => { addBtn.textContent = orig; addBtn.disabled = false; }, 1500);
+      }).catch(err => {
+        if (err && err.status === 401) {
+          window.location.href = '/login.html';
+        } else {
+          addBtn.textContent = 'Erreur';
+          setTimeout(() => { addBtn.textContent = orig; addBtn.disabled = false; }, 1500);
+        }
+      });
+    }
+    
+    // Intercept header cart icon click
+    var cartLink = e.target.closest('a[href="/panier.html"]');
+    if (cartLink && !cartLink.classList.contains('btn-checkout') && pageName() !== 'cart') {
+      e.preventDefault();
+      window.openMiniCart();
+    }
+  });
+
+  // 3. Quick View Modal
+  function injectQuickView() {
+    if (document.getElementById('magma-quickview-modal')) return;
+    var modal = document.createElement('div');
+    modal.id = 'magma-quickview-modal';
+    modal.innerHTML = `
+      <div class="quickview-content">
+        <button class="quickview-close">&times;</button>
+        <div class="quickview-img"><img id="qv-img" src="" alt=""></div>
+        <div class="quickview-info">
+          <div class="quickview-title" id="qv-title">...</div>
+          <div class="quickview-author" id="qv-author">...</div>
+          <div class="quickview-price" id="qv-price">...</div>
+          <div class="quickview-desc" id="qv-desc">...</div>
+          <div class="quickview-actions">
+            <button class="btn-orange add-cart" id="qv-addbtn" style="flex:1;padding:14px;border:none;border-radius:6px;font-size:16px;font-weight:700;cursor:pointer;">Ajouter au panier</button>
+            <button class="wishlist-btn" id="qv-wishbtn" style="width:50px;height:50px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:24px;color:#ff690c;"><span class="ico">🤍</span></button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.quickview-close').addEventListener('click', function() {
+      modal.classList.remove('open');
+    });
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.classList.remove('open');
+    });
+  }
+
+  window.openQuickView = function(e, id) {
+    e.preventDefault();
+    e.stopPropagation();
+    // injectQuickView();
+    var modal = document.getElementById('magma-quickview-modal');
+    modal.classList.add('open');
+    document.getElementById('qv-title').textContent = 'Chargement...';
+    get('/api/books/' + id).then(b => {
+      document.getElementById('qv-img').src = b.image || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 130"><rect width="100" height="130" fill="%23eee"/></svg>';
+      document.getElementById('qv-title').textContent = b.titre;
+      document.getElementById('qv-author').textContent = b.auteur || 'Auteur inconnu';
+      document.getElementById('qv-price').textContent = money(b.prix);
+      document.getElementById('qv-desc').innerHTML = (b.description || 'Aucune description').replace(/\n/g, '<br>');
+      
+      var addBtn = document.getElementById('qv-addbtn');
+      addBtn.setAttribute('data-bookid', b.id);
+      
+      var wishBtn = document.getElementById('qv-wishbtn');
+      wishBtn.setAttribute('data-id', b.id);
+      
+      fetch('/api/wishlist').then(r=>r.ok?r.json():[]).then(list=>{
+        const ids = list.map(item=>Number(item.id));
+        if(ids.includes(Number(b.id))) {
+          wishBtn.classList.add('active');
+          wishBtn.innerHTML = '<span class="ico">❤️</span>';
+        } else {
+          wishBtn.classList.remove('active');
+          wishBtn.innerHTML = '<span class="ico">🤍</span>';
+        }
+      }).catch(()=>{});
+    }).catch(e => {
+      document.getElementById('qv-title').textContent = 'Erreur';
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    injectWhatsApp();
+    injectMiniCart();
+    // injectQuickView();
+  });
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    injectWhatsApp();
+    injectMiniCart();
+    // injectQuickView();
+  }
 })();

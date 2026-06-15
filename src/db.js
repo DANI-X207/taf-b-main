@@ -161,10 +161,20 @@ async function initDb() {
   await addColumnIfMissing(db, "orders", "received_at", "TEXT");
   await addColumnIfMissing(db, "orders", "not_received_reported_at", "TEXT");
   await addColumnIfMissing(db, "orders", "not_received_reason", "TEXT DEFAULT ''");
+  await addColumnIfMissing(db, "orders", "admin_notes", "TEXT DEFAULT ''");
   await addColumnIfMissing(db, "users", "phone", "TEXT DEFAULT ''");
   await addColumnIfMissing(db, "users", "is_active", "INTEGER DEFAULT 1");
   await addColumnIfMissing(db, "users", "avatar", "TEXT DEFAULT ''");
   await addColumnIfMissing(db, "reviews", "user_id", "INTEGER REFERENCES users(id)");
+
+  // Table de configuration globale
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+  `);
 
   const bookCount = (await db.get("SELECT COUNT(*) as c FROM books")).c;
   if (bookCount === 0) {
@@ -273,12 +283,7 @@ async function initDb() {
     }
   }
   
-  try {
-    await db.exec("ALTER TABLE orders ADD COLUMN cancel_requested INTEGER DEFAULT 0");
-  } catch(e){}
-  try {
-    await db.exec("ALTER TABLE orders ADD COLUMN cancel_reason TEXT");
-  } catch(e){}
 }
+
 
 module.exports = { getDb, nowIso, initDb };

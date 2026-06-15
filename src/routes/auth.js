@@ -36,12 +36,7 @@ async function findResetUser(db, name, phone, email) {
   const enteredName = name.toLowerCase();
   const storedName = String(user.name || "").trim().toLowerCase();
   const nameMatches = storedName === enteredName || storedName.includes(enteredName) || enteredName.includes(storedName);
-  const storedPhone = normalizePhone(user.phone);
   if (nameMatches && (await phoneMatchesUser(db, user, phone))) return user;
-  if (!storedPhone) {
-    await db.run("UPDATE users SET name = ?, phone = ? WHERE id = ?", name, phone, user.id);
-    return { ...user, name, phone };
-  }
   return null;
 }
 

@@ -4,8 +4,193 @@
 <link rel="icon" type="image/png" href="/img/ICON-1.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>register</title>
+<title>Inscription — Librairie Magma</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2b293a 0%, #1d1c2a 100%);
+  }
+  .container {
+    display: flex;
+    width: min(900px, 96vw);
+    min-height: 520px;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.22);
+  }
+  .panel-left {
+    flex: 1;
+    position: relative;
+    background: #2b293a;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 36px 32px 40px;
+    min-width: 260px;
+  }
+  .logo-wrap {
+    width: 54px;
+    height: 54px;
+    margin-bottom: 32px;
+  }
+  .logo-wrap img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    border-radius: 50%;
+  }
+  .panel-left h2 {
+    font-size: 26px; font-weight: 900; color: #fff; line-height: 1.3; margin: 0 0 12px;
+  }
+  .panel-left p { color: rgba(255,255,255,.65); font-size: 14px; line-height: 1.6; margin: 0; }
+  .panel-left-bottom { border-top: 1px solid rgba(255,255,255,.15); padding-top: 20px; }
+  .panel-left-bottom p { color: rgba(255,255,255,.5); font-size: 12px; }
+  .panel-left-bottom a { color: #ff690c; text-decoration: none; font-weight: 700; }
+  .panel-right {
+    width: 400px; flex-shrink: 0; background: #fff; display: flex; flex-direction: column; justify-content: center; padding: 48px 40px;
+  }
+  .panel-right h1 { font-size: 26px; font-weight: 700; color: #2b293a; margin: 0 0 4px; }
+  .panel-right .subtitle { font-size: 14px; color: #999; margin: 0 0 28px; line-height: 1.5; }
+  
+  .error-msg { background: #fee4e2; color: #b42318; padding: 10px 14px; border-radius: 4px; margin: 0 0 14px; font-size: 13px; display: none; }
+  .field-group { margin-bottom: 16px; }
+  .field-group label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; }
+  .field-group input { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 3px; font-size: 14px; background: #f4f4f4; color: #333; outline: none; transition: border-color .2s; }
+  .field-group input:focus { border-color: #ff690c; background: #fff; }
+  
+  .btn-submit { width: 100%; padding: 13px; background: #ff690c; color: #fff; font-size: 15px; font-weight: 700; border: none; border-radius: 3px; cursor: pointer; letter-spacing: .3px; transition: background .2s; }
+  .btn-submit:hover { background: #e55a00; }
+  .btn-submit:disabled { background: #ffa870; cursor: not-allowed; }
+  
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
+    border-top-color: #fff; animation: spin 0.8s linear infinite;
+    vertical-align: middle; margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 620px) {
+    .panel-left { display: none; }
+    .panel-right { width: 100%; padding: 40px 28px; }
+  }
+</style>
 </head>
 <body>
+
+<div class="container">
+  <div class="panel-left">
+    <div>
+      <div class="logo-wrap">
+        <img src="/img/Logo version mobile.png" alt="Logo Magma">
+      </div>
+      <h2>Rejoignez<br>Librairie Magma</h2>
+      <p>Accédez à notre catalogue,<br>gérez votre panier et<br>suivez vos commandes.</p>
+    </div>
+    <div class="panel-left-bottom">
+      <p>Déjà un compte ? <a href="/login.html">Se connecter</a></p>
+    </div>
+  </div>
+
+  <div class="panel-right">
+    <h1>Créer un compte</h1>
+    <p class="subtitle">Remplissez le formulaire pour commencer</p>
+
+    <div id="error-msg" class="error-msg"></div>
+
+    <form id="register-form">
+      <div class="field-group">
+        <label for="name">Nom complet</label>
+        <input type="text" id="name" required autocomplete="name">
+      </div>
+      <div class="field-group">
+        <label for="email">Adresse email</label>
+        <input type="email" id="email" required autocomplete="email">
+      </div>
+      <div class="field-group">
+        <label for="phone">Numéro de téléphone <span style="color:#aaa;font-size:11px;">(XX-XXX-XXXX)</span></label>
+        <input type="tel" id="phone" required inputmode="numeric" autocomplete="tel" placeholder="XX-XXX-XXXX" maxlength="12">
+      </div>
+      <div class="field-group" style="margin-bottom:24px;">
+        <label for="password">Mot de passe <span style="color:#aaa;font-size:11px;">(min. 8, lettre+chiffre)</span></label>
+        <input type="password" id="password" required autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn-submit" id="reg-submit">Créer mon compte</button>
+    </form>
+    
+    <p style="margin-top:16px;font-size:12px;color:#aaa;text-align:center;">En créant un compte, vous acceptez nos conditions d'utilisation.</p>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function formatPhoneInput(rawDigits) {
+    var d = String(rawDigits || "").replace(/\\D+/g, "").slice(0, 9);
+    if (d.length <= 2) return d;
+    if (d.length <= 5) return d.slice(0, 2) + "-" + d.slice(2);
+    return d.slice(0, 2) + "-" + d.slice(2, 5) + "-" + d.slice(5, 9);
+  }
+  
+  const phoneInput = document.getElementById("phone");
+  phoneInput.addEventListener("input", function() {
+    var caretAtEnd = this.selectionStart === this.value.length;
+    var formatted = formatPhoneInput(this.value);
+    this.value = formatted;
+    if (caretAtEnd) {
+      try { this.setSelectionRange(formatted.length, formatted.length); } catch (e) {}
+    }
+  });
+  phoneInput.addEventListener("blur", function() {
+    this.value = formatPhoneInput(this.value);
+  });
+
+  const form = document.getElementById("register-form");
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const btn = document.getElementById("reg-submit");
+    const errEl = document.getElementById("error-msg");
+    
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = formatPhoneInput(phoneInput.value);
+    phoneInput.value = phone;
+    const pass = document.getElementById("password").value;
+
+    if (phone.replace(/\\D+/g, "").length !== 9) {
+      errEl.textContent = "Le numéro doit comporter 9 chiffres (ex: XX-XXX-XXXX).";
+      errEl.style.display = "block";
+      return;
+    }
+
+    errEl.style.display = "none";
+    btn.disabled = true;
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Création...';
+
+    fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name, email: email, phone: phone.replace(/\\D+/g, ""), password: pass })
+    })
+    .then(res => res.json().then(data => ({ok: res.ok, data: data})))
+    .then(res => {
+      if (!res.ok) throw new Error(res.data.error || "Erreur lors de l'inscription");
+      window.location.href = "/login.html?info=" + encodeURIComponent("Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.");
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.innerHTML = origHtml;
+      errEl.textContent = err.message;
+      errEl.style.display = "block";
+    });
+  });
+});
+</script>
+
 </body>
 </html>

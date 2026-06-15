@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <link rel="icon" type="image/png" href="/img/ICON-1.png">
@@ -38,10 +38,10 @@
   .modal-err.show{display:block}
 
   /* ===== HEADER (identique à Accueil-v2) ===== */
-  .topbar{background:#000000;color:#fff;height:56px;display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;z-index:100}
+  .topbar{background:#000000;color:#fff;height:66px;display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;z-index:100}
   .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;flex-shrink:0;text-decoration:none;color:inherit}
   .logo-mark{width:28px;height:28px;background:#ff690c;border-radius:6px;display:grid;place-items:center;font-size:14px}
-  .logo-img{height:42px;width:auto;display:block;object-fit:contain}
+  .logo-img{height:54px;width:auto;display:block;object-fit:contain;border-radius:50%;}
   .search{flex:0 1 300px;height:34px;background:#fff;border-radius:4px;display:flex;align-items:center;padding:0 12px;gap:8px}
   .search input{flex:1;border:0;outline:0;font-size:13px;color:#2d2d2d;background:transparent;min-width:0}
   .search button{background:#ff690c;color:#fff;border:0;height:26px;padding:0 12px;border-radius:3px;font-weight:600;cursor:pointer;font-size:12px;flex-shrink:0}
@@ -158,7 +158,7 @@
 <body>
 
 <header class="topbar">
-  <a href="/" class="logo" aria-label="Librairie Magma"><img class="logo-img" src="/img/Copilot_20260402_080209.png" alt="Librairie Magma"></a>
+  <a href="/" class="logo" aria-label="Librairie Magma"><img class="logo-img" src="/img/Logo version mobile.png" alt="Librairie Magma"></a>
   <form class="search" onsubmit="event.preventDefault();window.location='/catalogue.html?q='+encodeURIComponent(this.q.value)">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
     <input type="text" name="q" placeholder="Rechercher un article…">
@@ -166,7 +166,7 @@
   </form>
   <nav class="topbar-nav">
     <a href="/">Accueil</a>
-    <a href="/catalogue.html">Mon Magma</a>
+    <a href="/catalogue.html">Magma</a>
     <a href="/a-propos.html">à propos</a>
   </nav>
   <div class="icons">
@@ -182,10 +182,6 @@
     <a class="icon-btn" href="/mes-commandes.html" title="Mes commandes">
       <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>
       <span class="lbl">Commandes</span>
-    </a>
-    <a class="icon-btn" href="/parametres.html" title="Paramètres">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-      <span class="lbl">Paramètres</span>
     </a>
   </div>
 </header>
@@ -277,8 +273,8 @@
             <option value="">— Choisir une zone —</option>
           </select>
         </div>
-        <div class="field">
-          <label for="co-address">Adresse complète *</label>
+        <div class="field" style="display:none;">
+          <label for="co-address">Adresse précise *</label>
           <textarea id="co-address" name="delivery_address" maxlength="260" required placeholder="Quartier, rue, point de repère…"></textarea>
         </div>
       </div>
@@ -500,7 +496,7 @@ async function submitCheckout(ev){
   const err = document.getElementById('checkout-err');
   err.className = 'modal-err'; err.textContent = '';
   const zone = document.getElementById('co-zone').value;
-  const address = document.getElementById('co-address').value.trim();
+  const address = document.getElementById('co-address').value.trim() || zone;
   const payload = {
     customer_name: document.getElementById('co-name').value.trim(),
     customer_email: document.getElementById('co-email').value.trim(),
@@ -508,18 +504,8 @@ async function submitCheckout(ev){
     delivery_zone: zone,
     delivery_address: address
   };
-  if(!payload.delivery_zone){
+  if(!payload.customer_name || !payload.customer_email || !payload.customer_phone || !payload.delivery_zone || !payload.delivery_address){
     err.className = 'modal-err show'; err.textContent = 'Veuillez choisir une zone de livraison.';
-    document.getElementById('co-zone').focus();
-    return;
-  }
-  if(!payload.delivery_address){
-    err.className = 'modal-err show'; err.textContent = 'Veuillez indiquer votre adresse complète (quartier, rue, repère).';
-    document.getElementById('co-address').focus();
-    return;
-  }
-  if(!payload.customer_name || !payload.customer_email || !payload.customer_phone){
-    err.className = 'modal-err show'; err.textContent = 'Informations client incomplètes. Veuillez compléter votre profil.';
     return;
   }
   btn.disabled = true;

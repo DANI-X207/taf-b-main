@@ -1,7 +1,7 @@
 const express = require("express");
 const { getDb, nowIso } = require("../db");
 const { cleanText, cleanInt, cleanUrl, rowToBook } = require("../helpers");
-const { requireUser, requireAdmin } = require("../middleware");
+const { requireUser, requireAdmin, getCurrentUser } = require("../middleware");
 
 const router = express.Router();
 
@@ -122,13 +122,15 @@ router.get("/api/books/:id/reviews", async (req, res) => {
 
 router.get("/api/wishlist", requireUser(), async (req, res) => {
   try {
+    const user = await getCurrentUser(req);
+    if (!user) return res.status(401).json({ error: "Non autorisé" });
     const db = await getDb();
     const rows = await db.all(`
       SELECT books.* FROM books
       JOIN wishlists ON books.id = wishlists.book_id
       WHERE wishlists.user_id = ?
       ORDER BY wishlists.created_at DESC
-    `, req.session.user.id);
+    `, user.id);
     res.json(rows.map(rowToBook));
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -137,15 +139,17 @@ router.get("/api/wishlist", requireUser(), async (req, res) => {
 
 router.post("/api/wishlist/toggle", requireUser(), async (req, res) => {
   try {
+    const user = await getCurrentUser(req);
+    if (!user) return res.status(401).json({ error: "Non autorisé" });
     const bookId = parseInt(req.body.id);
     if (!bookId) return res.status(400).json({ error: "ID invalide" });
     const db = await getDb();
-    const exist = await db.get("SELECT id FROM wishlists WHERE user_id = ? AND book_id = ?", req.session.user.id, bookId);
+    const exist = await db.get("SELECT id FROM wishlists WHERE user_id = ? AND book_id = ?", user.id, bookId);
     if (exist) {
-      await db.run("DELETE FROM wishlists WHERE user_id = ? AND book_id = ?", req.session.user.id, bookId);
+      await db.run("DELETE FROM wishlists WHERE user_id = ? AND book_id = ?", user.id, bookId);
       res.json({ added: false });
     } else {
-      await db.run("INSERT INTO wishlists (user_id, book_id, created_at) VALUES (?, ?, ?)", req.session.user.id, bookId, nowIso());
+      await db.run("INSERT INTO wishlists (user_id, book_id, created_at) VALUES (?, ?, ?)", user.id, bookId, nowIso());
       res.json({ added: true });
     }
   } catch (e) {
